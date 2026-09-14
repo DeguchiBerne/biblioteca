@@ -1,1 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Coleção de Livros e Quadrinhos</title>
+    <!-- Tailwind CSS para estilização rápida e bonita -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold mb-2">Minha Biblioteca / Coleção</h1>
+            <p class="text-slate-400">Controle de livros e quadrinhos integrada ao Google Sheets</p>
+            
+            <!-- Campo de busca simples -->
+            <div class="mt-6 max-w-md mx-auto">
+                <input type="text" id="searchInput" placeholder="Pesquisar por título..." 
+                    class="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-indigo-500"
+                    onkeyup="filtrarColecao()">
+            </div>
+        </header>
 
+        <!-- Indicador de Carregamento -->
+        <div id="loading" class="text-center text-slate-400 py-12">Carregando coleção da planilha...</div>
+
+        <!-- Grade de Livros/Quadrinhos -->
+        <div id="gridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Os itens serão inseridos aqui via JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyxuYyKRAKJXYIGU-4tx8nq9i1C53QAKTgcvFzgMYhPgaf5UXEkPIGsfYmm1eGcq9oGiQ/exec';
+        let colecaoGlobal = [];
+
+        async function carregarDados() {
+            try {
+                const response = await fetch(API_URL);
+                colecaoGlobal = await response.json();
+                document.getElementById('loading').style.display = 'none';
+                renderizarCards(colecaoGlobal);
+            } catch (error) {
+                document.getElementById('loading').innerText = 'Erro ao carregar os dados da planilha.';
+                console.error(error);
+            }
+        }
+
+        function renderizarCards(dados) {
+            const container = document.getElementById('gridContainer');
+            container.innerHTML = '';
+
+            if (dados.length === 0) {
+                container.innerHTML = '<p class="col-span-3 text-center text-slate-500">Nenhum item encontrado.</p>';
+                return;
+            }
+
+            dados.forEach(item => {
+                // Adapte os nomes das colunas caso necessário de acordo com o seu cabeçalho
+                const titulo = item.titulo || 'Sem Título';
+                const formato = item.formato || 'Desconhecido';
+                const total = item.volumes_totais_ || item.volumes_tota || 'N/A';
+                const adquirido = item.sim_adquirido_ || item.sim_adquirido || '-';
+                const faltante = item.nao_faltante_ || item.nao_faltante || '-';
+                const obs = item.observacao || '';
+
+                const card = document.createElement('div');
+                card.className = 'bg-slate-800 border border-slate-700 rounded-lg p-5 flex flex-col justify-between shadow-md hover:border-indigo-500 transition-all';
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-semibold px-2 py-1 bg-indigo-900 text-indigo-200 rounded">${formato}</span>
+                            <span class="text-xs text-slate-400">Total: ${total}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">${titulo}</h3>
+                        <div class="text-sm space-y-1 text-slate-300 mb-3">
+                            <p><strong class="text-emerald-400">Possuo:</strong> ${adquiredText(adquirido)}</p>
+                            <p><strong class="text-rose-400">Falta:</strong> ${faltante}</p>
+                        </div>
+                    </div>
+                    ${obs ? `<p class="text-xs text-slate-400 italic border-t border-slate-700 pt-2 mt-2">Obs: ${obs}</p>` : ''}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function adquiredText(val) {
+            return (val === "" || val === null) ? "Nenhum" : val;
+        }
+
+        function filtrarColecao() {
+            const termo = document.getElementById('searchInput').value.toLowerCase();
+            const filtrados = colecaoGlobal.filter(item => {
+                const titulo = (item.titulo || '').toLowerCase();
+                return titulo.includes(termo);
+            });
+            renderizarCards(filtrados);
+        }
+
+        // Carrega os dados ao abrir a página
+        carregarDados();
+    </script>
+</body>
+</html>
