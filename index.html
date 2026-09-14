@@ -3,102 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Coleção de Livros e Quadrinhos</title>
-    <!-- Tailwind CSS para estilização rápida e bonita -->
+    <title>Minha Biblioteca de Quadrinhos e Livros</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 sm:p-6">
+    <div class="max-w-7xl mx-auto">
         <header class="mb-8 text-center">
-            <h1 class="text-3xl font-bold mb-2">Minha Biblioteca / Coleção</h1>
-            <p class="text-slate-400">Controle de livros e quadrinhos integrada ao Google Sheets</p>
+            <h1 class="text-3xl sm:text-4xl font-bold mb-2">📚 Minha Coleção</h1>
+            <p class="text-slate-400">Controle, visualização e estatísticas do acervo</p>
             
-            <!-- Campo de busca simples -->
-            <div class="mt-6 max-w-md mx-auto">
+            <!-- Painel de Indicadores (Estatísticas) -->
+            <div id="stats" class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6 max-w-3xl mx-auto">
+                <div class="bg-slate-800 border border-slate-700 p-4 rounded-lg shadow">
+                    <p class="text-xs text-slate-400 uppercase tracking-wider">Total de Obras</p>
+                    <p id="stat-total" class="text-2xl font-bold text-indigo-400">0</p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 p-4 rounded-lg shadow">
+                    <p class="text-xs text-slate-400 uppercase tracking-wider">Investimento Total</p>
+                    <p id="stat-custo" class="text-2xl font-bold text-emerald-400">R$ 0,00</p>
+                </div>
+                <div class="bg-slate-800 border border-slate-700 p-4 rounded-lg shadow">
+                    <p class="text-xs text-slate-400 uppercase tracking-wider">Formatos Diferentes</p>
+                    <p id="stat-formatos" class="text-2xl font-bold text-amber-400">0</p>
+                </div>
+            </div>
+
+            <!-- Barra de Pesquisa e Filtros -->
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6">
                 <input type="text" id="searchInput" placeholder="Pesquisar por título..." 
-                    class="w-full px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-indigo-500"
-                    onkeyup="filtrarColecao()">
+                    class="w-full sm:w-96 px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <!-- Botões de Filtros por Formato -->
+            <div id="formatFilters" class="flex flex-wrap justify-center gap-2 mt-4">
+                <button class="px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white filter-btn active" data-format="todos">Todos</button>
+                <!-- Os outros botões entram aqui dinamicamente -->
             </div>
         </header>
 
         <!-- Indicador de Carregamento -->
-        <div id="loading" class="text-center text-slate-400 py-12">Carregando coleção da planilha...</div>
+        <div id="loading" class="text-center text-slate-400 py-20 text-lg">Carregando sua coleção da planilha...</div>
 
         <!-- Grade de Livros/Quadrinhos -->
-        <div id="gridContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Os itens serão inseridos aqui via JavaScript -->
-        </div>
+        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </div>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyxuYyKRAKJXYIGU-4tx8nq9i1C53QAKTgcvFzgMYhPgaf5UXEkPIGsfYmm1eGcq9oGiQ/exec';
-        let colecaoGlobal = [];
+        // COLE SUA URL DO GOOGLE APPS SCRIPT ABAIXO ENTRE AS ASPAS:
+        const API_URL = 'COLOQUE_AQUI_A_URL_DO_WEB_APP';
+
+        let colecao = [];
+        let formatoSelecionado = 'todos';
 
         async function carregarDados() {
             try {
                 const response = await fetch(API_URL);
-                colecaoGlobal = await response.json();
+                if (!response.ok) throw new Error('Erro na resposta do servidor');
+                colecao = await response.json();
+                
                 document.getElementById('loading').style.display = 'none';
-                renderizarCards(colecaoGlobal);
+                
+                atualizarEstatisticas(colecao);
+                criarBotoesFiltro(colecao);
+                renderizarCards(colecao);
             } catch (error) {
-                document.getElementById('loading').innerText = 'Erro ao carregar os dados da planilha.';
+                document.getElementById('loading').innerText = 'Erro ao carregar os dados. Verifique a URL do Web App e as permissões de acesso.';
                 console.error(error);
             }
         }
 
+        function converterParaNumero(valorStr) {
+            if (!valorStr) return 0;
+            // Remove "R$", espaços, troca vírgula por ponto
+            let limpo = valorStr.toString().replace('R$', '').replace(/\s/g, '').replace('.', '').replace(',', '.');
+            let num = parseFloat(limpo);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function atualizarEstatisticas(dados) {
+            const totalObras = dados.length;
+            
+            let custoTotal = 0;
+            const formatosSet = new Set();
+
+            dados.forEach(item => {
+                custoTotal += converterParaNumero(item.custo);
+                if (item.formato) formatosSet.add(item.formato.trim().toLowerCase());
+            });
+
+            document.getElementById('stat-total').innerText = totalObras;
+            document.getElementById('stat-custo').innerText = custoTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('stat-formatos').innerText = formatosSet.size;
+        }
+
+        function criarBotoesFiltro(dados) {
+            const container = document.getElementById('formatFilters');
+            const formatosMap = {};
+
+            // Conta itens por formato
+            dados.forEach(item => {
+                let fmt = item.formato ? item.formato.trim() : 'Indefinido';
+                formatosMap[fmt] = (formatosMap[fmt] || 0) + 1;
+            });
+
+            // Mantém o botão "Todos" e adiciona os dinâmicos
+            let htmlBotoes = `<button onclick="filtrarPorFormato('todos', this)" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow">Todos (${dados.length})</button>`;
+            
+            for (let [fmt, qtd] of Object.entries(formatosMap)) {
+                htmlBotoes += `<button onclick="filtrarPorFormato('${fmt}', this)" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all">${fmt} (${qtd})</button>`;
+            }
+            container.innerHTML = htmlBotoes;
+        }
+
+        function filtrarPorFormato(formato, btn) {
+            formatoSelecionado = formato;
+            
+            // Atualiza estilo visual dos botões
+            document.querySelectorAll('#formatFilters button').forEach(b => {
+                b.className = "px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all";
+            });
+            btn.className = "px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow";
+
+            aplicarFiltros();
+        }
+
+        function aplicarFiltros() {
+            const termoBusca = document.getElementById('searchInput').value.toLowerCase();
+
+            const filtrados = colecao.filter(item => {
+                const titulo = item.titulo ? item.titulo.toLowerCase() : '';
+                const formatoItem = item.formato ? item.formato.trim() : 'Indefinido';
+                
+                const matchTexto = titulo.includes(termoBusca);
+                const matchFormato = formatoSelecionado === 'todos' || formatoItem.toLowerCase() === formatoSelecionado.toLowerCase();
+
+                return matchTexto && matchFormato;
+            });
+
+            renderizarCards(filtrados);
+        }
+
         function renderizarCards(dados) {
-            const container = document.getElementById('gridContainer');
-            container.innerHTML = '';
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
 
             if (dados.length === 0) {
-                container.innerHTML = '<p class="col-span-3 text-center text-slate-500">Nenhum item encontrado.</p>';
+                grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-10">Nenhum item encontrado.</p>`;
                 return;
             }
 
             dados.forEach(item => {
-                // Adapte os nomes das colunas caso necessário de acordo com o seu cabeçalho
                 const titulo = item.titulo || 'Sem Título';
                 const formato = item.formato || 'Desconhecido';
-                const total = item.volumes_totais_ || item.volumes_tota || 'N/A';
-                const adquirido = item.sim_adquirido_ || item.sim_adquirido || '-';
-                const faltante = item.nao_faltante_ || item.nao_faltante || '-';
-                const obs = item.observacao || '';
+                const adquirido = item.sim_adquirido || '-';
+                const faltante = item.nao_faltante || 'Nenhum';
+                const custo = item.custo || '-';
+                // Pega o link da coluna capa (caso exista na planilha)
+                const capa = item.capa && item.capa.startsWith('http') ? item.capa : 'https://via.placeholder.com/300x450/1e293b/94a3b8?text=Sem+Capa';
 
                 const card = document.createElement('div');
-                card.className = 'bg-slate-800 border border-slate-700 rounded-lg p-5 flex flex-col justify-between shadow-md hover:border-indigo-500 transition-all';
+                card.className = 'bg-slate-800 border border-slate-700 rounded-lg overflow-hidden flex flex-col justify-between shadow-lg hover:border-slate-500 transition-all';
                 
                 card.innerHTML = `
                     <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs font-semibold px-2 py-1 bg-indigo-900 text-indigo-200 rounded">${formato}</span>
-                            <span class="text-xs text-slate-400">Total: ${total}</span>
+                        <!-- Capa do Livro/Quadrinho -->
+                        <div class="h-64 w-full bg-slate-900 overflow-hidden relative">
+                            <img src="${capa}" alt="${titulo}" class="w-full h-full object-cover object-center" onerror="this.src='https://via.placeholder.com/300x450/1e293b/94a3b8?text=Erro+Na+Capa'">
+                            <span class="absolute top-2 left-2 text-[10px] font-bold px-2 py-1 bg-slate-900/80 backdrop-blur text-indigo-200 rounded uppercase tracking-wide border border-slate-700">${formato}</span>
+                            <span class="absolute top-2 right-2 text-xs font-bold px-2 py-1 bg-emerald-900/90 text-emerald-200 rounded border border-emerald-700">${custo}</span>
                         </div>
-                        <h3 class="text-lg font-bold text-white mb-2">${titulo}</h3>
-                        <div class="text-sm space-y-1 text-slate-300 mb-3">
-                            <p><strong class="text-emerald-400">Possuo:</strong> ${adquiredText(adquirido)}</p>
-                            <p><strong class="text-rose-400">Falta:</strong> ${faltante}</p>
+                        <div class="p-4">
+                            <h2 class="font-bold text-base text-white line-clamp-2" title="${titulo}">${titulo}</h2>
                         </div>
                     </div>
-                    ${obs ? `<p class="text-xs text-slate-400 italic border-t border-slate-700 pt-2 mt-2">Obs: ${obs}</p>` : ''}
+                    <div class="px-4 pb-4 pt-2 text-xs text-slate-300 space-y-1 border-t border-slate-700/60 bg-slate-800/50">
+                        <p><strong class="text-slate-400">Possuo:</strong> ${adquirido}</p>
+                        <p><strong class="text-slate-400">Falta:</strong> ${faltante}</p>
+                    </div>
                 `;
-                container.appendChild(card);
+                grid.appendChild(card);
             });
         }
 
-        function adquiredText(val) {
-            return (val === "" || val === null) ? "Nenhum" : val;
-        }
+        // Evento da barra de pesquisa em tempo real
+        document.getElementById('searchInput').addEventListener('input', aplicarFiltros);
 
-        function filtrarColecao() {
-            const termo = document.getElementById('searchInput').value.toLowerCase();
-            const filtrados = colecaoGlobal.filter(item => {
-                const titulo = (item.titulo || '').toLowerCase();
-                return titulo.includes(termo);
-            });
-            renderizarCards(filtrados);
-        }
-
-        // Carrega os dados ao abrir a página
         carregarDados();
     </script>
 </body>
