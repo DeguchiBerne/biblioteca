@@ -29,7 +29,7 @@
                 </div>
             </div>
 
-            <!-- Barra de Pesquisa e Filtros -->
+            <!-- Barra de Pesquisa -->
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6">
                 <input type="text" id="searchInput" placeholder="Pesquisar por título..." 
                     class="w-full sm:w-96 px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-indigo-500">
@@ -37,8 +37,7 @@
 
             <!-- Botões de Filtros por Formato -->
             <div id="formatFilters" class="flex flex-wrap justify-center gap-2 mt-4">
-                <button class="px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white filter-btn active" data-format="todos">Todos</button>
-                <!-- Os outros botões entram aqui dinamicamente -->
+                <!-- Preenchido via JavaScript -->
             </div>
         </header>
 
@@ -51,7 +50,7 @@
 
     <script>
         // COLE SUA URL DO GOOGLE APPS SCRIPT ABAIXO ENTRE AS ASPAS:
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyxuYyKRAKJXYIGU-4tx8nq9i1C53QAKTgcvFzgMYhPgaf5UXEkPIGsfYmm1eGcq9oGiQ/exec';
+        const API_URL = 'COLOQUE_AQUI_A_URL_DO_WEB_APP';
 
         let colecao = [];
         let formatoSelecionado = 'todos';
@@ -60,7 +59,10 @@
             try {
                 const response = await fetch(API_URL);
                 if (!response.ok) throw new Error('Erro na resposta do servidor');
-                colecao = await response.json();
+                let dadosBrutos = await response.json();
+                
+                // Filtra para garantir que ignora linhas totalmente vazias ou sem título
+                colecao = dadosBrutos.filter(item => item.titulo && item.titulo.toString().trim() !== "");
                 
                 document.getElementById('loading').style.display = 'none';
                 
@@ -75,21 +77,40 @@
 
         function converterParaNumero(valorStr) {
             if (!valorStr) return 0;
-            // Remove "R$", espaços, troca vírgula por ponto
-            let limpo = valorStr.toString().replace('R$', '').replace(/\s/g, '').replace('.', '').replace(',', '.');
-            let num = parseFloat(limpo);
+            let str = valorStr.toString().trim();
+            
+            // Se já for número puro
+            if (!isNaN(str)) return parseFloat(str);
+
+            // Remove "R$", letras e espaços
+            str = str.replace(/[^\d.,]/g, '');
+            
+            if (str === '') return 0;
+
+            // Se o formato usa ponto para milhar e vírgula para decimal (ex: 1.250,50)
+            if (str.includes(',') && str.includes('.')) {
+                if (str.indexOf('.') < str.indexOf(',')) {
+                    str = str.replace(/\./g, '').replace(',', '.');
+                } else {
+                    str = str.replace(/,/g, '');
+                }
+            } else if (str.includes(',')) {
+                // Apenas vírgula (ex: 45,90)
+                str = str.replace(',', '.');
+            }
+
+            let num = parseFloat(str);
             return isNaN(num) ? 0 : num;
         }
 
         function atualizarEstatisticas(dados) {
             const totalObras = dados.length;
-            
             let custoTotal = 0;
             const formatosSet = new Set();
 
             dados.forEach(item => {
                 custoTotal += converterParaNumero(item.custo);
-                if (item.formato) formatosSet.add(item.formato.trim().toLowerCase());
+                if (item.formato) formatosSet.add(item.formato.toString().trim().toLowerCase());
             });
 
             document.getElementById('stat-total').innerText = totalObras;
@@ -101,29 +122,38 @@
             const container = document.getElementById('formatFilters');
             const formatosMap = {};
 
-            // Conta itens por formato
             dados.forEach(item => {
-                let fmt = item.formato ? item.formato.trim() : 'Indefinido';
+                let fmt = item.formato ? item.formato.toString().trim() : 'Indefinido';
                 formatosMap[fmt] = (formatosMap[fmt] || 0) + 1;
             });
 
-            // Mantém o botão "Todos" e adiciona os dinâmicos
-            let htmlBotoes = `<button onclick="filtrarPorFormato('todos', this)" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow">Todos (${dados.length})</button>`;
+            let htmlBotoes = `<button data-format="todos" class="filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow">Todos (${dados.length})</button>`;
             
             for (let [fmt, qtd] of Object.entries(formatosMap)) {
-                htmlBotoes += `<button onclick="filtrarPorFormato('${fmt}', this)" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all">${fmt} (${qtd})</button>`;
+                htmlBotoes += `<button data-format="${fmt}" class="filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all">${fmt} (${qtd})</button>`;
             }
             container.innerHTML = htmlBotoes;
+
+            // Adiciona evento de clique limpo em todos os botões gerados
+            document.querySelectorAll('.filtro-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const formatoEscolhido = e.currentTarget.getAttribute('data-format');
+                    selecionarFiltro(formatoEscolhido);
+                });
+            });
         }
 
-        function filtrarPorFormato(formato, btn) {
+        function selecionarFiltro(formato) {
             formatoSelecionado = formato;
-            
-            // Atualiza estilo visual dos botões
-            document.querySelectorAll('#formatFilters button').forEach(b => {
-                b.className = "px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all";
+
+            // Atualiza visual dos botões
+            document.querySelectorAll('.filtro-btn').forEach(b => {
+                if (b.getAttribute('data-format') === formato) {
+                    b.className = "filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow";
+                } else {
+                    b.className = "filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all";
+                }
             });
-            btn.className = "px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow";
 
             aplicarFiltros();
         }
@@ -132,8 +162,8 @@
             const termoBusca = document.getElementById('searchInput').value.toLowerCase();
 
             const filtrados = colecao.filter(item => {
-                const titulo = item.titulo ? item.titulo.toLowerCase() : '';
-                const formatoItem = item.formato ? item.formato.trim() : 'Indefinido';
+                const titulo = item.titulo ? item.titulo.toString().toLowerCase() : '';
+                const formatoItem = item.formato ? item.formato.toString().trim() : 'Indefinido';
                 
                 const matchTexto = titulo.includes(termoBusca);
                 const matchFormato = formatoSelecionado === 'todos' || formatoItem.toLowerCase() === formatoSelecionado.toLowerCase();
@@ -159,15 +189,13 @@
                 const adquirido = item.sim_adquirido || '-';
                 const faltante = item.nao_faltante || 'Nenhum';
                 const custo = item.custo || '-';
-                // Pega o link da coluna capa (caso exista na planilha)
-                const capa = item.capa && item.capa.startsWith('http') ? item.capa : 'https://via.placeholder.com/300x450/1e293b/94a3b8?text=Sem+Capa';
+                const capa = item.capa && item.capa.toString().startsWith('http') ? item.capa : 'https://via.placeholder.com/300x450/1e293b/94a3b8?text=Sem+Capa';
 
                 const card = document.createElement('div');
                 card.className = 'bg-slate-800 border border-slate-700 rounded-lg overflow-hidden flex flex-col justify-between shadow-lg hover:border-slate-500 transition-all';
                 
                 card.innerHTML = `
                     <div>
-                        <!-- Capa do Livro/Quadrinho -->
                         <div class="h-64 w-full bg-slate-900 overflow-hidden relative">
                             <img src="${capa}" alt="${titulo}" class="w-full h-full object-cover object-center" onerror="this.src='https://via.placeholder.com/300x450/1e293b/94a3b8?text=Erro+Na+Capa'">
                             <span class="absolute top-2 left-2 text-[10px] font-bold px-2 py-1 bg-slate-900/80 backdrop-blur text-indigo-200 rounded uppercase tracking-wide border border-slate-700">${formato}</span>
