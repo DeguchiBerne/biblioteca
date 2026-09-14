@@ -7,14 +7,19 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-4 sm:p-6">
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 sm:p-6 pb-24">
     <div class="max-w-7xl mx-auto">
-        <header class="mb-8 text-center">
+        <header class="mb-8 text-center relative">
+            <!-- Botão de Adicionar Item -->
+            <button onclick="abrirModalAdd()" class="absolute right-0 top-0 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center gap-2">
+                ➕ Adicionar Obra
+            </button>
+
             <h1 class="text-3xl sm:text-4xl font-bold mb-2">📚 Minha Coleção</h1>
             <p class="text-slate-400">Controle, visualização e estatísticas do acervo</p>
             
-            <!-- Painel de Indicadores (Estatísticas) -->
-            <div id="stats" class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6 max-w-3xl mx-auto">
+            <!-- Painel de Indicadores (Apenas 2 colunas agora) -->
+            <div id="stats" class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6 max-w-xl mx-auto">
                 <div class="bg-slate-800 border border-slate-700 p-4 rounded-lg shadow">
                     <p class="text-xs text-slate-400 uppercase tracking-wider">Total de Obras</p>
                     <p id="stat-total" class="text-2xl font-bold text-indigo-400">0</p>
@@ -22,10 +27,6 @@
                 <div class="bg-slate-800 border border-slate-700 p-4 rounded-lg shadow">
                     <p class="text-xs text-slate-400 uppercase tracking-wider">Investimento Total</p>
                     <p id="stat-custo" class="text-2xl font-bold text-emerald-400">R$ 0,00</p>
-                </div>
-                <div class="bg-slate-800 border border-slate-700 p-4 rounded-lg shadow">
-                    <p class="text-xs text-slate-400 uppercase tracking-wider">Formatos Diferentes</p>
-                    <p id="stat-formatos" class="text-2xl font-bold text-amber-400">0</p>
                 </div>
             </div>
 
@@ -36,9 +37,7 @@
             </div>
 
             <!-- Botões de Filtros por Formato -->
-            <div id="formatFilters" class="flex flex-wrap justify-center gap-2 mt-4">
-                <!-- Preenchido via JavaScript -->
-            </div>
+            <div id="formatFilters" class="flex flex-wrap justify-center gap-2 mt-4"></div>
         </header>
 
         <!-- Indicador de Carregamento -->
@@ -48,15 +47,56 @@
         <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </div>
 
-    <!-- Modal de Detalhes do Item -->
+    <!-- Modal de Detalhes -->
     <div id="modalDetalhes" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full overflow-hidden shadow-2xl relative animate-in fade-in zoom-in duration-200">
-            <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-900/60 rounded-full p-2 transition">
-                ✕
-            </button>
-            <div id="modalConteudo" class="p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-                <!-- Conteúdo injetado via JS -->
-            </div>
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full overflow-hidden shadow-2xl relative">
+            <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-900/60 rounded-full p-2 transition">✕</button>
+            <div id="modalConteudo" class="p-6 space-y-4 max-h-[90vh] overflow-y-auto"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Adicionar Novo Item -->
+    <div id="modalAdd" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full overflow-hidden shadow-2xl relative p-6">
+            <button onclick="fecharModalAdd()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-900/60 rounded-full p-2 transition">✕</button>
+            <h2 class="text-xl font-bold text-white mb-4">Adicionar Nova Obra</h2>
+            
+            <form id="formAdd" onsubmit="enviarNovoItem(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Título *</label>
+                    <input type="text" id="add-titulo" required class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Formato</label>
+                    <input type="text" id="add-formato" placeholder="Ex: Livro, Formatinho..." class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Possuo</label>
+                        <input type="text" id="add-sim_adquirido" class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Falta</label>
+                        <input type="text" id="add-nao_faltante" class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Custo (R$)</label>
+                    <input type="text" id="add-custo" placeholder="Ex: 29,90" class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Link da Capa (Opcional)</label>
+                    <input type="url" id="add-capa" placeholder="https://..." class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Senha de Autorização *</label>
+                    <input type="password" id="add-senha" required placeholder="Digite sua senha" class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+                
+                <p id="msgRetorno" class="text-xs text-center mt-2"></p>
+
+                <button type="submit" id="btnSalvar" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded font-semibold text-sm transition">Salvar na Planilha</button>
+            </form>
         </div>
     </div>
 
@@ -107,11 +147,9 @@
             return isNaN(num) ? 0 : num;
         }
 
-        // Formata qualquer valor numérico ou texto para o padrão "R$ 0,00"
         function formatarMoeda(valorStr) {
             const num = converterParaNumero(valorStr);
             if (num === 0 && (!valorStr || valorStr.toString().trim() === '' || valorStr.toString().includes('0'))) {
-                // Se for realmente zero ou vazio na planilha
                 return valorStr ? valorStr : 'R$ 0,00';
             }
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -120,16 +158,13 @@
         function atualizarEstatisticas(dados) {
             const totalObras = dados.length;
             let custoTotal = 0;
-            const formatosSet = new Set();
 
             dados.forEach(item => {
                 custoTotal += converterParaNumero(item.custo);
-                if (item.formato) formatosSet.add(item.formato.toString().trim().toLowerCase());
             });
 
             document.getElementById('stat-total').innerText = totalObras;
             document.getElementById('stat-custo').innerText = custoTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            document.getElementById('stat-formatos').innerText = formatosSet.size;
         }
 
         function criarBotoesFiltro(dados) {
@@ -195,11 +230,9 @@
                 return;
             }
 
-            dados.forEach((item, index) => {
+            dados.forEach((item) => {
                 const titulo = item.titulo || 'Sem Título';
                 const formato = item.formato || 'Desconhecido';
-                const adquirido = item.sim_adquirido || '-';
-                const faltante = item.nao_faltante || 'Nenhum';
                 const custoFormatado = formatarMoeda(item.custo);
                 
                 let capa = item.capa && item.capa.toString().startsWith('http') 
@@ -209,7 +242,6 @@
                 const card = document.createElement('div');
                 card.className = 'bg-slate-800 border border-slate-700 rounded-lg overflow-hidden flex flex-col justify-between shadow-lg hover:border-indigo-500 cursor-pointer transition-all transform hover:-translate-y-1';
                 
-                // Ao clicar no card, abre a janela de detalhes completos
                 card.addEventListener('click', () => abrirModal(item, capa, custoFormatado));
 
                 card.innerHTML = `
@@ -223,21 +255,18 @@
                             <h2 class="font-bold text-base text-white line-clamp-2" title="${titulo}">${titulo}</h2>
                         </div>
                     </div>
-                    <div class="px-4 pb-4 pt-2 text-xs text-slate-300 space-y-1 border-t border-slate-700/60 bg-slate-800/50">
-                        <p><strong class="text-slate-400">Possuo:</strong> ${adquirido}</p>
-                        <p><strong class="text-slate-400">Falta:</strong> ${faltante}</p>
+                    <div class="px-4 pb-3 pt-2 text-xs text-slate-400 border-t border-slate-700/60 bg-slate-800/50 text-center">
+                        <span>Clique para ver detalhes</span>
                     </div>
                 `;
                 grid.appendChild(card);
             });
         }
 
-        // Função para abrir o Modal com todas as informações da linha da tabela
         function abrirModal(item, capaUrl, custoFmt) {
             const modal = document.getElementById('modalDetalhes');
             const conteudo = document.getElementById('modalConteudo');
 
-            // Monta dinamicamente todas as colunas/propriedades que vieram da planilha
             let detalhesHtml = `
                 <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
                     <img src="${capaUrl}" class="w-36 h-52 object-cover rounded-lg border border-slate-700 shadow" alt="Capa">
@@ -250,11 +279,9 @@
                 <div class="border-t border-slate-700 pt-4 mt-4 space-y-3 text-sm">
             `;
 
-            // Varre todas as chaves da planilha para exibir caso existam preenchidas
             for (let [chave, valor] of Object.entries(item)) {
-                if (['titulo', 'formato', 'custo', 'capa'].includes(chave)) continue; // Já exibidas acima
+                if (['titulo', 'formato', 'custo', 'capa'].includes(chave)) continue;
                 if (valor !== undefined && valor !== null && valor !== '') {
-                    // Formata a chave para ficar bonita (ex: sim_adquirido vira Sim Adquirido)
                     let nomeChave = chave.replace(/_/g, ' ').toUpperCase();
                     detalhesHtml += `
                         <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/50 flex justify-between">
@@ -274,9 +301,66 @@
             document.getElementById('modalDetalhes').classList.add('hidden');
         }
 
-        // Fecha o modal ao clicar fora da caixa de conteúdo
+        function abrirModalAdd() {
+            document.getElementById('modalAdd').classList.remove('hidden');
+            document.getElementById('msgRetorno').innerText = '';
+            document.getElementById('formAdd').reset();
+        }
+
+        function fecharModalAdd() {
+            document.getElementById('modalAdd').classList.add('hidden');
+        }
+
+        async function enviarNovoItem(event) {
+            event.preventDefault();
+            const btn = document.getElementById('btnSalvar');
+            const msg = document.getElementById('msgRetorno');
+            
+            btn.innerText = 'Salvando...';
+            btn.disabled = true;
+
+            const payload = {
+                senha: document.getElementById('add-senha').value,
+                titulo: document.getElementById('add-titulo').value,
+                formato: document.getElementById('add-formato').value,
+                sim_adquirido: document.getElementById('add-sim_adquirido').value,
+                nao_faltante: document.getElementById('add-nao_faltante').value,
+                custo: document.getElementById('add-custo').value,
+                capa: document.getElementById('add-capa').value
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                const resultado = await response.json();
+
+                if (resultado.sucesso) {
+                    msg.className = "text-xs text-center mt-2 text-emerald-400 font-bold";
+                    msg.innerText = resultado.mensagem;
+                    setTimeout(() => {
+                        fecharModalAdd();
+                        carregarDados(); // Recarrega os dados atualizados da planilha
+                    }, 1500);
+                } else {
+                    msg.className = "text-xs text-center mt-2 text-rose-400 font-bold";
+                    msg.innerText = resultado.mensagem;
+                }
+            } catch (err) {
+                msg.className = "text-xs text-center mt-2 text-rose-400 font-bold";
+                msg.innerText = "Erro de conexão ao salvar.";
+            } finally {
+                btn.innerText = 'Salvar na Planilha';
+                btn.disabled = false;
+            }
+        }
+
         document.getElementById('modalDetalhes').addEventListener('click', (e) => {
             if (e.target.id === 'modalDetalhes') fecharModal();
+        });
+        document.getElementById('modalAdd').addEventListener('click', (e) => {
+            if (e.target.id === 'modalAdd') fecharModalAdd();
         });
 
         document.getElementById('searchInput').addEventListener('input', aplicarFiltros);
