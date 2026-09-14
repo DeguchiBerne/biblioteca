@@ -10,7 +10,7 @@
 <body class="bg-slate-900 text-slate-100 min-h-screen p-3 sm:p-6 pb-28 relative bg-cover bg-center bg-fixed" style="background-image: linear-gradient(rgba(15, 23, 42, 0.93), rgba(15, 23, 42, 0.93)), url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/bibliofundo.jpg');">
     <div class="max-w-7xl mx-auto">
         <header class="mb-6 text-center flex flex-col items-center">
-            <!-- Botão de Adicionar Item (Otimizado para mobile no topo) -->
+            <!-- Botão de Adicionar Item -->
             <div class="w-full flex justify-end sm:absolute sm:right-0 sm:top-0 mb-4 sm:mb-0">
                 <button onclick="abrirModalAdd()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold shadow transition flex items-center justify-center gap-2">
                     ➕ Adicionar Obra
@@ -38,7 +38,7 @@
                     class="w-full px-4 py-2.5 rounded-lg bg-slate-800/90 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
             </div>
 
-            <!-- Botões de Filtros por Formato (Com rolagem horizontal no celular) -->
+            <!-- Botões de Filtros por Formato -->
             <div id="formatFilters" class="flex overflow-x-auto w-full max-w-3xl gap-2 mt-4 pb-2 px-1 justify-start sm:justify-center scrollbar-none"></div>
         </header>
 
@@ -49,7 +49,7 @@
         <div id="grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"></div>
     </div>
 
-    <!-- Rodapé Padrão com Informações -->
+    <!-- Rodapé -->
     <footer class="absolute bottom-0 left-0 w-full text-center py-3 bg-slate-950/90 border-t border-slate-800 text-[11px] sm:text-xs text-slate-400 space-y-0.5 px-2">
         <p>Criado por <strong class="text-slate-300">Bernardo Deguchi</strong> • 2026</p>
         <p class="text-slate-500">Acervo sincronizado via Google Sheets • Todos os direitos reservados</p>
@@ -92,10 +92,17 @@
                     <label class="block text-xs text-slate-400 mb-1">Custo (R$)</label>
                     <input type="text" id="add-custo" placeholder="Ex: 29,90" class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
                 </div>
+                
+                <!-- Campo de Upload de Arquivo para o Google Drive -->
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Link da Capa (Opcional)</label>
+                    <label class="block text-xs text-slate-400 mb-1">Enviar Foto da Capa (Arquivo)</label>
+                    <input type="file" id="add-arquivo-capa" accept="image/*" class="w-full px-3 py-1.5 rounded bg-slate-900 border border-slate-700 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">Ou Link da Capa (Opcional)</label>
                     <input type="url" id="add-capa" placeholder="https://..." class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
                 </div>
+
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Senha de Autorização *</label>
                     <input type="password" id="add-senha" required placeholder="Digite sua senha" class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
@@ -324,8 +331,25 @@
             const btn = document.getElementById('btnSalvar');
             const msg = document.getElementById('msgRetorno');
             
-            btn.innerText = 'Salvando...';
+            btn.innerText = 'Processando imagem e salvando...';
             btn.disabled = true;
+
+            const arquivoInput = document.getElementById('add-arquivo-capa');
+            let imagemBase64 = "";
+            let nomeArquivo = "";
+            let tipoMime = "";
+
+            if (arquivoInput.files && arquivoInput.files[0]) {
+                const file = arquivoInput.files[0];
+                nomeArquivo = file.name;
+                tipoMime = file.type;
+                
+                imagemBase64 = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+                    reader.readAsDataURL(file);
+                });
+            }
 
             const payload = {
                 senha: document.getElementById('add-senha').value,
@@ -334,7 +358,10 @@
                 sim_adquirido: document.getElementById('add-sim_adquirido').value,
                 nao_faltante: document.getElementById('add-nao_faltante').value,
                 custo: document.getElementById('add-custo').value,
-                capa: document.getElementById('add-capa').value
+                capa: document.getElementById('add-capa').value,
+                imagemBase64: imagemBase64,
+                nomeArquivo: nomeArquivo,
+                tipoMime: tipoMime
             };
 
             try {
