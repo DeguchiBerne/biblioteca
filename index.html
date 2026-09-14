@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Biblioteca de Quadrinhos e Livros</title>
+    <title>Biblioteca do Berne</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-4 sm:p-6 pb-24 relative bg-cover bg-center" style="background-image: linear-gradient(rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.92)), url('https://github.com/DeguchiBerne/biblioteca/blob/main/bibliofundo.jpg');">
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4 sm:p-6 pb-28 relative bg-cover bg-center bg-fixed" style="background-image: linear-gradient(rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.92)), url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/bibliofundo.jpg');">
     <div class="max-w-7xl mx-auto">
         <header class="mb-8 text-center relative">
             <!-- Botão de Adicionar Item -->
@@ -15,16 +15,16 @@
                 ➕ Adicionar Obra
             </button>
 
-            <h1 class="text-3xl sm:text-4xl font-bold mb-2">📚 Minha Coleção</h1>
-            <p class="text-slate-400">Controle, visualização e estatísticas do acervo</p>
+            <h1 class="text-3xl sm:text-4xl font-bold mb-2">📚 Biblioteca do Berne</h1>
+            <p class="text-slate-400">Controle, visualização e estatísticas do acervo pessoal</p>
             
-            <!-- Painel de Indicadores (Apenas 2 colunas agora) -->
+            <!-- Painel de Indicadores -->
             <div id="stats" class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6 max-w-xl mx-auto">
-                <div class="bg-slate-800 border border-slate-700 p-4 rounded-lg shadow">
+                <div class="bg-slate-800/80 backdrop-blur border border-slate-700 p-4 rounded-lg shadow">
                     <p class="text-xs text-slate-400 uppercase tracking-wider">Total de Obras</p>
                     <p id="stat-total" class="text-2xl font-bold text-indigo-400">0</p>
                 </div>
-                <div class="bg-slate-800 border border-slate-700 p-4 rounded-lg shadow">
+                <div class="bg-slate-800/80 backdrop-blur border border-slate-700 p-4 rounded-lg shadow">
                     <p class="text-xs text-slate-400 uppercase tracking-wider">Investimento Total</p>
                     <p id="stat-custo" class="text-2xl font-bold text-emerald-400">R$ 0,00</p>
                 </div>
@@ -33,7 +33,7 @@
             <!-- Barra de Pesquisa -->
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6">
                 <input type="text" id="searchInput" placeholder="Pesquisar por título..." 
-                    class="w-full sm:w-96 px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-indigo-500">
+                    class="w-full sm:w-96 px-4 py-2 rounded-lg bg-slate-800/90 border border-slate-700 text-white focus:outline-none focus:border-indigo-500">
             </div>
 
             <!-- Botões de Filtros por Formato -->
@@ -46,6 +46,12 @@
         <!-- Grade de Livros/Quadrinhos -->
         <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </div>
+
+    <!-- Rodapé Padrão com Informações -->
+    <footer class="absolute bottom-0 left-0 w-full text-center py-4 bg-slate-950/80 border-t border-slate-800 text-xs text-slate-400 space-y-1">
+        <p>Criado por <strong class="text-slate-300">Bernardo Deguchi</strong> • 2026</p>
+        <p class="text-slate-500">Acervo sincronizado via Google Sheets • Todos os direitos reservados</p>
+    </footer>
 
     <!-- Modal de Detalhes -->
     <div id="modalDetalhes" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
@@ -179,7 +185,7 @@
             let htmlBotoes = `<button data-format="todos" class="filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow">Todos (${dados.length})</button>`;
             
             for (let [fmt, qtd] of Object.entries(formatosMap)) {
-                htmlBotoes += `<button data-format="${fmt}" class="filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all">${fmt} (${qtd})</button>`;
+                htmlBotoes += `<button data-format="${fmt}" class="filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all">${fmt} (${qtd})</button>`;
             }
             container.innerHTML = htmlBotoes;
 
@@ -198,7 +204,7 @@
                 if (b.getAttribute('data-format') === formato) {
                     b.className = "filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow";
                 } else {
-                    b.className = "filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all";
+                    b.className = "filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all";
                 }
             });
 
@@ -240,7 +246,7 @@
                     : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca+do+Berne';
 
                 const card = document.createElement('div');
-                card.className = 'bg-slate-800 border border-slate-700 rounded-lg overflow-hidden flex flex-col justify-between shadow-lg hover:border-indigo-500 cursor-pointer transition-all transform hover:-translate-y-1';
+                card.className = 'bg-slate-800/80 backdrop-blur border border-slate-700 rounded-lg overflow-hidden flex flex-col justify-between shadow-lg hover:border-indigo-500 cursor-pointer transition-all transform hover:-translate-y-1';
                 
                 card.addEventListener('click', () => abrirModal(item, capa, custoFormatado));
 
@@ -341,7 +347,7 @@
                     msg.innerText = resultado.mensagem;
                     setTimeout(() => {
                         fecharModalAdd();
-                        carregarDados(); // Recarrega os dados atualizados da planilha
+                        carregarDados();
                     }, 1500);
                 } else {
                     msg.className = "text-xs text-center mt-2 text-rose-400 font-bold";
