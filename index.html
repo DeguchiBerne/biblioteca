@@ -49,7 +49,6 @@
     </div>
 
     <script>
-        // URL configurada automaticamente
         const API_URL = 'https://script.google.com/macros/s/AKfycbyxuYyKRAKJXYIGU-4tx8nq9i1C53QAKTgcvFzgMYhPgaf5UXEkPIGsfYmm1eGcq9oGiQ/exec';
 
         let colecao = [];
@@ -180,7 +179,11 @@
                 const adquirido = item.sim_adquirido || '-';
                 const faltante = item.nao_faltante || 'Nenhum';
                 const custo = item.custo || '-';
-                const capa = item.capa && item.capa.toString().startsWith('http') ? item.capa : 'https://via.placeholder.com/300x450/1e293b/94a3b8?text=Sem+Capa';
+                
+                // Se a capa não existir ou não começar com http, gera uma capa padrão personalizada "Biblioteca do Berne"
+                let capa = item.capa && item.capa.toString().startsWith('http') 
+                    ? item.capa 
+                    : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca+do+Berne';
 
                 const card = document.createElement('div');
                 card.className = 'bg-slate-800 border border-slate-700 rounded-lg overflow-hidden flex flex-col justify-between shadow-lg hover:border-slate-500 transition-all';
@@ -188,7 +191,7 @@
                 card.innerHTML = `
                     <div>
                         <div class="h-64 w-full bg-slate-900 overflow-hidden relative">
-                            <img src="${capa}" alt="${titulo}" class="w-full h-full object-cover object-center" onerror="this.src='https://via.placeholder.com/300x450/1e293b/94a3b8?text=Erro+Na+Capa'">
+                            <img src="${capa}" alt="${titulo}" class="w-full h-full object-cover object-center" onerror="this.src='https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca+do+Berne'">
                             <span class="absolute top-2 left-2 text-[10px] font-bold px-2 py-1 bg-slate-900/80 backdrop-blur text-indigo-200 rounded uppercase tracking-wide border border-slate-700">${formato}</span>
                             <span class="absolute top-2 right-2 text-xs font-bold px-2 py-1 bg-emerald-900/90 text-emerald-200 rounded border border-emerald-700">${custo}</span>
                         </div>
