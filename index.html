@@ -7,67 +7,69 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-4 sm:p-6 pb-28 relative bg-cover bg-center bg-fixed" style="background-image: linear-gradient(rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.92)), url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/bibliofundo.jpg');">
+<body class="bg-slate-900 text-slate-100 min-h-screen p-3 sm:p-6 pb-28 relative bg-cover bg-center bg-fixed" style="background-image: linear-gradient(rgba(15, 23, 42, 0.93), rgba(15, 23, 42, 0.93)), url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/bibliofundo.jpg');">
     <div class="max-w-7xl mx-auto">
-        <header class="mb-8 text-center relative">
-            <!-- Botão de Adicionar Item -->
-            <button onclick="abrirModalAdd()" class="absolute right-0 top-0 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center gap-2">
-                ➕ Adicionar Obra
-            </button>
+        <header class="mb-6 text-center flex flex-col items-center">
+            <!-- Botão de Adicionar Item (Otimizado para mobile no topo) -->
+            <div class="w-full flex justify-end sm:absolute sm:right-0 sm:top-0 mb-4 sm:mb-0">
+                <button onclick="abrirModalAdd()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold shadow transition flex items-center justify-center gap-2">
+                    ➕ Adicionar Obra
+                </button>
+            </div>
 
-            <h1 class="text-3xl sm:text-4xl font-bold mb-2">📚 Biblioteca do Berne</h1>
-            <p class="text-slate-400">Controle, visualização e estatísticas do acervo pessoal</p>
+            <h1 class="text-2xl sm:text-4xl font-bold mb-1">📚 Biblioteca do Berne</h1>
+            <p class="text-xs sm:text-sm text-slate-400">Controle, visualização e estatísticas do acervo pessoal</p>
             
             <!-- Painel de Indicadores -->
-            <div id="stats" class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6 max-w-xl mx-auto">
-                <div class="bg-slate-800/80 backdrop-blur border border-slate-700 p-4 rounded-lg shadow">
-                    <p class="text-xs text-slate-400 uppercase tracking-wider">Total de Obras</p>
-                    <p id="stat-total" class="text-2xl font-bold text-indigo-400">0</p>
+            <div id="stats" class="grid grid-cols-2 gap-3 my-5 w-full max-w-md">
+                <div class="bg-slate-800/80 backdrop-blur border border-slate-700 p-3 rounded-lg shadow text-center">
+                    <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Total de Obras</p>
+                    <p id="stat-total" class="text-xl sm:text-2xl font-bold text-indigo-400">0</p>
                 </div>
-                <div class="bg-slate-800/80 backdrop-blur border border-slate-700 p-4 rounded-lg shadow">
-                    <p class="text-xs text-slate-400 uppercase tracking-wider">Investimento Total</p>
-                    <p id="stat-custo" class="text-2xl font-bold text-emerald-400">R$ 0,00</p>
+                <div class="bg-slate-800/80 backdrop-blur border border-slate-700 p-3 rounded-lg shadow text-center">
+                    <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Investimento</p>
+                    <p id="stat-custo" class="text-lg sm:text-2xl font-bold text-emerald-400 truncate">R$ 0,00</p>
                 </div>
             </div>
 
             <!-- Barra de Pesquisa -->
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6">
+            <div class="w-full max-w-md mt-2">
                 <input type="text" id="searchInput" placeholder="Pesquisar por título..." 
-                    class="w-full sm:w-96 px-4 py-2 rounded-lg bg-slate-800/90 border border-slate-700 text-white focus:outline-none focus:border-indigo-500">
+                    class="w-full px-4 py-2.5 rounded-lg bg-slate-800/90 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
             </div>
 
-            <!-- Botões de Filtros por Formato -->
-            <div id="formatFilters" class="flex flex-wrap justify-center gap-2 mt-4"></div>
+            <!-- Botões de Filtros por Formato (Com rolagem horizontal no celular) -->
+            <div id="formatFilters" class="flex overflow-x-auto w-full max-w-3xl gap-2 mt-4 pb-2 px-1 justify-start sm:justify-center scrollbar-none"></div>
         </header>
 
         <!-- Indicador de Carregamento -->
-        <div id="loading" class="text-center text-slate-400 py-20 text-lg">Carregando sua coleção da planilha...</div>
+        <div id="loading" class="text-center text-slate-400 py-20 text-base">Carregando sua coleção da planilha...</div>
 
         <!-- Grade de Livros/Quadrinhos -->
-        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        <div id="grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"></div>
     </div>
 
     <!-- Rodapé Padrão com Informações -->
-    <footer class="absolute bottom-0 left-0 w-full text-center py-4 bg-slate-950/80 border-t border-slate-800 text-xs text-slate-400 space-y-1">
+    <footer class="absolute bottom-0 left-0 w-full text-center py-3 bg-slate-950/90 border-t border-slate-800 text-[11px] sm:text-xs text-slate-400 space-y-0.5 px-2">
         <p>Criado por <strong class="text-slate-300">Bernardo Deguchi</strong> • 2026</p>
         <p class="text-slate-500">Acervo sincronizado via Google Sheets • Todos os direitos reservados</p>
     </footer>
 
     <!-- Modal de Detalhes -->
-    <div id="modalDetalhes" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div id="modalDetalhes" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full overflow-hidden shadow-2xl relative">
-            <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-900/60 rounded-full p-2 transition">✕</button>
-            <div id="modalConteudo" class="p-6 space-y-4 max-h-[90vh] overflow-y-auto"></div>
+            <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-900/80 rounded-full p-2 transition z-10">✕</button>
+            <div id="modalConteudo" class="p-4 sm:p-6 space-y-4 max-h-[85vh] overflow-y-auto"></div>
         </div>
     </div>
 
     <!-- Modal de Adicionar Novo Item -->
-    <div id="modalAdd" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full overflow-hidden shadow-2xl relative p-6">
-            <button onclick="fecharModalAdd()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-900/60 rounded-full p-2 transition">✕</button>
-            <h2 class="text-xl font-bold text-white mb-4">Adicionar Nova Obra</h2>
+    <div id="modalAdd" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full overflow-hidden shadow-2xl relative p-4 sm:p-6">
+            <button onclick="fecharModalAdd()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-900/80 rounded-full p-2 transition">✕</button>
+            <h2 class="text-lg sm:text-xl font-bold text-white mb-3">Adicionar Nova Obra</h2>
             
-            <form id="formAdd" onsubmit="enviarNovoItem(event)" class="space-y-3">
+            <form id="formAdd" onsubmit="enviarNovoItem(event)" class="space-y-2.5 max-h-[80vh] overflow-y-auto pr-1">
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Título *</label>
                     <input type="text" id="add-titulo" required class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
@@ -101,7 +103,7 @@
                 
                 <p id="msgRetorno" class="text-xs text-center mt-2"></p>
 
-                <button type="submit" id="btnSalvar" class="w-full mt-4 bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded font-semibold text-sm transition">Salvar na Planilha</button>
+                <button type="submit" id="btnSalvar" class="w-full mt-3 bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded font-semibold text-sm transition">Salvar na Planilha</button>
             </form>
         </div>
     </div>
@@ -182,10 +184,10 @@
                 formatosMap[fmt] = (formatosMap[fmt] || 0) + 1;
             });
 
-            let htmlBotoes = `<button data-format="todos" class="filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow">Todos (${dados.length})</button>`;
+            let htmlBotoes = `<button data-format="todos" class="filtro-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow">Todos (${dados.length})</button>`;
             
             for (let [fmt, qtd] of Object.entries(formatosMap)) {
-                htmlBotoes += `<button data-format="${fmt}" class="filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all">${fmt} (${qtd})</button>`;
+                htmlBotoes += `<button data-format="${fmt}" class="filtro-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all">${fmt} (${qtd})</button>`;
             }
             container.innerHTML = htmlBotoes;
 
@@ -202,9 +204,9 @@
 
             document.querySelectorAll('.filtro-btn').forEach(b => {
                 if (b.getAttribute('data-format') === formato) {
-                    b.className = "filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow";
+                    b.className = "filtro-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow";
                 } else {
-                    b.className = "filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all";
+                    b.className = "filtro-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all";
                 }
             });
 
@@ -232,7 +234,7 @@
             grid.innerHTML = '';
 
             if (dados.length === 0) {
-                grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-10">Nenhum item encontrado.</p>`;
+                grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-10 text-sm">Nenhum item encontrado.</p>`;
                 return;
             }
 
@@ -246,23 +248,23 @@
                     : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca+do+Berne';
 
                 const card = document.createElement('div');
-                card.className = 'bg-slate-800/80 backdrop-blur border border-slate-700 rounded-lg overflow-hidden flex flex-col justify-between shadow-lg hover:border-indigo-500 cursor-pointer transition-all transform hover:-translate-y-1';
+                card.className = 'bg-slate-800/80 backdrop-blur border border-slate-700 rounded-lg overflow-hidden flex flex-col justify-between shadow-lg hover:border-indigo-500 cursor-pointer transition-all';
                 
                 card.addEventListener('click', () => abrirModal(item, capa, custoFormatado));
 
                 card.innerHTML = `
                     <div>
-                        <div class="h-64 w-full bg-slate-900 overflow-hidden relative">
+                        <div class="h-48 sm:h-64 w-full bg-slate-900 overflow-hidden relative">
                             <img src="${capa}" alt="${titulo}" class="w-full h-full object-cover object-center" onerror="this.src='https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca+do+Berne'">
-                            <span class="absolute top-2 left-2 text-[10px] font-bold px-2 py-1 bg-slate-900/80 backdrop-blur text-indigo-200 rounded uppercase tracking-wide border border-slate-700">${formato}</span>
-                            <span class="absolute top-2 right-2 text-xs font-bold px-2 py-1 bg-emerald-900/90 text-emerald-200 rounded border border-emerald-700">${custoFormatado}</span>
+                            <span class="absolute top-1.5 left-1.5 text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 bg-slate-900/80 backdrop-blur text-indigo-200 rounded uppercase tracking-wide border border-slate-700">${formato}</span>
+                            <span class="absolute top-1.5 right-1.5 text-[10px] sm:text-xs font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 bg-emerald-900/90 text-emerald-200 rounded border border-emerald-700">${custoFormatado}</span>
                         </div>
-                        <div class="p-4">
-                            <h2 class="font-bold text-base text-white line-clamp-2" title="${titulo}">${titulo}</h2>
+                        <div class="p-3 sm:p-4">
+                            <h2 class="font-bold text-xs sm:text-base text-white line-clamp-2" title="${titulo}">${titulo}</h2>
                         </div>
                     </div>
-                    <div class="px-4 pb-3 pt-2 text-xs text-slate-400 border-t border-slate-700/60 bg-slate-800/50 text-center">
-                        <span>Clique para ver detalhes</span>
+                    <div class="px-3 pb-2.5 pt-1.5 text-[10px] sm:text-xs text-slate-400 border-t border-slate-700/60 bg-slate-800/50 text-center">
+                        <span>Ver detalhes</span>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -275,14 +277,14 @@
 
             let detalhesHtml = `
                 <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
-                    <img src="${capaUrl}" class="w-36 h-52 object-cover rounded-lg border border-slate-700 shadow" alt="Capa">
-                    <div class="space-y-2 flex-1">
-                        <span class="text-xs font-bold px-2 py-1 bg-indigo-900 text-indigo-200 rounded">${item.formato || 'Geral'}</span>
-                        <h2 class="text-xl font-bold text-white">${item.titulo || 'Sem Título'}</h2>
-                        <p class="text-emerald-400 font-bold text-lg">${custoFmt}</p>
+                    <img src="${capaUrl}" class="w-28 h-40 sm:w-36 sm:h-52 object-cover rounded-lg border border-slate-700 shadow shrink-0" alt="Capa">
+                    <div class="space-y-1.5 sm:space-y-2 flex-1 text-center sm:text-left">
+                        <span class="text-xs font-bold px-2 py-1 bg-indigo-900 text-indigo-200 rounded inline-block">${item.formato || 'Geral'}</span>
+                        <h2 class="text-lg sm:text-xl font-bold text-white">${item.titulo || 'Sem Título'}</h2>
+                        <p class="text-emerald-400 font-bold text-base sm:text-lg">${custoFmt}</p>
                     </div>
                 </div>
-                <div class="border-t border-slate-700 pt-4 mt-4 space-y-3 text-sm">
+                <div class="border-t border-slate-700 pt-3 mt-3 space-y-2 text-xs sm:text-sm">
             `;
 
             for (let [chave, valor] of Object.entries(item)) {
@@ -290,9 +292,9 @@
                 if (valor !== undefined && valor !== null && valor !== '') {
                     let nomeChave = chave.replace(/_/g, ' ').toUpperCase();
                     detalhesHtml += `
-                        <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/50 flex justify-between">
-                            <strong class="text-slate-400 text-xs">${nomeChave}:</strong>
-                            <span class="text-slate-200 text-right font-medium">${valor}</span>
+                        <div class="bg-slate-900/50 p-2.5 rounded-lg border border-slate-700/50 flex flex-col sm:flex-row justify-between gap-1">
+                            <strong class="text-slate-400 text-[10px] sm:text-xs uppercase">${nomeChave}:</strong>
+                            <span class="text-slate-200 text-left sm:text-right font-medium">${valor}</span>
                         </div>
                     `;
                 }
