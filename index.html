@@ -49,8 +49,8 @@
     </div>
 
     <script>
-        // COLE SUA URL DO GOOGLE APPS SCRIPT ABAIXO ENTRE AS ASPAS:
-        const API_URL = 'COLOQUE_AQUI_A_URL_DO_WEB_APP';
+        // URL configurada automaticamente
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyxuYyKRAKJXYIGU-4tx8nq9i1C53QAKTgcvFzgMYhPgaf5UXEkPIGsfYmm1eGcq9oGiQ/exec';
 
         let colecao = [];
         let formatoSelecionado = 'todos';
@@ -61,7 +61,6 @@
                 if (!response.ok) throw new Error('Erro na resposta do servidor');
                 let dadosBrutos = await response.json();
                 
-                // Filtra para garantir que ignora linhas totalmente vazias ou sem título
                 colecao = dadosBrutos.filter(item => item.titulo && item.titulo.toString().trim() !== "");
                 
                 document.getElementById('loading').style.display = 'none';
@@ -70,7 +69,7 @@
                 criarBotoesFiltro(colecao);
                 renderizarCards(colecao);
             } catch (error) {
-                document.getElementById('loading').innerText = 'Erro ao carregar os dados. Verifique a URL do Web App e as permissões de acesso.';
+                document.getElementById('loading').innerText = 'Erro ao carregar os dados. Verifique a conexão.';
                 console.error(error);
             }
         }
@@ -78,16 +77,11 @@
         function converterParaNumero(valorStr) {
             if (!valorStr) return 0;
             let str = valorStr.toString().trim();
-            
-            // Se já for número puro
             if (!isNaN(str)) return parseFloat(str);
 
-            // Remove "R$", letras e espaços
             str = str.replace(/[^\d.,]/g, '');
-            
             if (str === '') return 0;
 
-            // Se o formato usa ponto para milhar e vírgula para decimal (ex: 1.250,50)
             if (str.includes(',') && str.includes('.')) {
                 if (str.indexOf('.') < str.indexOf(',')) {
                     str = str.replace(/\./g, '').replace(',', '.');
@@ -95,7 +89,6 @@
                     str = str.replace(/,/g, '');
                 }
             } else if (str.includes(',')) {
-                // Apenas vírgula (ex: 45,90)
                 str = str.replace(',', '.');
             }
 
@@ -134,7 +127,6 @@
             }
             container.innerHTML = htmlBotoes;
 
-            // Adiciona evento de clique limpo em todos os botões gerados
             document.querySelectorAll('.filtro-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const formatoEscolhido = e.currentTarget.getAttribute('data-format');
@@ -146,7 +138,6 @@
         function selecionarFiltro(formato) {
             formatoSelecionado = formato;
 
-            // Atualiza visual dos botões
             document.querySelectorAll('.filtro-btn').forEach(b => {
                 if (b.getAttribute('data-format') === formato) {
                     b.className = "filtro-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow";
@@ -214,7 +205,6 @@
             });
         }
 
-        // Evento da barra de pesquisa em tempo real
         document.getElementById('searchInput').addEventListener('input', aplicarFiltros);
 
         carregarDados();
