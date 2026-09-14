@@ -48,6 +48,18 @@
         <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </div>
 
+    <!-- Modal de Detalhes do Item -->
+    <div id="modalDetalhes" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full overflow-hidden shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-900/60 rounded-full p-2 transition">
+                ✕
+            </button>
+            <div id="modalConteudo" class="p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+                <!-- Conteúdo injetado via JS -->
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbyxuYyKRAKJXYIGU-4tx8nq9i1C53QAKTgcvFzgMYhPgaf5UXEkPIGsfYmm1eGcq9oGiQ/exec';
 
@@ -93,6 +105,16 @@
 
             let num = parseFloat(str);
             return isNaN(num) ? 0 : num;
+        }
+
+        // Formata qualquer valor numérico ou texto para o padrão "R$ 0,00"
+        function formatarMoeda(valorStr) {
+            const num = converterParaNumero(valorStr);
+            if (num === 0 && (!valorStr || valorStr.toString().trim() === '' || valorStr.toString().includes('0'))) {
+                // Se for realmente zero ou vazio na planilha
+                return valorStr ? valorStr : 'R$ 0,00';
+            }
+            return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
         function atualizarEstatisticas(dados) {
@@ -173,27 +195,29 @@
                 return;
             }
 
-            dados.forEach(item => {
+            dados.forEach((item, index) => {
                 const titulo = item.titulo || 'Sem Título';
                 const formato = item.formato || 'Desconhecido';
                 const adquirido = item.sim_adquirido || '-';
                 const faltante = item.nao_faltante || 'Nenhum';
-                const custo = item.custo || '-';
+                const custoFormatado = formatarMoeda(item.custo);
                 
-                // Se a capa não existir ou não começar com http, gera uma capa padrão personalizada "Biblioteca do Berne"
                 let capa = item.capa && item.capa.toString().startsWith('http') 
                     ? item.capa 
                     : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca+do+Berne';
 
                 const card = document.createElement('div');
-                card.className = 'bg-slate-800 border border-slate-700 rounded-lg overflow-hidden flex flex-col justify-between shadow-lg hover:border-slate-500 transition-all';
+                card.className = 'bg-slate-800 border border-slate-700 rounded-lg overflow-hidden flex flex-col justify-between shadow-lg hover:border-indigo-500 cursor-pointer transition-all transform hover:-translate-y-1';
                 
+                // Ao clicar no card, abre a janela de detalhes completos
+                card.addEventListener('click', () => abrirModal(item, capa, custoFormatado));
+
                 card.innerHTML = `
                     <div>
                         <div class="h-64 w-full bg-slate-900 overflow-hidden relative">
                             <img src="${capa}" alt="${titulo}" class="w-full h-full object-cover object-center" onerror="this.src='https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca+do+Berne'">
                             <span class="absolute top-2 left-2 text-[10px] font-bold px-2 py-1 bg-slate-900/80 backdrop-blur text-indigo-200 rounded uppercase tracking-wide border border-slate-700">${formato}</span>
-                            <span class="absolute top-2 right-2 text-xs font-bold px-2 py-1 bg-emerald-900/90 text-emerald-200 rounded border border-emerald-700">${custo}</span>
+                            <span class="absolute top-2 right-2 text-xs font-bold px-2 py-1 bg-emerald-900/90 text-emerald-200 rounded border border-emerald-700">${custoFormatado}</span>
                         </div>
                         <div class="p-4">
                             <h2 class="font-bold text-base text-white line-clamp-2" title="${titulo}">${titulo}</h2>
@@ -207,6 +231,53 @@
                 grid.appendChild(card);
             });
         }
+
+        // Função para abrir o Modal com todas as informações da linha da tabela
+        function abrirModal(item, capaUrl, custoFmt) {
+            const modal = document.getElementById('modalDetalhes');
+            const conteudo = document.getElementById('modalConteudo');
+
+            // Monta dinamicamente todas as colunas/propriedades que vieram da planilha
+            let detalhesHtml = `
+                <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+                    <img src="${capaUrl}" class="w-36 h-52 object-cover rounded-lg border border-slate-700 shadow" alt="Capa">
+                    <div class="space-y-2 flex-1">
+                        <span class="text-xs font-bold px-2 py-1 bg-indigo-900 text-indigo-200 rounded">${item.formato || 'Geral'}</span>
+                        <h2 class="text-xl font-bold text-white">${item.titulo || 'Sem Título'}</h2>
+                        <p class="text-emerald-400 font-bold text-lg">${custoFmt}</p>
+                    </div>
+                </div>
+                <div class="border-t border-slate-700 pt-4 mt-4 space-y-3 text-sm">
+            `;
+
+            // Varre todas as chaves da planilha para exibir caso existam preenchidas
+            for (let [chave, valor] of Object.entries(item)) {
+                if (['titulo', 'formato', 'custo', 'capa'].includes(chave)) continue; // Já exibidas acima
+                if (valor !== undefined && valor !== null && valor !== '') {
+                    // Formata a chave para ficar bonita (ex: sim_adquirido vira Sim Adquirido)
+                    let nomeChave = chave.replace(/_/g, ' ').toUpperCase();
+                    detalhesHtml += `
+                        <div class="bg-slate-900/50 p-3 rounded-lg border border-slate-700/50 flex justify-between">
+                            <strong class="text-slate-400 text-xs">${nomeChave}:</strong>
+                            <span class="text-slate-200 text-right font-medium">${valor}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            detalhesHtml += `</div>`;
+            conteudo.innerHTML = detalhesHtml;
+            modal.classList.remove('hidden');
+        }
+
+        function fecharModal() {
+            document.getElementById('modalDetalhes').classList.add('hidden');
+        }
+
+        // Fecha o modal ao clicar fora da caixa de conteúdo
+        document.getElementById('modalDetalhes').addEventListener('click', (e) => {
+            if (e.target.id === 'modalDetalhes') fecharModal();
+        });
 
         document.getElementById('searchInput').addEventListener('input', aplicarFiltros);
 
