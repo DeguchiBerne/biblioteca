@@ -17,7 +17,7 @@
             background-attachment: fixed;
         }
 
-        /* Container Centralizado da Estante (Madeira mais clara) */
+        /* Container Centralizado da Estante (Madeira clara) */
         .shelf-container-wrapper {
             max-width: 860px;
             margin: 0 auto;
@@ -30,7 +30,7 @@
             border-radius: 10px;
             border: 4px solid #5a3214;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(0,0,0,0.5);
-            filter: brightness(1.15); /* Aumenta a luminosidade geral da estante */
+            filter: brightness(1.15);
         }
 
         /* Prateleira Individual */
@@ -71,7 +71,7 @@
             opacity: 0.95;
         }
 
-        /* Lombada do Livro com Cores e Textura de Couro Mais Claras e Vivas */
+        /* Lombada do Livro com Textura de Couro e Cores Variadas por Cima */
         .book-spine {
             cursor: pointer;
             border-radius: 3px 3px 0 0;
@@ -84,10 +84,10 @@
             position: relative;
             flex-shrink: 0;
             user-select: none;
-            background-blend-mode: normal; /* Deixa a cor base mais realçada sem escurecer demais */
+            background-blend-mode: multiply; /* Mistura a cor base com a textura de couro mantendo a variação */
             background-image: 
                 url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/textura-couro.jpg'),
-                radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25) 0%, rgba(0,0,0,0.15) 100%);
+                radial-gradient(circle at 50% 30%, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.2) 100%);
             background-size: cover;
             background-position: center;
         }
@@ -230,14 +230,15 @@
         let colecao = [];
         let formatoSelecionado = ''; 
 
-        /* Cores base mais claras e vibrantes para as lombadas */
+        /* Paletas coloridas variadas aplicadas sobre a textura de couro */
         const paletasLombadas = [
-            { baseColor: '#5c3317', modalBg: '#1c1008', modalBorder: '#5c3317', capaFundo: '#241306', destaqueCor: 'text-amber-400' }, 
-            { baseColor: '#7a2517', modalBg: '#1c0c07', modalBorder: '#612115', capaFundo: '#2b0e07', destaqueCor: 'text-rose-400' }, 
-            { baseColor: '#1d4a33', modalBg: '#09140f', modalBorder: '#1f4a35', capaFundo: '#0d1c15', destaqueCor: 'text-emerald-400' }, 
-            { baseColor: '#4f2373', modalBg: '#160821', modalBorder: '#4a2366', capaFundo: '#1f0d2c', destaqueCor: 'text-purple-400' }, 
-            { baseColor: '#734d17', modalBg: '#1f1406', modalBorder: '#69481a', capaFundo: '#2c1b09', destaqueCor: 'text-yellow-400' }, 
-            { baseColor: '#1b416e', modalBg: '#08121f', modalBorder: '#20436b', capaFundo: '#0c1a2c', destaqueCor: 'text-cyan-400' }  
+            { baseColor: '#8c4b26', modalBg: '#1c1008', modalBorder: '#5c3317', capaFundo: '#241306', destaqueCor: 'text-amber-400' }, // Castanho / Terracota
+            { baseColor: '#b83b2c', modalBg: '#1c0c07', modalBorder: '#612115', capaFundo: '#2b0e07', destaqueCor: 'text-rose-400' }, // Vermelho Bordô
+            { baseColor: '#1d6b47', modalBg: '#09140f', modalBorder: '#1f4a35', capaFundo: '#0d1c15', destaqueCor: 'text-emerald-400' }, // Verde Floresta
+            { baseColor: '#683296', modalBg: '#160821', modalBorder: '#4a2366', capaFundo: '#1f0d2c', destaqueCor: 'text-purple-400' }, // Roxo / Lilás escuro
+            { baseColor: '#a67324', modalBg: '#1f1406', modalBorder: '#69481a', capaFundo: '#2c1b09', destaqueCor: 'text-yellow-400' }, // Ocre / Amarelo Queimado
+            { baseColor: '#245f9e', modalBg: '#08121f', modalBorder: '#20436b', capaFundo: '#0c1a2c', destaqueCor: 'text-cyan-400' }, // Azul Escuro / Índigo
+            { baseColor: '#268a7d', modalBg: '#081c19', modalBorder: '#1c5c53', capaFundo: '#0c2622', destaqueCor: 'text-teal-400' }  // Verde Petróleo / Azulado
         ];
 
         const fontesDisponiveis = [
@@ -388,7 +389,8 @@
                     const temCapaValida = item.capa && item.capa.toString().startsWith('http');
                     const capaUrl = temCapaValida ? item.capa : '';
 
-                    const paleta = paletasLombadas[(i + indexIndice) % paletasLombadas.length];
+                    /* Seleciona uma cor de forma variada para cada livro com base na posição/índice */
+                    const paleta = paletasLombadas[(i * 3 + indexIndice * 7) % paletasLombadas.length];
 
                     const spine = document.createElement('div');
                     spine.className = 'book-spine';
@@ -397,7 +399,7 @@
                     spine.style.width = `${larguraFinal}px`;
 
                     spine.addEventListener('click', () => {
-                        abrirModalLivro(item, capaUrl, i + indexIndice);
+                        abrirModalLivro(item, capaUrl, (i * 3 + indexIndice * 7));
                     });
 
                     spine.innerHTML = `
