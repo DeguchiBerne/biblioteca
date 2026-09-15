@@ -7,7 +7,6 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Background geral da página */
         body {
             background-color: #0f172a;
             background-image: 
@@ -22,12 +21,11 @@
         .shelf {
             display: flex;
             align-items: flex-end;
-            gap: 4px;
-            padding: 0 20px;
-            min-height: 210px;
-            /* Prateleira de madeira tridimensional na base */
-            border-bottom: 18px solid #451a03;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%);
+            gap: 3px;
+            padding: 0 15px;
+            min-height: 220px;
+            border-bottom: 20px solid #451a03;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%);
             position: relative;
             margin-bottom: 2.5rem;
             border-radius: 4px;
@@ -39,14 +37,12 @@
 
         /* Lombada do Livro em Pé */
         .book-spine {
-            width: 44px;
-            height: 175px;
             cursor: pointer;
             border-radius: 3px 3px 0 0;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 8px 3px;
+            padding: 6px 2px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             box-shadow: inset -4px 0 8px rgba(0,0,0,0.5), 2px 2px 6px rgba(0,0,0,0.6);
             position: relative;
@@ -64,28 +60,21 @@
         .book-title-vertical {
             writing-mode: vertical-rl;
             text-orientation: mixed;
-            font-size: 10px;
             font-weight: 600;
             color: #f8fafc;
-            max-height: 110px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
             margin: auto 0;
+            text-align: center;
         }
 
-        /* Espaços vazios na prateleira para action figures e decorações */
-        .shelf-gap-small {
-            width: 50px;
-            flex-shrink: 0;
-        }
-        .shelf-gap-large {
-            width: 100px;
+        /* Espaços vazios aleatórios na prateleira para action figures */
+        .shelf-gap {
             flex-shrink: 0;
         }
 
-        /* Efeito de Livro Aberto suave ao abrir o modal */
         #modalDetalhes > div {
             animation: abrirLivro 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             transform-origin: center;
@@ -115,9 +104,8 @@
     </style>
 </head>
 <body class="text-slate-100 min-h-screen p-3 sm:p-6 pb-28 relative">
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-7xl mx-auto">
         <header class="mb-6 text-center flex flex-col items-center">
-            <!-- Botão de Voltar à Página Inicial -->
             <div class="w-full flex justify-start sm:absolute sm:left-6 sm:top-6 mb-4 sm:mb-0">
                 <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2 border border-slate-700">
                     &larr; Voltar ao Início
@@ -127,7 +115,6 @@
             <h1 class="text-2xl sm:text-4xl font-bold mb-1 drop-shadow-md">📖 Acervo da Biblioteca</h1>
             <p class="text-xs sm:text-sm text-slate-300 drop-shadow">Modo de visualização pública para visitantes</p>
             
-            <!-- Indicador de Total -->
             <div id="stats" class="my-4 w-full max-w-xs">
                 <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-lg shadow-xl text-center backdrop-blur-sm">
                     <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Obras no Acervo</p>
@@ -135,37 +122,30 @@
                 </div>
             </div>
 
-            <!-- Barra de Pesquisa -->
             <div class="w-full max-w-md mt-2">
                 <input type="text" id="searchInput" placeholder="Pesquisar por título na estante..." 
                     class="w-full px-4 py-2.5 rounded-lg bg-slate-900/90 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500 shadow-inner backdrop-blur-sm">
             </div>
 
-            <!-- Botões de Filtros por Formato -->
             <div id="formatFilters" class="flex overflow-x-auto w-full max-w-3xl gap-2 mt-4 pb-2 px-1 justify-start sm:justify-center scrollbar-none"></div>
         </header>
 
-        <!-- Indicador de Carregamento -->
         <div id="loading" class="text-center text-slate-300 py-20 text-base drop-shadow">Carregando estante da biblioteca...</div>
 
-        <!-- Estante de Madeira Estruturada -->
         <div id="estanteContainer" class="hidden">
             <div class="text-xs text-slate-300 mb-2 italic text-center sm:text-left flex items-center justify-between px-2 drop-shadow">
                 <span id="status-exibicao">Mostrando amostra inicial da estante:</span>
-                <span class="text-[11px] text-amber-300 font-medium">Dica: Clique em qualquer livro para ver a capa e detalhes.</span>
+                <span class="text-[11px] text-amber-300 font-medium">Dica: Clique em qualquer lombada para ver a capa e detalhes.</span>
             </div>
             
-            <!-- Prateleiras geradas dinamicamente -->
             <div id="prateleirasWrapper" class="space-y-6"></div>
         </div>
     </div>
 
-    <!-- Rodapé -->
     <footer class="absolute bottom-0 left-0 w-full text-center py-3 bg-slate-950/80 backdrop-blur-md border-t border-slate-900 text-[11px] sm:text-xs text-slate-400 space-y-0.5 px-2">
         <p>Criado por <strong class="text-slate-200">Bernardo Deguchi</strong> • 2026</p>
     </footer>
 
-    <!-- Modal de Detalhes -->
     <div id="modalDetalhes" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 sm:p-4">
         <div id="modalBoxContainer" class="border-2 rounded-lg max-w-4xl w-full overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative transition-all duration-300">
             <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-200 hover:text-white bg-black/50 hover:bg-black/80 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-30">✕</button>
@@ -181,12 +161,18 @@
         let formatoSelecionado = ''; 
 
         const paletasLombadas = [
-            { bg: 'linear-gradient(135deg, #1e293b, #0f172a)', accent: 'bg-indigo-500', modalBg: '#111827', modalBorder: '#374151', capaFundo: '#1f2937', destaqueCor: 'text-indigo-400' },
-            { bg: 'linear-gradient(135deg, #450a0a, #260505)', accent: 'bg-rose-500', modalBg: '#1c1010', modalBorder: '#5c1d1d', capaFundo: '#2c1515', destaqueCor: 'text-rose-400' },
-            { bg: 'linear-gradient(135deg, #064e3b, #022c22)', accent: 'bg-emerald-500', modalBg: '#0b1d17', modalBorder: '#134e38', capaFundo: '#112a21', destaqueCor: 'text-emerald-400' },
-            { bg: 'linear-gradient(135deg, #3b0764, #2e1065)', accent: 'bg-purple-500', modalBg: '#190c24', modalBorder: '#4c1d95', capaFundo: '#251038', destaqueCor: 'text-purple-400' },
-            { bg: 'linear-gradient(135deg, #431407, #291104)', accent: 'bg-amber-500', modalBg: '#1c1208', modalBorder: '#78350f', capaFundo: '#2b1a0d', destaqueCor: 'text-amber-400' },
-            { bg: 'linear-gradient(135deg, #1e3a8a, #0f172a)', accent: 'bg-cyan-500', modalBg: '#08101a', modalBorder: '#1e3a8a', capaFundo: '#0f172a', destaqueCor: 'text-cyan-400' }
+            { bg: 'linear-gradient(135deg, #1e293b, #0f172a)', modalBg: '#111827', modalBorder: '#374151', capaFundo: '#1f2937', destaqueCor: 'text-indigo-400' },
+            { bg: 'linear-gradient(135deg, #450a0a, #260505)', modalBg: '#1c1010', modalBorder: '#5c1d1d', capaFundo: '#2c1515', destaqueCor: 'text-rose-400' },
+            { bg: 'linear-gradient(135deg, #064e3b, #022c22)', modalBg: '#0b1d17', modalBorder: '#134e38', capaFundo: '#112a21', destaqueCor: 'text-emerald-400' },
+            { bg: 'linear-gradient(135deg, #3b0764, #2e1065)', modalBg: '#190c24', modalBorder: '#4c1d95', capaFundo: '#251038', destaqueCor: 'text-purple-400' },
+            { bg: 'linear-gradient(135deg, #431407, #291104)', modalBg: '#1c1208', modalBorder: '#78350f', capaFundo: '#2b1a0d', destaqueCor: 'text-amber-400' },
+            { bg: 'linear-gradient(135deg, #1e3a8a, #0f172a)', modalBg: '#08101a', modalBorder: '#1e3a8a', capaFundo: '#0f172a', destaqueCor: 'text-cyan-400' }
+        ];
+
+        const fontesDisponiveis = [
+            'ui-sans-serif, system-ui, sans-serif',
+            'ui-serif, Georgia, Cambria, serif',
+            'ui-monospace, SFMono-Regular, monospace'
         ];
 
         async function carregarDados() {
@@ -273,8 +259,8 @@
             let dadosParaRenderizar = filtrados;
 
             if (termoBusca === '' && formatoSelecionado === '') {
-                dadosParaRenderizar = colecao.slice(0, 32);
-                statusExibicao.innerText = `Mostrando amostra inicial da estante (32 obras):`;
+                dadosParaRenderizar = colecao; // Mostra tudo distribuído nas prateleiras para preencher a tela até a direita
+                statusExibicao.innerText = `Mostrando acervo completo nas estantes:`;
             } else {
                 statusExibicao.innerText = `Resultados encontrados (${filtrados.length}):`;
             }
@@ -295,8 +281,8 @@
                 return;
             }
 
-            // Aprox. 10 a 12 livros por prateleira
-            const itensPorPrateleira = 10;
+            // Prateleiras mais densas (aprox 16 a 18 livros por prateleira para preencher perfeitamente)
+            const itensPorPrateleira = 17;
             for (let i = 0; i < dados.length; i += itensPorPrateleira) {
                 const lote = dados.slice(i, i + itensPorPrateleira);
                 
@@ -304,11 +290,41 @@
                 shelfDiv.className = 'shelf card-organizando';
                 shelfDiv.style.animationDelay = `${(i / itensPorPrateleira) * 0.1}s`;
 
+                // Posição aleatória na prateleira para inserir o espaço vazio de decoração (ex: em prateleiras alternadas)
+                const posicaoGap = 4 + (i % 5); 
+
                 lote.forEach((item, indexIndice) => {
+                    // Insere espaço vazio de decoração de forma variada
+                    if (indexIndice === posicaoGap || indexIndice === posicaoGap + 7) {
+                        const gap = document.createElement('div');
+                        const larguraGap = 50 + ((i + indexIndice) % 3) * 35; // Varia de 50px a 120px
+                        gap.className = 'shelf-gap';
+                        gap.style.width = `${larguraGap}px`;
+                        shelfDiv.appendChild(gap);
+                    }
+
                     const titulo = item.titulo || 'Sem Título';
                     const formato = item.formato || 'Livro';
-                    const volumes = item.volumes ? `Vol. ${item.volumes}` : '';
+                    const volumesStr = item.volumes ? item.volumes.toString() : '1';
                     
+                    // Extrai número de volumes para calcular grossura
+                    const matchVol = volumesStr.match(/\d+/);
+                    const qtdVolumes = matchVol ? parseInt(matchVol[0]) : 1;
+
+                    // Variação orgânica de tamanho (Proporção máxima de até ~3.5x entre o menor e o maior)
+                    // Fatores determinísticos baseados no índice para estabilidade visual
+                    const seed = (i + indexIndice) * 997;
+                    const altFator = 145 + (seed % 50);   // Altura entre 145px e 195px (Menor ~145, Maior ~195)
+                    
+                    // Grossura baseada nos volumes (mínimo 30px, aumentanto para coleções maiores)
+                    const baseLargura = 32 + ((seed % 7) * 2);
+                    const extraGrossura = Math.min(qtdVolumes * 2.5, 45); // Coleções grossas ganham destaque
+                    const larguraFinal = Math.round(baseLargura + extraGrossura);
+
+                    // Tamanho de letra variável por livro (entre 8px e 10px)
+                    const tamanhoLetra = 8 + ((seed % 3));
+                    const familiaFonte = fontesDisponiveis[seed % fontesDisponiveis.length];
+
                     const temCapaValida = item.capa && item.capa.toString().startsWith('http');
                     const capaUrl = temCapaValida ? item.capa : '';
 
@@ -317,25 +333,20 @@
                     const spine = document.createElement('div');
                     spine.className = 'book-spine';
                     spine.style.background = paleta.bg;
+                    spine.style.height = `${altFator}px`;
+                    spine.style.width = `${larguraFinal}px`;
 
                     spine.addEventListener('click', () => {
                         abrirModalLivro(item, capaUrl, i + indexIndice);
                     });
 
                     spine.innerHTML = `
-                        <div class="text-[8px] uppercase tracking-wider text-slate-300 font-bold text-center opacity-75 truncate">${formato}</div>
-                        <div class="book-title-vertical" title="${titulo}">${titulo}</div>
-                        <div class="text-[8px] text-center text-slate-300 opacity-80 truncate">${volumes}</div>
+                        <div class="uppercase tracking-wider text-slate-300 font-bold text-center opacity-75 truncate" style="font-size: ${Math.max(tamanhoLetra - 1, 7)}px;">${formato}</div>
+                        <div class="book-title-vertical" title="${titulo}" style="font-size: ${tamanhoLetra}px; font-family: ${familiaFonte}; max-height: ${altFator - 50}px;">${titulo}</div>
+                        <div class="text-center text-slate-300 opacity-80 truncate" style="font-size: ${Math.max(tamanhoLetra - 1, 7)}px;">${item.volumes ? 'Vol. ' + item.volumes : ''}</div>
                     `;
 
                     shelfDiv.appendChild(spine);
-
-                    // Insere um espaço vazio para decoração/action figures a cada 4 livros
-                    if ((indexIndice + 1) % 4 === 0 && indexIndice < lote.length - 1) {
-                        const gap = document.createElement('div');
-                        gap.className = (indexIndice % 8 === 0) ? 'shelf-gap-large' : 'shelf-gap-small';
-                        shelfDiv.appendChild(gap);
-                    }
                 });
 
                 wrapper.appendChild(shelfDiv);
