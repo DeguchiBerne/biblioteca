@@ -26,7 +26,7 @@
                 url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/textura-madeira.jpg');
             background-size: cover;
             background-position: center;
-            padding: 25px 15px;
+            padding: 25px 0px; /* Removido padding lateral para os livros tocarem as bordas */
             border-radius: 10px;
             border: 4px solid #5a3214;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(0,0,0,0.5);
@@ -42,7 +42,7 @@
             justify-content: space-between; /* Garante ocupação de ponta a ponta */
             flex-wrap: nowrap;
             gap: 0px; 
-            padding: 0 10px;
+            padding: 0px; /* Encostado totalmente nas bordas de madeira da estante */
             min-height: 230px;
             min-width: 820px;
             background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(255,255,255,0.05) 40%, rgba(0,0,0,0.4) 100%);
@@ -208,7 +208,7 @@
         @media (max-width: 960px) {
             .alavanca-esq { left: 5px; z-index: 40; }
             .alavanca-dir { right: 5px; z-index: 40; }
-            .shelf-container-wrapper { padding: 25px 45px; }
+            .shelf-container-wrapper { padding: 25px 5px; }
         }
 
         #modalDetalhes > div {
@@ -301,8 +301,8 @@
         let formatoSelecionado = ''; 
         let paginaAtual = 0;
         const andaresPorEstante = 4; // 4 prateleiras por visualização
-        const itensPorPrateleira = 20; // 20 livros por prateleira
-        const itensPorPagina = andaresPorEstante * itensPorPrateleira; // 80 títulos por página
+        const itensPorPrateleira = 25; // 25 livros por prateleira
+        const itensPorPagina = andaresPorEstante * itensPorPrateleira; // 100 títulos por página
 
         const fontesDisponiveis = [
             'ui-sans-serif, system-ui, sans-serif',
@@ -496,8 +496,8 @@
                 const grupoDir = document.createElement('div');
                 grupoDir.className = 'shelf-side-group right';
 
-                // Definir 3 a 4 espaços vazios (gaps) distribuídos no andar equivalentes a 3+ livros de largura (80px a 115px)
-                const qtdGapsTotal = 3 + ((paginaIndex + andar) % 2); // alterna entre 3 e 4 espaços
+                // Definir 2 a 3 espaços vazios (gaps) distribuídos no andar equivalentes a 3+ livros de largura (78px a 115px)
+                const qtdGapsTotal = 2 + ((paginaIndex + andar) % 2); // alterna entre 2 e 3 espaços
                 
                 // Distribuir os gaps de forma inteligente entre os grupos
                 const qtdGapsEsq = Math.ceil(qtdGapsTotal / 2);
@@ -516,7 +516,6 @@
                     if (indicesGapsEsq.includes(idx + 1)) {
                         const gap = document.createElement('div');
                         gap.className = 'shelf-gap';
-                        // Largura equivalente a 3 ou mais livros (78px a 115px)
                         gap.style.width = `${78 + (((paginaIndex * 7 + andar * 11 + idx) % 4) * 12)}px`;
                         grupoEsq.appendChild(gap);
                     }
@@ -534,7 +533,6 @@
                     if (indicesGapsDir.includes(idx + 1)) {
                         const gap = document.createElement('div');
                         gap.className = 'shelf-gap';
-                        // Largura equivalente a 3 ou mais livros (78px a 115px)
                         gap.style.width = `${78 + (((paginaIndex * 5 + andar * 9 + idx) % 4) * 12)}px`;
                         grupoDir.appendChild(gap);
                     }
