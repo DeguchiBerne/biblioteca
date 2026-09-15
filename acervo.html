@@ -300,9 +300,9 @@
         let colecao = [];
         let formatoSelecionado = ''; 
         let paginaAtual = 0;
-        const andaresPorEstante = 3;
+        const andaresPorEstante = 4; // 4 prateleiras por visualização
         const itensPorPrateleira = 20; // 20 livros por prateleira
-        const itensPorPagina = andaresPorEstante * itensPorPrateleira; // 60 títulos por página
+        const itensPorPagina = andaresPorEstante * itensPorPrateleira; // 80 títulos por página
 
         const fontesDisponiveis = [
             'ui-sans-serif, system-ui, sans-serif',
@@ -496,27 +496,46 @@
                 const grupoDir = document.createElement('div');
                 grupoDir.className = 'shelf-side-group right';
 
-                // Inserir 1 ou 2 espaços vazios (gaps) para elementos futuros de forma orgânica
-                const qtdGaps = 1 + ((paginaIndex + andar) % 2); // alterna entre 1 e 2 espaços
-                const posicaoGapEsq = Math.floor(loteEsquerda.length / 2);
+                // Definir 3 a 4 espaços vazios (gaps) distribuídos no andar equivalentes a 3+ livros de largura (80px a 115px)
+                const qtdGapsTotal = 3 + ((paginaIndex + andar) % 2); // alterna entre 3 e 4 espaços
+                
+                // Distribuir os gaps de forma inteligente entre os grupos
+                const qtdGapsEsq = Math.ceil(qtdGapsTotal / 2);
+                const qtdGapsDir = qtdGapsTotal - qtdGapsEsq;
 
-                // Renderizar lado esquerdo
+                // Pontos de inserção no lado esquerdo
+                const passoEsq = Math.max(1, Math.floor(loteEsquerda.length / (qtdGapsEsq + 1)));
+                const indicesGapsEsq = [];
+                for (let g = 1; g <= qtdGapsEsq; g++) {
+                    indicesGapsEsq.push(g * passoEsq);
+                }
+
+                // Renderizar lado esquerdo com os espaços vazios
                 loteEsquerda.forEach((item, idx) => {
                     grupoEsq.appendChild(criarElementoLivro(item, idx, paginaIndex, andar));
-                    if (idx === posicaoGapEsq && qtdGaps > 0) {
+                    if (indicesGapsEsq.includes(idx + 1)) {
                         const gap = document.createElement('div');
                         gap.className = 'shelf-gap';
-                        gap.style.width = `${24 + ((paginaIndex + andar * 5) % 15)}px`;
+                        // Largura equivalente a 3 ou mais livros (78px a 115px)
+                        gap.style.width = `${78 + (((paginaIndex * 7 + andar * 11 + idx) % 4) * 12)}px`;
                         grupoEsq.appendChild(gap);
                     }
                 });
 
-                // Renderizar lado direito
+                // Pontos de inserção no lado direito
+                const passoDir = Math.max(1, Math.floor(loteDireita.length / (qtdGapsDir + 1)));
+                const indicesGapsDir = [];
+                for (let g = 1; g <= qtdGapsDir; g++) {
+                    indicesGapsDir.push(g * passoDir);
+                }
+
+                // Renderizar lado direito com os espaços vazios
                 loteDireita.forEach((item, idx) => {
-                    if (idx === 1 && qtdGaps > 1) {
+                    if (indicesGapsDir.includes(idx + 1)) {
                         const gap = document.createElement('div');
                         gap.className = 'shelf-gap';
-                        gap.style.width = `${22 + ((paginaIndex * 3 + andar) % 18)}px`;
+                        // Largura equivalente a 3 ou mais livros (78px a 115px)
+                        gap.style.width = `${78 + (((paginaIndex * 5 + andar * 9 + idx) % 4) * 12)}px`;
                         grupoDir.appendChild(gap);
                     }
                     grupoDir.appendChild(criarElementoLivro(item, meio + idx, paginaIndex, andar));
