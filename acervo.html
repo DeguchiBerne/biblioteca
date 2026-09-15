@@ -23,37 +23,37 @@
             margin: 0 auto;
         }
 
-        /* Estrutura Realista e Marcada de Prateleira de Madeira Estilizada (Sem barra de rolagem) */
+        /* Estrutura Realista e Contínua da Prateleira de Madeira */
         .shelf {
             display: flex;
             align-items: flex-end;
-            justify-content: flex-start;
+            justify-content: space-between; /* Distribui blocos e livros por toda a extensão */
             flex-wrap: nowrap;
             gap: 2px;
             padding: 0 15px;
-            min-height: 220px;
-            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.6) 100%), #311005;
+            min-height: 235px; /* Altura garantida para cobrir perfeitamente o andar */
+            background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.5) 100%), #311005;
             border-top: 4px solid #6c2e12;
-            border-bottom: 22px solid #230b03;
+            border-bottom: 24px solid #230b03;
             position: relative;
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem; /* Espaçamento ajustado entre as prateleiras sem vazios */
             border-radius: 2px 2px 6px 6px;
             box-shadow: 
                 inset 0 15px 15px -8px rgba(0,0,0,0.8), 
                 inset 0 -4px 6px rgba(0,0,0,0.9),
                 0 18px 25px -5px rgba(0,0,0,0.7);
-            overflow: hidden; /* Remove totalmente qualquer barra de rolagem */
+            overflow: hidden;
         }
 
         .shelf::after {
             content: '';
             position: absolute;
-            bottom: -22px;
+            bottom: -24px;
             left: 0;
             right: 0;
-            height: 5px;
+            height: 6px;
             background: linear-gradient(90deg, #521c08, #854d0e, #521c08);
-            opacity: 0.8;
+            opacity: 0.9;
         }
 
         /* Lombada do Livro em Pé */
@@ -75,6 +75,12 @@
             transform: translateY(-8px);
             box-shadow: inset -4px 0 8px rgba(0,0,0,0.5), 4px 6px 12px rgba(0,0,0,0.8);
             z-index: 10;
+        }
+
+        /* Espaço livre entre os livros na prateleira (mostrando madeira) */
+        .shelf-gap {
+            flex-shrink: 0;
+            background: transparent;
         }
 
         /* Título na lombada em modo vertical simulado */
@@ -273,7 +279,7 @@
             });
 
             let dadosParaRenderizar = filtrados;
-            const itensPorPrateleira = 14; // Aumentado para colocar mais livros por andar
+            const itensPorPrateleira = 15; // Quantidade ideal para preencher de ponta a ponta
             const maxEstantesIniciais = 5;
 
             if (termoBusca === '' && formatoSelecionado === '') {
@@ -307,7 +313,19 @@
                 shelfDiv.className = 'shelf card-organizando';
                 shelfDiv.style.animationDelay = `${(i / itensPorPrateleira) * 0.1}s`;
 
+                // Definimos posições estratégicas para inserir 2 a 3 vãos de tamanhos variados por andar
+                const posicoesVazios = [5, 10]; 
+
                 lote.forEach((item, indexIndice) => {
+                    // Adiciona espaço livre de madeira entre os livros em pontos específicos
+                    if (posicoesVazios.includes(indexIndice)) {
+                        const gap = document.createElement('div');
+                        const larguraGap = 25 + ((i + indexIndice * 17) % 35); // Variação de tamanho do vão
+                        gap.className = 'shelf-gap';
+                        gap.style.width = `${larguraGap}px`;
+                        shelfDiv.appendChild(gap);
+                    }
+
                     const titulo = item.titulo || 'Sem Título';
                     const volumesTexto = item.volumes ? item.volumes.toString().trim() : '';
                     const quantidadeAdquirida = item.quantidade ? parseInt(item.quantidade) : (item.qtd ? parseInt(item.qtd) : 1);
@@ -315,7 +333,7 @@
                     const seed = (i + indexIndice) * 997;
 
                     const altFator = Math.round(155 + ((seed % 7) * 5)); 
-                    const larguraFinal = Math.round(30 + (Math.max(quantidadeAdquirida, 1) * 5)); // Largura otimizada para caber mais livros lado a lado sem espaços vazios
+                    const larguraFinal = Math.round(28 + (Math.max(quantidadeAdquirida, 1) * 4.5)); 
 
                     const tamanhoLetra = 11 + (seed % 3);
                     const familiaFonte = fontesDisponiveis[seed % fontesDisponiveis.length];
