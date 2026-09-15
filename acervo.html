@@ -23,7 +23,7 @@
             margin: 0 auto;
         }
 
-        /* Prateleira com Textura de Madeira Rústica e Envelhecida */
+        /* Prateleira com Textura de Madeira Real (Via GitHub) */
         .shelf {
             display: flex;
             align-items: flex-end;
@@ -32,10 +32,15 @@
             gap: 2px;
             padding: 0 15px;
             min-height: 240px;
+            /* 
+              SUBSTITUA O LINK ABAIXO pelo link raw da sua imagem de textura de madeira no GitHub.
+              Exemplo: url('https://raw.githubusercontent.com/SeuUsuario/seu-repo/main/textura-madeira.jpg')
+            */
             background: 
-                radial-gradient(ellipse at center top, rgba(255, 200, 120, 0.08) 0%, transparent 70%),
-                linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(20,8,3,0.6) 50%, rgba(10,3,1,0.9) 100%), 
-                #210b04;
+                linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(20,8,3,0.3) 50%, rgba(10,3,1,0.85) 100%),
+                url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/textura-madeira.jpg');
+            background-size: cover;
+            background-position: center;
             border-top: 5px solid #4a1c0b;
             border-bottom: 26px solid #170702;
             position: relative;
@@ -59,7 +64,7 @@
             opacity: 0.95;
         }
 
-        /* Lombada do Livro com Textura Estilo Couro/Pergaminho Antigo */
+        /* Lombada do Livro com Textura de Encadernação (Via GitHub) + Cor Base */
         .book-spine {
             cursor: pointer;
             border-radius: 3px 3px 0 0;
@@ -68,19 +73,26 @@
             justify-content: space-between;
             padding: 8px 2px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: inset -5px 0 10px rgba(0,0,0,0.6), 2px 3px 8px rgba(0,0,0,0.7);
+            box-shadow: inset -5px 0 10px rgba(0,0,0,0.7), 2px 3px 8px rgba(0,0,0,0.7);
             position: relative;
             flex-shrink: 0;
             user-select: none;
-            /* Textura sutil simulando papel envelhecido/tecido sobre a cor */
+            /* 
+              Camada de textura de couro/tecido por cima da cor base.
+              SUBSTITUA O LINK ABAIXO pelo link raw da sua textura de lombada/couro no GitHub.
+              Se preferir usar apenas a cor sólida com relevos, basta remover a linha do url().
+            */
+            background-blend-mode: overlay;
             background-image: 
-                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.35) 100%),
-                repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px);
+                url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/textura-couro.jpg'),
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.4) 100%);
+            background-size: cover;
+            background-position: center;
         }
 
         .book-spine:hover {
             transform: translateY(-8px);
-            box-shadow: inset -5px 0 10px rgba(0,0,0,0.6), 4px 8px 14px rgba(0,0,0,0.9);
+            box-shadow: inset -5px 0 10px rgba(0,0,0,0.7), 4px 8px 14px rgba(0,0,0,0.9);
             z-index: 10;
         }
 
@@ -92,8 +104,9 @@
             left: 2px;
             right: 2px;
             height: 2px;
-            background: rgba(255, 220, 150, 0.25);
-            box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 12px 0 rgba(255, 220, 150, 0.15);
+            background: rgba(255, 220, 150, 0.3);
+            box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 12px 0 rgba(255, 220, 150, 0.2);
+            z-index: 2;
         }
 
         .book-spine::after {
@@ -103,8 +116,9 @@
             left: 2px;
             right: 2px;
             height: 2px;
-            background: rgba(255, 220, 150, 0.25);
-            box-shadow: 0 -4px 0 rgba(0,0,0,0.3);
+            background: rgba(255, 220, 150, 0.3);
+            box-shadow: 0 -4px 0 rgba(0,0,0,0.4);
+            z-index: 2;
         }
 
         /* Espaço livre entre os livros na prateleira */
@@ -118,14 +132,15 @@
             writing-mode: vertical-rl;
             text-orientation: mixed;
             font-weight: 600;
-            color: #f1f5f9;
+            color: #f8fafc;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             letter-spacing: 0.4px;
             margin: auto 0;
             text-align: center;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+            z-index: 3;
         }
 
         #modalDetalhes > div {
@@ -213,14 +228,14 @@
         let colecao = [];
         let formatoSelecionado = ''; 
 
-        // Paletas de cores inspiradas em tons clássicos de couro envelhecido e madeira rústica
+        // Paletas de cores clássicas para as lombadas
         const paletasLombadas = [
-            { baseColor: '#2b1708', modalBg: '#1c1008', modalBorder: '#5c3317', capaFundo: '#241306', destaqueCor: 'text-amber-400' }, // Marrom Café Clássico
-            { baseColor: '#38120a', modalBg: '#1c0c07', modalBorder: '#612115', capaFundo: '#2b0e07', destaqueCor: 'text-rose-400' }, // Vinho / Bordeaux
-            { baseColor: '#12261c', modalBg: '#09140f', modalBorder: '#1f4a35', capaFundo: '#0d1c15', destaqueCor: 'text-emerald-400' }, // Verde Musgo Antigo
-            { baseColor: '#28113b', modalBg: '#160821', modalBorder: '#4a2366', capaFundo: '#1f0d2c', destaqueCor: 'text-purple-400' }, // Roxo Real Envelhecido
-            { baseColor: '#38250c', modalBg: '#1f1406', modalBorder: '#69481a', capaFundo: '#2c1b09', destaqueCor: 'text-yellow-400' }, // Ocre / Couro Queimado
-            { baseColor: '#102238', modalBg: '#08121f', modalBorder: '#20436b', capaFundo: '#0c1a2c', destaqueCor: 'text-cyan-400' }  // Azul Marinho Clássico
+            { baseColor: '#2b1708', modalBg: '#1c1008', modalBorder: '#5c3317', capaFundo: '#241306', destaqueCor: 'text-amber-400' }, 
+            { baseColor: '#38120a', modalBg: '#1c0c07', modalBorder: '#612115', capaFundo: '#2b0e07', destaqueCor: 'text-rose-400' }, 
+            { baseColor: '#12261c', modalBg: '#09140f', modalBorder: '#1f4a35', capaFundo: '#0d1c15', destaqueCor: 'text-emerald-400' }, 
+            { baseColor: '#28113b', modalBg: '#160821', modalBorder: '#4a2366', capaFundo: '#1f0d2c', destaqueCor: 'text-purple-400' }, 
+            { baseColor: '#38250c', modalBg: '#1f1406', modalBorder: '#69481a', capaFundo: '#2c1b09', destaqueCor: 'text-yellow-400' }, 
+            { baseColor: '#102238', modalBg: '#08121f', modalBorder: '#20436b', capaFundo: '#0c1a2c', destaqueCor: 'text-cyan-400' }  
         ];
 
         const fontesDisponiveis = [
@@ -375,7 +390,6 @@
 
                     const spine = document.createElement('div');
                     spine.className = 'book-spine';
-                    // Fundo com cor base + textura sutil simulando encadernação antiga
                     spine.style.backgroundColor = paleta.baseColor;
                     spine.style.height = `${altFator}px`;
                     spine.style.width = `${larguraFinal}px`;
@@ -387,7 +401,7 @@
                     spine.innerHTML = `
                         <div></div>
                         <div class="book-title-vertical" title="${titulo}" style="font-size: ${tamanhoLetra}px; font-family: ${familiaFonte}; max-height: ${altFator - 50}px;">${titulo}</div>
-                        <div class="text-center text-amber-200/90 font-semibold truncate" style="font-size: ${Math.max(tamanhoLetra - 1, 9)}px;" title="${volumesTexto}">${volumesTexto}</div>
+                        <div class="text-center text-amber-200/90 font-semibold truncate z-10" style="font-size: ${Math.max(tamanhoLetra - 1, 9)}px;" title="${volumesTexto}">${volumesTexto}</div>
                     `;
 
                     shelfDiv.appendChild(spine);
