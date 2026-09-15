@@ -289,7 +289,7 @@
         <p>Criado por <strong class="text-slate-200">Bernardo Deguchi</strong> • 2026</p>
     </footer>
 
-    <!-- Modal Detalhes / Edição Admin (Mantido Completo) -->
+    <!-- Modal Detalhes / Edição Admin -->
     <div id="modalDetalhes" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 sm:p-4">
         <div id="modalBoxContainer" class="border-2 rounded-lg max-w-4xl w-full overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative transition-all duration-300 bg-slate-950">
             <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-200 hover:text-white bg-black/50 hover:bg-black/80 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-30">✕</button>
@@ -608,15 +608,20 @@
             let paginaDireita = `
                 <div class="pagina-livro p-5 sm:p-7 flex flex-col justify-between text-slate-900 shadow-inner overflow-y-auto max-h-[85vh]">
                     <div class="space-y-3">
-                        <div>
-                            <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-900 border-b border-amber-900/20 pb-2">${item.titulo || 'Sem Título'}</h2>
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 border-b border-amber-900/20 pb-2">
+                            <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-900">${item.titulo || 'Sem Título'}</h2>
+                            ${item.custo !== undefined && item.custo !== null && item.custo !== '' ? `
+                                <div class="bg-amber-100 border border-amber-300 text-amber-900 px-3 py-1 rounded-lg text-xs font-bold shadow-sm shrink-0 self-start">
+                                    Custo: ${item.custo}
+                                </div>
+                            ` : ''}
                         </div>
 
                         <div class="space-y-2 text-xs sm:text-sm">
             `;
 
             for (let [chave, valor] of Object.entries(item)) {
-                if (['titulo', 'formato', 'custo', 'capa'].includes(chave)) continue;
+                if (['titulo', 'custo', 'capa'].includes(chave)) continue;
                 if (valor !== undefined && valor !== null && valor !== '') {
                     let nomeChave = chave.replace(/_/g, ' ').toUpperCase();
                     paginaDireita += `
