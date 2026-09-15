@@ -7,28 +7,39 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilo personalizado para simular lombadas de livros */
+        /* Estilos base das lombadas com paletas variadas geradas dinamicamente */
         .lombada-livro {
-            background: linear-gradient(90deg, rgba(30,41,59,0.95) 0%, rgba(51,65,85,0.9) 15%, rgba(30,41,59,0.95) 85%, rgba(15,23,42,0.95) 100%);
-            box-shadow: inset 4px 0 8px rgba(255, 255, 255, 0.05), inset -4px 0 8px rgba(0, 0, 0, 0.4), 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-            transition: all 0.25s ease;
+            box-shadow: inset 4px 0 8px rgba(255, 255, 255, 0.08), inset -4px 0 10px rgba(0, 0, 0, 0.5), 0 8px 12px -3px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform-style: preserve-3d;
         }
         .lombada-livro:hover {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: inset 4px 0 10px rgba(255, 255, 255, 0.1), inset -4px 0 10px rgba(0, 0, 0, 0.5), 0 15px 25px -5px rgba(99, 102, 241, 0.3);
+            transform: translateY(-8px) scale(1.03) translateZ(10px);
+            box-shadow: inset 4px 0 12px rgba(255, 255, 255, 0.15), inset -4px 0 14px rgba(0, 0, 0, 0.6), 0 18px 30px -5px rgba(0, 0, 0, 0.8);
+            z-index: 10;
         }
-        /* Linhas decorativas da lombada */
         .spine-line {
-            border-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
         }
-        /* Animação suave do modal */
+
+        /* Animação do livro saindo da estante ao clicar */
+        @keyframes sairEstante {
+            0% { transform: scale(1) translateY(0); opacity: 1; }
+            50% { transform: scale(1.1) translateY(-15px) rotate(2deg); opacity: 0.9; }
+            100% { transform: scale(1.2) translateY(-30px); opacity: 0; }
+        }
+        .animando-saida {
+            animation: sairEstante 0.35s ease-in-out forwards;
+        }
+
+        /* Animação suave do modal abrindo como um livro */
         #modalDetalhes > div, #modalAdd > div {
-            animation: abrirLivro 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: abrirLivro 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             transform-origin: center;
         }
         @keyframes abrirLivro {
-            0% { opacity: 0; transform: scale(0.9) translateY(10px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
+            0% { opacity: 0; transform: scale(0.85) perspective(1000px) rotateY(-10deg); }
+            100% { opacity: 1; transform: scale(1) perspective(1000px) rotateY(0deg); }
         }
     </style>
 </head>
@@ -144,6 +155,24 @@
 
         let colecao = [];
         let formatoSelecionado = 'todos';
+
+        // Paletas de cores variadas para as lombadas dos livros
+        const paletasLombadas = [
+            { bg: 'linear-gradient(90deg, #1e293b 0%, #334155 15%, #1e293b 85%, #0f172a 100%)', text: 'text-indigo-200', accent: 'bg-indigo-500' }, // Azul Noite
+            { bg: 'linear-gradient(90deg, #450a0a 0%, #7f1d1d 15%, #450a0a 85%, #260505 100%)', text: 'text-rose-200', accent: 'bg-rose-500' },   // Vinho / Couro Vermelho
+            { bg: 'linear-gradient(90deg, #064e3b 0%, #065f46 15%, #064e3b 85%, #022c22 100%)', text: 'text-emerald-200', accent: 'bg-emerald-500' }, // Verde Clássico
+            { bg: 'linear-gradient(90deg, #3b0764 0%, #581c87 15%, #3b0764 85%, #2e1065 100%)', text: 'text-purple-200', accent: 'bg-purple-500' }, // Roxo Real
+            { bg: 'linear-gradient(90deg, #431407 0%, #78350f 15%, #431407 85%, #291104 100%)', text: 'text-amber-200', accent: 'bg-amber-500' },   // Marrom / Couro Antigo
+            { bg: 'linear-gradient(90deg, #0f172a 0%, #1e293b 15%, #0f172a 85%, #020617 100%)', text: 'text-cyan-200', accent: 'bg-cyan-500' }     // Grafite Escuro
+        ];
+
+        // Fontes e estilos tipográficos variados para as letras dos títulos nas lombadas
+        const estilosTitulos = [
+            'font-serif tracking-wide italic font-medium',
+            'font-sans tracking-tight font-bold uppercase',
+            'font-mono tracking-normal font-semibold',
+            'font-serif tracking-widest font-bold'
+        ];
 
         async function carregarDados() {
             try {
@@ -269,7 +298,7 @@
                 return;
             }
 
-            dados.forEach((item) => {
+            dados.forEach((item, index) => {
                 const titulo = item.titulo || 'Sem Título';
                 const formato = item.formato || 'Livro';
                 const custoFormatado = formatarMoeda(item.custo);
@@ -278,29 +307,40 @@
                     ? item.capa 
                     : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca';
 
+                // Escolhe dinamicamente uma cor de lombada e um estilo de letra baseados no índice do item
+                const paleta = paletasLombadas[index % paletasLombadas.length];
+                const estiloTitulo = estilosTitulos[index % estilosTitulos.length];
+
                 const card = document.createElement('div');
-                // Estilo de lombada de livro vertical (sem mostrar preço na estante)
-                card.className = 'lombada-livro border border-slate-700 rounded-md p-2.5 flex flex-col justify-between cursor-pointer min-h-[210px] sm:min-h-[250px] relative overflow-hidden group';
+                card.className = 'lombada-livro border border-slate-700/60 rounded-md p-2.5 flex flex-col justify-between cursor-pointer min-h-[220px] sm:min-h-[260px] relative overflow-hidden group';
+                card.style.background = paleta.bg;
                 
-                card.addEventListener('click', () => abrirModal(item, capa, custoFormatado));
+                // Ao clicar, faz a animação do livro saindo da estante e depois abre o modal
+                card.addEventListener('click', (e) => {
+                    card.classList.add('animando-saida');
+                    setTimeout(() => {
+                        abrirModal(item, capa, custoFormatado);
+                        card.classList.remove('animando-saida');
+                    }, 280);
+                });
 
                 card.innerHTML = `
-                    <!-- Linhas de relevo simulando a lombada no topo -->
+                    <!-- Detalhes superiores da lombada -->
                     <div class="space-y-1 mb-2">
                         <div class="border-b spine-line w-full pb-1 flex justify-between items-center">
-                            <span class="text-[8px] uppercase tracking-wider text-indigo-300 font-bold truncate max-w-[70px]">${formato}</span>
+                            <span class="text-[8px] uppercase tracking-wider text-slate-300 font-bold truncate max-w-[70px]">${formato}</span>
                         </div>
                         <div class="border-b spine-line w-full"></div>
                     </div>
 
-                    <!-- Título na lombada -->
+                    <!-- Título na lombada com variação de fonte/estilo -->
                     <div class="my-auto py-1">
-                        <h2 class="font-bold text-xs sm:text-sm text-slate-200 group-hover:text-indigo-300 transition-colors line-clamp-5 text-center leading-snug" title="${titulo}">${titulo}</h2>
+                        <h2 class="${estiloTitulo} text-xs sm:text-sm ${paleta.text} group-hover:brightness-125 transition-all line-clamp-5 text-center leading-snug" title="${titulo}">${titulo}</h2>
                     </div>
 
                     <!-- Detalhes inferiores da lombada -->
                     <div class="space-y-1 mt-2 pt-1 border-t spine-line text-center">
-                        <div class="w-2 h-2 rounded-full bg-slate-700 mx-auto group-hover:bg-indigo-500 transition-colors"></div>
+                        <div class="w-2 h-2 rounded-full ${paleta.accent} mx-auto opacity-75 group-hover:opacity-100 transition-opacity"></div>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -336,7 +376,7 @@
                 }
             }
 
-            // Sessão para alterar/atualizar a foto da capa de itens já existentes
+            // Seção para alterar/atualizar a foto da capa de itens já existentes
             detalhesHtml += `
                 </div>
                 <div class="border-t border-slate-700 pt-4 mt-4 bg-slate-900/80 p-3 rounded-lg border border-slate-700">
