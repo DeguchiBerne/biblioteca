@@ -31,6 +31,18 @@
             filter: contrast(1.1) saturate(1.2);
         }
 
+        /* Efeito de Estante de Madeira Realista */
+        .estante-madeira {
+            background-color: #2b1708;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)),
+                url('https://images.unsplash.com/photo-1541123437800-1bb1317badc2?q=80&w=1000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            box-shadow: inset 0 20px 30px -10px rgba(0,0,0,0.9), inset 0 -20px 30px -10px rgba(0,0,0,0.9);
+            border: 8px solid #1a0e05;
+        }
+
         /* Efeito de Livro Aberto suave ao abrir o modal */
         #modalDetalhes > div {
             animation: abrirLivro 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -47,7 +59,6 @@
             }
         }
 
-        /* Animação suave para os cards ao filtrar (efeito de organização) */
         @keyframes organizarEstante {
             0% {
                 opacity: 0;
@@ -62,24 +73,22 @@
             animation: organizarEstante 0.4s ease-in-out forwards;
         }
 
-        /* Textura interna simulando páginas de livro antigo */
         .pagina-livro {
             background-color: #fcf8f2;
             background-image: radial-gradient(#e6dbcc 0.75px, transparent 0.75px);
             background-size: 16px 16px;
         }
 
-        /* Efeito de marca-página/lombada central no livro aberto */
         .dobra-livro {
             background: linear-gradient(90deg, rgba(0,0,0,0.15), rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.25));
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-3 sm:p-6 pb-28 relative bg-cover bg-center bg-fixed" style="background-image: linear-gradient(rgba(15, 23, 42, 0.93), rgba(15, 23, 42, 0.93)), url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/bibliofundo.jpg');">
-    <div class="max-w-7xl mx-auto">
+<body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-6 pb-28 relative">
+    <div class="max-w-6xl mx-auto">
         <header class="mb-6 text-center flex flex-col items-center">
             <!-- Botão de Adicionar Item -->
-            <div class="w-full flex justify-end sm:absolute sm:right-0 sm:top-0 mb-4 sm:mb-0">
+            <div class="w-full flex justify-end sm:absolute sm:right-6 sm:top-6 mb-4 sm:mb-0">
                 <button onclick="abrirModalAdd()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold shadow transition flex items-center justify-center gap-2">
                     ➕ Adicionar Obra
                 </button>
@@ -89,12 +98,12 @@
             <p class="text-xs sm:text-sm text-slate-400">Controle, visualização e estatísticas do acervo pessoal</p>
             
             <!-- Painel de Indicadores -->
-            <div id="stats" class="grid grid-cols-2 gap-3 my-5 w-full max-w-md">
-                <div class="bg-slate-800/80 backdrop-blur border border-slate-700 p-3 rounded-lg shadow text-center">
+            <div id="stats" class="grid grid-cols-2 gap-3 my-4 w-full max-w-md">
+                <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-lg shadow text-center">
                     <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Total de Obras</p>
                     <p id="stat-total" class="text-xl sm:text-2xl font-bold text-indigo-400">0</p>
                 </div>
-                <div class="bg-slate-800/80 backdrop-blur border border-slate-700 p-3 rounded-lg shadow text-center">
+                <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-lg shadow text-center">
                     <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Investimento</p>
                     <p id="stat-custo" class="text-lg sm:text-2xl font-bold text-emerald-400 truncate">R$ 0,00</p>
                 </div>
@@ -102,8 +111,8 @@
 
             <!-- Barra de Pesquisa -->
             <div class="w-full max-w-md mt-2">
-                <input type="text" id="searchInput" placeholder="Pesquisar por título..." 
-                    class="w-full px-4 py-2.5 rounded-lg bg-slate-800/90 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                <input type="text" id="searchInput" placeholder="Pesquisar por título na estante..." 
+                    class="w-full px-4 py-2.5 rounded-lg bg-slate-900/90 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500 shadow-inner">
             </div>
 
             <!-- Botões de Filtros por Formato -->
@@ -111,70 +120,77 @@
         </header>
 
         <!-- Indicador de Carregamento -->
-        <div id="loading" class="text-center text-slate-400 py-20 text-base">Organizando a estante virtual...</div>
+        <div id="loading" class="text-center text-slate-400 py-20 text-base">Conectando à estante da biblioteca...</div>
 
-        <!-- Grade de Lombadas de Livros -->
-        <div id="grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-4"></div>
+        <!-- Estante de Madeira (5 colunas x 5 fileiras = 25 itens iniciais) -->
+        <div id="estanteContainer" class="hidden">
+            <div class="text-xs text-slate-400 mb-2 italic text-center sm:text-left flex items-center justify-between px-2">
+                <span id="status-exibicao">Mostrando amostra inicial da estante (5x5):</span>
+                <span class="text-[11px] text-amber-500/90">Dica: Use a pesquisa ou os filtros acima para encontrar obras específicas.</span>
+            </div>
+            <div class="estante-madeira p-4 sm:p-8 rounded-xl shadow-2xl">
+                <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Rodapé -->
-    <footer class="absolute bottom-0 left-0 w-full text-center py-3 bg-slate-950/90 border-t border-slate-800 text-[11px] sm:text-xs text-slate-400 space-y-0.5 px-2">
-        <p>Criado por <strong class="text-slate-300">Bernardo Deguchi</strong> • 2026</p>
-        <p class="text-slate-500">Acervo sincronizado via Google Sheets • Todos os direitos reservados</p>
+    <footer class="absolute bottom-0 left-0 w-full text-center py-3 bg-slate-950 border-t border-slate-900 text-[11px] sm:text-xs text-slate-500 space-y-0.5 px-2">
+        <p>Criado por <strong class="text-slate-400">Bernardo Deguchi</strong> • 2026</p>
+        <p>Acervo sincronizado via Google Sheets</p>
     </footer>
 
-    <!-- Modal de Detalhes (Livro Aberto 2 Páginas com Cores Dinâmicas) -->
+    <!-- Modal de Detalhes -->
     <div id="modalDetalhes" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 sm:p-4">
         <div id="modalBoxContainer" class="border-2 rounded-lg max-w-4xl w-full overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative transition-all duration-300">
             <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-200 hover:text-white bg-black/50 hover:bg-black/80 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-30">✕</button>
             <div id="modalConteudo" class="grid grid-cols-1 md:grid-cols-2 max-h-[90vh] overflow-y-auto relative"></div>
-            <!-- Dobra central simulando a lombada interna do livro aberto -->
             <div class="hidden md:block absolute top-0 bottom-0 left-1/2 w-6 -ml-3 pointer-events-none dobra-livro z-20"></div>
         </div>
     </div>
 
     <!-- Modal de Adicionar Novo Item -->
     <div id="modalAdd" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden z-50 flex items-center justify-center p-3 sm:p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-md w-full overflow-hidden shadow-2xl relative p-4 sm:p-6">
-            <button onclick="fecharModalAdd()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-900/80 rounded-full p-2 transition">✕</button>
+        <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full overflow-hidden shadow-2xl relative p-4 sm:p-6">
+            <button onclick="fecharModalAdd()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-950/80 rounded-full p-2 transition">✕</button>
             <h2 class="text-lg sm:text-xl font-bold text-white mb-3">Adicionar Nova Obra</h2>
             
             <form id="formAdd" onsubmit="enviarNovoItem(event)" class="space-y-2.5 max-h-[80vh] overflow-y-auto pr-1">
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Título *</label>
-                    <input type="text" id="add-titulo" required class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                    <input type="text" id="add-titulo" required class="w-full px-3 py-2 rounded bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
                 </div>
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Formato</label>
-                    <input type="text" id="add-formato" placeholder="Ex: Livro, Formatinho..." class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                    <input type="text" id="add-formato" placeholder="Ex: Livro, Formatinho..." class="w-full px-3 py-2 rounded bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Possuo</label>
-                        <input type="text" id="add-sim_adquirido" class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                        <input type="text" id="add-sim_adquirido" class="w-full px-3 py-2 rounded bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Falta</label>
-                        <input type="text" id="add-nao_faltante" class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                        <input type="text" id="add-nao_faltante" class="w-full px-3 py-2 rounded bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Custo (R$)</label>
-                    <input type="text" id="add-custo" placeholder="Ex: 29,90" class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                    <input type="text" id="add-custo" placeholder="Ex: 29,90" class="w-full px-3 py-2 rounded bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
                 </div>
                 
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Enviar Foto da Capa (Arquivo)</label>
-                    <input type="file" id="add-arquivo-capa" accept="image/*" class="w-full px-3 py-1.5 rounded bg-slate-900 border border-slate-700 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500">
+                    <input type="file" id="add-arquivo-capa" accept="image/*" class="w-full px-3 py-1.5 rounded bg-slate-950 border border-slate-800 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500">
                 </div>
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Ou Link da Capa (Opcional)</label>
-                    <input type="url" id="add-capa" placeholder="https://..." class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                    <input type="url" id="add-capa" placeholder="https://..." class="w-full px-3 py-2 rounded bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
                 </div>
 
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Senha de Autorização *</label>
-                    <input type="password" id="add-senha" required placeholder="Digite sua senha" class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
+                    <input type="password" id="add-senha" required placeholder="Digite sua senha" class="w-full px-3 py-2 rounded bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
                 </div>
                 
                 <p id="msgRetorno" class="text-xs text-center mt-2"></p>
@@ -188,9 +204,8 @@
         const API_URL = 'https://script.google.com/macros/s/AKfycbyxuYyKRAKJXYIGU-4tx8nq9i1C53QAKTgcvFzgMYhPgaf5UXEkPIGsfYmm1eGcq9oGiQ/exec';
 
         let colecao = [];
-        let formatoSelecionado = 'todos';
+        let formatoSelecionado = ''; // Inicia sem nenhum formato selecionado
 
-        // Paletas de fallback caso o livro não tenha capa cadastrada
         const paletasLombadas = [
             { bg: 'linear-gradient(90deg, #1e293b 0%, #334155 15%, #1e293b 85%, #0f172a 100%)', text: 'text-indigo-200', accent: 'bg-indigo-500', modalBg: '#111827', modalBorder: '#374151', capaFundo: '#1f2937', destaqueCor: 'text-indigo-400' },
             { bg: 'linear-gradient(90deg, #450a0a 0%, #7f1d1d 15%, #450a0a 85%, #260505 100%)', text: 'text-rose-200', accent: 'bg-rose-500', modalBg: '#1c1010', modalBorder: '#5c1d1d', capaFundo: '#2c1515', destaqueCor: 'text-rose-400' },
@@ -216,10 +231,11 @@
                 colecao = dadosBrutos.filter(item => item.titulo && item.titulo.toString().trim() !== "");
                 
                 document.getElementById('loading').style.display = 'none';
+                document.getElementById('estanteContainer').classList.remove('hidden');
                 
                 atualizarEstatisticas(colecao);
                 criarBotoesFiltro(colecao);
-                renderizarCards(colecao);
+                aplicarFiltros(); // Renderiza os 25 iniciais sem capa / sem filtro
             } catch (error) {
                 document.getElementById('loading').innerText = 'Erro ao carregar os dados. Verifique a conexão.';
                 console.error(error);
@@ -277,10 +293,11 @@
                 formatosMap[fmt] = (formatosMap[fmt] || 0) + 1;
             });
 
-            let htmlBotoes = `<button data-format="todos" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow">Todos (${dados.length})</button>`;
+            // Botão "Todos" desmarcado no início
+            let htmlBotoes = `<button data-format="todos" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all">Todos (${dados.length})</button>`;
             
             for (let [fmt, qtd] of Object.entries(formatosMap)) {
-                htmlBotoes += `<button data-format="${fmt}" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all">${fmt} (${qtd})</button>`;
+                htmlBotoes += `<button data-format="${fmt}" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all">${fmt} (${qtd})</button>`;
             }
             container.innerHTML = htmlBotoes;
 
@@ -293,13 +310,19 @@
         }
 
         function selecionarFiltro(formato) {
-            formatoSelecionado = formato;
+            if (formatoSelecionado === formato) {
+                // Se clicar no já selecionado, desmarca
+                formatoSelecionado = '';
+            } else {
+                formatoSelecionado = formato;
+            }
 
             document.querySelectorAll('.filtro-btn').forEach(b => {
-                if (b.getAttribute('data-format') === formato) {
+                const fmtBtn = b.getAttribute('data-format');
+                if (fmtBtn === formatoSelecionado) {
                     b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow";
                 } else {
-                    b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all";
+                    b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all";
                 }
             });
 
@@ -307,19 +330,31 @@
         }
 
         function aplicarFiltros() {
-            const termoBusca = document.getElementById('searchInput').value.toLowerCase();
+            const termoBusca = document.getElementById('searchInput').value.toLowerCase().trim();
+            const statusExibicao = document.getElementById('status-exibicao');
 
             const filtrados = colecao.filter(item => {
                 const titulo = item.titulo ? item.titulo.toString().toLowerCase() : '';
                 const formatoItem = item.formato ? item.formato.toString().trim() : 'Indefinido';
                 
-                const matchTexto = titulo.includes(termoBusca);
-                const matchFormato = formatoSelecionado === 'todos' || formatoItem.toLowerCase() === formatoSelecionado.toLowerCase();
+                const matchTexto = termoBusca === '' || titulo.includes(termoBusca);
+                const matchFormato = formatoSelecionado === '' || formatoSelecionado === 'todos' || formatoItem.toLowerCase() === formatoSelecionado.toLowerCase();
 
                 return matchTexto && matchFormato;
             });
 
-            renderizarCards(filtrados);
+            let dadosParaRenderizar = filtrados;
+
+            // Se o usuário não digitou nada na busca e nenhum filtro foi selecionado, exibe apenas 25 livros sem capa (amostra 5x5)
+            if (termoBusca === '' && formatoSelecionado === '') {
+                const semCapa = colecao.filter(item => !item.capa || !item.capa.toString().startsWith('http'));
+                dadosParaRenderizar = semCapa.slice(0, 25);
+                statusExibicao.innerText = `Amostra da estante (25 livros sem capa - 5x5):`;
+            } else {
+                statusExibicao.innerText = `Resultados encontrados (${filtrados.length}):`;
+            }
+
+            renderizarCards(dadosParaRenderizar);
         }
 
         function renderizarCards(dados) {
@@ -327,7 +362,7 @@
             grid.innerHTML = '';
 
             if (dados.length === 0) {
-                grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-10 text-sm">Nenhum item encontrado na estante.</p>`;
+                grid.innerHTML = `<p class="col-span-full text-center text-slate-400 py-12 text-sm italic">Nenhum livro encontrado nesta estante com os critérios informados.</p>`;
                 return;
             }
 
@@ -348,15 +383,13 @@
                 card.className = 'lombada-livro card-organizando border border-slate-700/60 rounded-md p-2.5 flex flex-col justify-between cursor-pointer min-h-[220px] sm:min-h-[260px] relative overflow-hidden group';
                 
                 if (temCapaValida) {
-                    // Se possui capa válida, aplica a imagem com efeito pixelizado (80%) e overlay escuro sutil
                     card.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${capa}')`;
                     card.classList.add('lombada-com-capa');
                 } else {
-                    // Caso contrário, usa a cor aleatória padrão
                     card.style.background = paleta.bg;
                 }
 
-                card.style.animationDelay = `${index * 0.03}s`;
+                card.style.animationDelay = `${index * 0.02}s`;
                 
                 card.addEventListener('click', () => {
                     abrirModalLivro(item, capa, custoFormatado, index);
@@ -365,7 +398,7 @@
                 card.innerHTML = `
                     <div class="space-y-1 mb-2 z-10">
                         <div class="border-b spine-line w-full pb-1 flex justify-between items-center">
-                            <span class="text-[8px] uppercase tracking-wider text-slate-200 font-bold truncate max-w-[70px]">${formato}</span>
+                            <span class="text-[8px] uppercase tracking-wider text-slate-200 font-bold truncate max-w-[80px]">${formato}</span>
                         </div>
                         <div class="border-b spine-line w-full"></div>
                     </div>
