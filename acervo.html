@@ -17,9 +17,9 @@
             background-attachment: fixed;
         }
 
-        /* Container Centralizado da Estante com rolamento horizontal para celulares */
+        /* Container Centralizado da Estante Compactado */
         .shelf-container-wrapper {
-            max-width: 860px;
+            max-width: 780px;
             margin: 0 auto;
             background: 
                 linear-gradient(rgba(40, 22, 10, 0.4), rgba(30, 15, 5, 0.5)),
@@ -31,7 +31,7 @@
             border: 4px solid #5a3214;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(0,0,0,0.5);
             filter: brightness(1.15);
-            overflow-x: auto; /* Rolamento horizontal habilitado */
+            position: relative;
         }
 
         /* Prateleira Individual */
@@ -42,8 +42,7 @@
             flex-wrap: nowrap;
             gap: 0px; 
             padding: 0 15px;
-            min-height: 240px;
-            min-width: 780px; /* Garante espaço para o scroll horizontal em telas menores */
+            min-height: 230px;
             background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(255,255,255,0.05) 40%, rgba(0,0,0,0.4) 100%);
             border-top: 6px solid transparent;
             border-bottom: 26px solid transparent;
@@ -55,8 +54,7 @@
                 inset 0 15px 20px -8px rgba(0,0,0,0.7), 
                 inset 0 -6px 8px rgba(0,0,0,0.7),
                 0 15px 25px -5px rgba(0,0,0,0.7);
-            overflow-x: auto;
-            overflow-y: hidden;
+            overflow: hidden;
         }
 
         .shelf:last-child {
@@ -106,7 +104,6 @@
             z-index: 10;
         }
 
-        /* Relevos decorativos nas extremidades da lombada */
         .book-spine::before {
             content: '';
             position: absolute;
@@ -149,6 +146,49 @@
             text-align: center;
             text-shadow: 0 1px 3px rgba(0,0,0,0.95);
             z-index: 3;
+        }
+
+        /* Alavancas de Paginação Laterais */
+        .alavanca-lateral {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #4a2810, #241205);
+            color: #fcd34d;
+            border: 2px solid #78350f;
+            width: 42px;
+            height: 64px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 2px 3px rgba(255,255,255,0.2);
+            transition: all 0.2s ease;
+            z-index: 30;
+        }
+
+        .alavanca-lateral:hover:not(:disabled) {
+            background: linear-gradient(135deg, #78350f, #4a2810);
+            transform: translateY(-50%) scale(1.08);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.9), inset 0 2px 5px rgba(255,255,255,0.3);
+            color: #fff;
+        }
+
+        .alavanca-lateral:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            filter: grayscale(80%);
+        }
+
+        .alavanca-esq { left: -52px; }
+        .alavanca-dir { right: -52px; }
+
+        @media (max-width: 920px) {
+            .alavanca-esq { left: 5px; z-index: 40; }
+            .alavanca-dir { right: 5px; z-index: 40; }
+            .shelf-container-wrapper { padding: 25px 45px; }
         }
 
         #modalDetalhes > div {
@@ -209,9 +249,13 @@
         <div id="loading" class="text-center text-slate-300 py-20 text-base drop-shadow">Carregando estante da biblioteca...</div>
 
         <div id="estanteContainer" class="hidden shelf-container-wrapper">
-            <div class="text-xs text-amber-100 mb-4 italic text-center sm:text-left flex items-center justify-between px-2 drop-shadow border-b border-amber-900/40 pb-2">
-                <span id="status-exibicao">Mostrando as primeiras estantes do acervo:</span>
-                <span class="text-[11px] text-amber-300 font-medium">Dica: Arraste para o lado para ver mais e clique nas lombadas.</span>
+            <!-- Alavancas laterais de paginação -->
+            <button id="btnAnterior" onclick="mudarPagina(-1)" class="alavanca-lateral alavanca-esq" title="Livros Anteriores">◀</button>
+            <button id="btnProximo" onclick="mudarPagina(1)" class="alavanca-lateral alavanca-dir" title="Próximos Livros">▶</button>
+
+            <div class="text-xs text-amber-100 mb-4 italic text-center sm:text-left flex flex-col sm:flex-row items-center justify-between px-2 drop-shadow border-b border-amber-900/40 pb-2 gap-1">
+                <span id="status-exibicao">Carregando status do acervo...</span>
+                <span class="text-[11px] text-amber-300 font-medium">Dica: Clique em qualquer lombada para detalhes.</span>
             </div>
             
             <div id="prateleirasWrapper" class="space-y-6"></div>
@@ -235,6 +279,10 @@
 
         let colecao = [];
         let formatoSelecionado = ''; 
+        let paginaAtual = 0;
+        const andaresPorEstante = 3;
+        const itensPorPrateleira = 16; // Maior densidade por prateleira para preencher o espaço reduzido
+        const itensPorPagina = andaresPorEstante * itensPorPrateleira; // 48 livros por página (3 andares)
 
         const fontesDisponiveis = [
             'ui-sans-serif, system-ui, sans-serif',
@@ -262,6 +310,7 @@
                 
                 atualizarEstatisticas(colecao);
                 criarBotoesFiltro(colecao);
+                paginaAtual = 0;
                 aplicarFiltros(); 
             } catch (error) {
                 document.getElementById('loading').innerText = 'Erro ao carregar os dados. Verifique a conexão.';
@@ -313,6 +362,7 @@
                 }
             });
 
+            paginaAtual = 0;
             aplicarFiltros();
         }
 
@@ -330,46 +380,61 @@
                 return matchTexto && matchFormato;
             });
 
-            let dadosParaRenderizar = filtrados;
-            const itensPorPrateleira = 14; 
-            const maxEstantesIniciais = 5;
+            const totalPaginas = Math.max(1, Math.ceil(filtrados.length / itensPorPagina));
+            if (paginaAtual >= totalPaginas) paginaAtual = totalPaginas - 1;
 
-            if (termoBusca === '' && formatoSelecionado === '') {
-                const limiteMaximoInicial = maxEstantesIniciais * itensPorPrateleira;
-                dadosParaRenderizar = colecao.slice(0, limiteMaximoInicial);
-                statusExibicao.innerText = `Mostrando as primeiras ${Math.min(maxEstantesIniciais, Math.ceil(colecao.length / itensPorPrateleira))} estantes do acervo:`;
+            const inicio = paginaAtual * itensPorPagina;
+            const fim = Math.min(inicio + itensPorPagina, filtrados.length);
+            const dadosPagina = filtrados.slice(inicio, fim);
+
+            if (filtrados.length > 0) {
+                statusExibicao.innerHTML = `Mostrando livros <strong class="text-amber-300">${inicio + 1}</strong> a <strong class="text-amber-300">${fim}</strong> de <strong class="text-amber-300">${filtrados.length}</strong> (Página ${paginaAtual + 1} de ${totalPaginas})`;
             } else {
-                statusExibicao.innerText = `Resultados encontrados (${filtrados.length}):`;
+                statusExibicao.innerText = `Nenhum livro encontrado com os critérios informados.`;
             }
 
-            renderizarEstantesEmPrateleiras(dadosParaRenderizar, itensPorPrateleira);
+            document.getElementById('btnAnterior').disabled = paginaAtual === 0;
+            document.getElementById('btnProximo').disabled = paginaAtual >= totalPaginas - 1;
+
+            renderizarEstantesEmPrateleiras(dadosPagina, paginaAtual);
         }
 
-        function renderizarEstantesEmPrateleiras(dados, itensPorPrateleira) {
+        function mudarPagina(direcao) {
+            paginaAtual += direcao;
+            aplicarFiltros();
+            window.scrollTo({ top: 150, behavior: 'smooth' });
+        }
+
+        function renderizarEstantesEmPrateleiras(dados, paginaIndex) {
             const wrapper = document.getElementById('prateleirasWrapper');
             wrapper.innerHTML = '';
 
             if (dados.length === 0) {
                 wrapper.innerHTML = `
                     <div class="shelf p-8 text-center text-slate-300 italic text-sm justify-center">
-                        Nenhum livro encontrado nesta estante com os critérios informados.
+                        Nenhum livro nesta estante.
                     </div>
                 `;
                 return;
             }
 
-            for (let i = 0; i < dados.length; i += itensPorPrateleira) {
-                const lote = dados.slice(i, i + itensPorPrateleira);
-                
+            // Garante exatamente 3 andares por página (distribuindo os itens disponíveis)
+            for (let andar = 0; andar < andaresPorEstante; andar++) {
+                const inicioLote = andar * itensPorPrateleira;
+                const lote = dados.slice(inicioLote, inicioLote + itensPorPrateleira);
+
+                if (lote.length === 0 && andar > 0) continue; // Pula andar vazio se houver poucos livros na última página
+
                 const shelfDiv = document.createElement('div');
                 shelfDiv.className = 'shelf card-organizando';
-                shelfDiv.style.animationDelay = `${(i / itensPorPrateleira) * 0.1}s`;
+                shelfDiv.style.animationDelay = `${andar * 0.1}s`;
 
-                const qtdVagos = 1 + ((i * 7) % 2); 
+                // Espaços vagos aleatórios (1 ou 2 por andar)
+                const qtdVagos = 1 + ((paginaIndex * 5 + andar * 7) % 2); 
                 let posicoesVazios = [];
-                while(posicoesVazios.length < qtdVagos) {
-                    let posRandom = 3 + ((i * 31 + posicoesVazios.length * 47) % (lote.length - 4));
-                    if (!posicoesVazios.includes(posRandom) && posRandom > 1 && posRandom < lote.length - 1) {
+                while(lote.length > 5 && posicoesVazios.length < qtdVagos) {
+                    let posRandom = 2 + (((paginaIndex + 1) * 31 + andar * 47 + posicoesVazios.length * 19) % (lote.length - 3));
+                    if (!posicoesVazios.includes(posRandom) && posRandom > 0 && posRandom < lote.length - 1) {
                         posicoesVazios.push(posRandom);
                     }
                 }
@@ -377,7 +442,7 @@
                 lote.forEach((item, indexIndice) => {
                     if (posicoesVazios.includes(indexIndice)) {
                         const gap = document.createElement('div');
-                        const larguraGap = 30 + ((i + indexIndice * 19) % 35); 
+                        const larguraGap = 25 + (((paginaIndex + 1) * andar + indexIndice * 13) % 30); 
                         gap.className = 'shelf-gap';
                         gap.style.width = `${larguraGap}px`;
                         shelfDiv.appendChild(gap);
@@ -386,15 +451,14 @@
                     const titulo = item.titulo || 'Sem Título';
                     const volumesTexto = item.volumes ? item.volumes.toString().trim() : '';
                     
-                    // Quantidade de livros adquiridos para definir a largura proporcional com teto limite (máx 4x o padrão)
                     const qtdAdquirida = item.quantidade ? parseInt(item.quantidade) : (item.qtd ? parseInt(item.qtd) : 1);
-                    const larguraBasePadrao = 28;
-                    const larguraCalculada = larguraBasePadrao + Math.min((Math.max(qtdAdquirida, 1) - 1) * 5, larguraBasePadrao * 3);
+                    const larguraBasePadrao = 26;
+                    const larguraCalculada = larguraBasePadrao + Math.min((Math.max(qtdAdquirida, 1) - 1) * 4.5, larguraBasePadrao * 3);
 
-                    // Semente única por livro combinando andar e índice para garantir alturas totalmente aleatórias e variadas entre andares
-                    const seed = (i * 73 + 17) ^ (indexIndice * 149 + 31);
+                    // Semente única combinando página, andar e índice para variação total e independente
+                    const seed = ((paginaIndex + 1) * 97 + andar * 73) ^ (indexIndice * 149 + 31);
 
-                    const altFator = Math.round(145 + ((seed % 11) * 6)); // Variação de altura dinâmica
+                    const altFator = Math.round(140 + ((seed % 13) * 6)); 
                     const tamanhoLetra = 11 + (seed % 3);
                     const familiaFonte = fontesDisponiveis[seed % fontesDisponiveis.length];
 
@@ -486,7 +550,10 @@
             if (e.target.id === 'modalDetalhes') fecharModal();
         });
 
-        document.getElementById('searchInput').addEventListener('input', aplicarFiltros);
+        document.getElementById('searchInput').addEventListener('input', () => {
+            paginaAtual = 0;
+            aplicarFiltros();
+        });
 
         carregarDados();
     </script>
