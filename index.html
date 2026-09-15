@@ -7,6 +7,17 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Background geral da página com a imagem do GitHub e transparência (70% translúcido = opacidade 0.3 na imagem) */
+        body {
+            background-color: #0f172a;
+            background-image: 
+                linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.90)), 
+                url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/bibliofundo.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
         /* Estilos base das lombadas */
         .lombada-livro {
             box-shadow: inset 4px 0 8px rgba(255, 255, 255, 0.08), inset -4px 0 10px rgba(0, 0, 0, 0.5), 0 8px 12px -3px rgba(0, 0, 0, 0.6);
@@ -22,7 +33,7 @@
             border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* Efeito de pixelização da capa na lombada (80% pixelizado / mosaico) */
+        /* Efeito de pixelização da capa na lombada */
         .lombada-com-capa {
             background-size: cover;
             background-position: center;
@@ -31,16 +42,21 @@
             filter: contrast(1.1) saturate(1.2);
         }
 
-        /* Efeito de Estante de Madeira Realista */
+        /* Estrutura de Prateleiras de Madeira Pura (CSS) */
         .estante-madeira {
-            background-color: #2b1708;
-            background-image: 
-                linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)),
-                url('https://images.unsplash.com/photo-1541123437800-1bb1317badc2?q=80&w=1000&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            box-shadow: inset 0 20px 30px -10px rgba(0,0,0,0.9), inset 0 -20px 30px -10px rgba(0,0,0,0.9);
-            border: 8px solid #1a0e05;
+            background: linear-gradient(135deg, #3d2314 0%, #29150a 100%);
+            border: 8px solid #1a0d06;
+            box-shadow: inset 0 15px 25px rgba(0,0,0,0.8), 0 20px 40px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        /* Prateleiras internas simulando madeira física em camadas */
+        .prateleira-camada {
+            position: relative;
+            padding-bottom: 24px;
+            margin-bottom: 16px;
+            border-bottom: 14px solid #4a2814;
+            box-shadow: 0 12px 10px -4px rgba(0, 0, 0, 0.7), inset 0 -4px 6px rgba(0,0,0,0.5);
         }
 
         /* Efeito de Livro Aberto suave ao abrir o modal */
@@ -84,7 +100,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-6 pb-28 relative">
+<body class="text-slate-100 min-h-screen p-3 sm:p-6 pb-28 relative">
     <div class="max-w-6xl mx-auto">
         <header class="mb-6 text-center flex flex-col items-center">
             <!-- Botão de Adicionar Item -->
@@ -94,16 +110,16 @@
                 </button>
             </div>
 
-            <h1 class="text-2xl sm:text-4xl font-bold mb-1">📚 Biblioteca do Berne</h1>
-            <p class="text-xs sm:text-sm text-slate-400">Controle, visualização e estatísticas do acervo pessoal</p>
+            <h1 class="text-2xl sm:text-4xl font-bold mb-1 drop-shadow-md">📚 Biblioteca do Berne</h1>
+            <p class="text-xs sm:text-sm text-slate-300 drop-shadow">Controle, visualização e estatísticas do acervo pessoal</p>
             
             <!-- Painel de Indicadores -->
             <div id="stats" class="grid grid-cols-2 gap-3 my-4 w-full max-w-md">
-                <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-lg shadow text-center">
+                <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-lg shadow-xl text-center backdrop-blur-sm">
                     <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Total de Obras</p>
                     <p id="stat-total" class="text-xl sm:text-2xl font-bold text-indigo-400">0</p>
                 </div>
-                <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-lg shadow text-center">
+                <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-lg shadow-xl text-center backdrop-blur-sm">
                     <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Investimento</p>
                     <p id="stat-custo" class="text-lg sm:text-2xl font-bold text-emerald-400 truncate">R$ 0,00</p>
                 </div>
@@ -112,7 +128,7 @@
             <!-- Barra de Pesquisa -->
             <div class="w-full max-w-md mt-2">
                 <input type="text" id="searchInput" placeholder="Pesquisar por título na estante..." 
-                    class="w-full px-4 py-2.5 rounded-lg bg-slate-900/90 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500 shadow-inner">
+                    class="w-full px-4 py-2.5 rounded-lg bg-slate-900/90 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500 shadow-inner backdrop-blur-sm">
             </div>
 
             <!-- Botões de Filtros por Formato -->
@@ -120,23 +136,23 @@
         </header>
 
         <!-- Indicador de Carregamento -->
-        <div id="loading" class="text-center text-slate-400 py-20 text-base">Conectando à estante da biblioteca...</div>
+        <div id="loading" class="text-center text-slate-300 py-20 text-base drop-shadow">Conectando à estante da biblioteca...</div>
 
-        <!-- Estante de Madeira (5 colunas x 5 fileiras = 25 itens iniciais) -->
+        <!-- Estante de Madeira Estruturada (5 colunas x 5 fileiras) -->
         <div id="estanteContainer" class="hidden">
-            <div class="text-xs text-slate-400 mb-2 italic text-center sm:text-left flex items-center justify-between px-2">
+            <div class="text-xs text-slate-300 mb-2 italic text-center sm:text-left flex items-center justify-between px-2 drop-shadow">
                 <span id="status-exibicao">Mostrando amostra inicial da estante (5x5):</span>
-                <span class="text-[11px] text-amber-500/90">Dica: Use a pesquisa ou os filtros acima para encontrar obras específicas.</span>
+                <span class="text-[11px] text-amber-300 font-medium">Dica: Use a pesquisa ou os filtros acima para encontrar obras específicas.</span>
             </div>
-            <div class="estante-madeira p-4 sm:p-8 rounded-xl shadow-2xl">
+            <div class="estante-madeira p-4 sm:p-6 rounded-xl shadow-2xl">
                 <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6"></div>
             </div>
         </div>
     </div>
 
     <!-- Rodapé -->
-    <footer class="absolute bottom-0 left-0 w-full text-center py-3 bg-slate-950 border-t border-slate-900 text-[11px] sm:text-xs text-slate-500 space-y-0.5 px-2">
-        <p>Criado por <strong class="text-slate-400">Bernardo Deguchi</strong> • 2026</p>
+    <footer class="absolute bottom-0 left-0 w-full text-center py-3 bg-slate-950/80 backdrop-blur-md border-t border-slate-900 text-[11px] sm:text-xs text-slate-400 space-y-0.5 px-2">
+        <p>Criado por <strong class="text-slate-200">Bernardo Deguchi</strong> • 2026</p>
         <p>Acervo sincronizado via Google Sheets</p>
     </footer>
 
@@ -204,7 +220,7 @@
         const API_URL = 'https://script.google.com/macros/s/AKfycbyxuYyKRAKJXYIGU-4tx8nq9i1C53QAKTgcvFzgMYhPgaf5UXEkPIGsfYmm1eGcq9oGiQ/exec';
 
         let colecao = [];
-        let formatoSelecionado = ''; // Inicia sem nenhum formato selecionado
+        let formatoSelecionado = ''; 
 
         const paletasLombadas = [
             { bg: 'linear-gradient(90deg, #1e293b 0%, #334155 15%, #1e293b 85%, #0f172a 100%)', text: 'text-indigo-200', accent: 'bg-indigo-500', modalBg: '#111827', modalBorder: '#374151', capaFundo: '#1f2937', destaqueCor: 'text-indigo-400' },
@@ -235,7 +251,7 @@
                 
                 atualizarEstatisticas(colecao);
                 criarBotoesFiltro(colecao);
-                aplicarFiltros(); // Renderiza os 25 iniciais sem capa / sem filtro
+                aplicarFiltros(); 
             } catch (error) {
                 document.getElementById('loading').innerText = 'Erro ao carregar os dados. Verifique a conexão.';
                 console.error(error);
@@ -293,11 +309,10 @@
                 formatosMap[fmt] = (formatosMap[fmt] || 0) + 1;
             });
 
-            // Botão "Todos" desmarcado no início
-            let htmlBotoes = `<button data-format="todos" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all">Todos (${dados.length})</button>`;
+            let htmlBotoes = `<button data-format="todos" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all backdrop-blur-sm">Todos (${dados.length})</button>`;
             
             for (let [fmt, qtd] of Object.entries(formatosMap)) {
-                htmlBotoes += `<button data-format="${fmt}" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all">${fmt} (${qtd})</button>`;
+                htmlBotoes += `<button data-format="${fmt}" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all backdrop-blur-sm">${fmt} (${qtd})</button>`;
             }
             container.innerHTML = htmlBotoes;
 
@@ -311,7 +326,6 @@
 
         function selecionarFiltro(formato) {
             if (formatoSelecionado === formato) {
-                // Se clicar no já selecionado, desmarca
                 formatoSelecionado = '';
             } else {
                 formatoSelecionado = formato;
@@ -322,7 +336,7 @@
                 if (fmtBtn === formatoSelecionado) {
                     b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow";
                 } else {
-                    b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all";
+                    b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all backdrop-blur-sm";
                 }
             });
 
@@ -345,7 +359,6 @@
 
             let dadosParaRenderizar = filtrados;
 
-            // Se o usuário não digitou nada na busca e nenhum filtro foi selecionado, exibe apenas 25 livros sem capa (amostra 5x5)
             if (termoBusca === '' && formatoSelecionado === '') {
                 const semCapa = colecao.filter(item => !item.capa || !item.capa.toString().startsWith('http'));
                 dadosParaRenderizar = semCapa.slice(0, 25);
@@ -362,7 +375,7 @@
             grid.innerHTML = '';
 
             if (dados.length === 0) {
-                grid.innerHTML = `<p class="col-span-full text-center text-slate-400 py-12 text-sm italic">Nenhum livro encontrado nesta estante com os critérios informados.</p>`;
+                grid.innerHTML = `<p class="col-span-full text-center text-slate-300 py-12 text-sm italic">Nenhum livro encontrado nesta estante com os critérios informados.</p>`;
                 return;
             }
 
