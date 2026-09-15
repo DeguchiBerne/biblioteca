@@ -3,673 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Área do Dono - Biblioteca do Berne</title>
+    <title>Biblioteca do Berne - Início</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Background geral da página com a imagem do GitHub e transparência */
         body {
             background-color: #0f172a;
             background-image: 
-                linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.90)), 
+                linear-gradient(rgba(15, 23, 42, 0.80), rgba(15, 23, 42, 0.88)), 
                 url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/bibliofundo.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
 
-        .lombada-livro {
-            box-shadow: inset 4px 0 8px rgba(255, 255, 255, 0.08), inset -4px 0 10px rgba(0, 0, 0, 0.5), 0 8px 12px -3px rgba(0, 0, 0, 0.6);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            transform-style: preserve-3d;
+        /* Efeito de vidro fosco para os cartões de acesso */
+        .card-portal {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .lombada-livro:hover {
-            transform: translateY(-8px) scale(1.03) translateZ(10px);
-            box-shadow: inset 4px 0 12px rgba(255, 255, 255, 0.15), inset -4px 0 14px rgba(0, 0, 0, 0.6), 0 18px 30px -5px rgba(0, 0, 0, 0.8);
-            z-index: 10;
-        }
-        .spine-line {
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .lombada-com-capa {
-            background-size: cover;
-            background-position: center;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-            filter: contrast(1.1) saturate(1.2);
-        }
-
-        .estante-madeira {
-            background: linear-gradient(135deg, #3d2314 0%, #29150a 100%);
-            border: 8px solid #1a0d06;
-            box-shadow: inset 0 15px 25px rgba(0,0,0,0.8), 0 20px 40px rgba(0,0,0,0.6);
-            position: relative;
-        }
-
-        #modalDetalhes > div {
-            animation: abrirLivro 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            transform-origin: center;
-        }
-        @keyframes abrirLivro {
-            0% { opacity: 0; transform: scale(0.7) rotateY(-15deg); }
-            100% { opacity: 1; transform: scale(1) rotateY(0deg); }
-        }
-
-        @keyframes organizarEstante {
-            0% { opacity: 0; transform: translateY(15px) scale(0.95); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .card-organizando {
-            animation: organizarEstante 0.4s ease-in-out forwards;
-        }
-
-        .pagina-livro {
-            background-color: #fcf8f2;
-            background-image: radial-gradient(#e6dbcc 0.75px, transparent 0.75px);
-            background-size: 16px 16px;
-        }
-
-        .dobra-livro {
-            background: linear-gradient(90deg, rgba(0,0,0,0.15), rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.25));
+        .card-portal:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 25px rgba(99, 102, 241, 0.2);
         }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen p-3 sm:p-6 pb-28 relative">
+<body class="text-slate-100 min-h-screen flex flex-col justify-between p-4 sm:p-6">
 
-    <!-- Modal de Autenticação Inicial (Bloqueio da Área do Dono) -->
-    <div id="modalAuth" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center">
-            <div class="w-14 h-14 bg-amber-600/20 border border-amber-500/30 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
-                🔒
-            </div>
-            <h2 class="text-lg font-bold text-white mb-1">Acesso Restrito</h2>
-            <p class="text-xs text-slate-400 mb-4">Digite a senha de administrador para gerenciar o acervo.</p>
-            
-            <form onsubmit="autenticarAdmin(event)" class="space-y-3">
-                <input type="password" id="inputSenhaAdmin" required placeholder="Senha de acesso" 
-                    class="w-full px-4 py-2.5 rounded-lg bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-amber-500 text-center">
-                <p id="msgAuthErro" class="text-xs text-rose-400 font-medium hidden">Senha incorreta. Tente novamente.</p>
-                <button type="submit" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-lg font-semibold text-sm transition shadow">
-                    Entrar no Painel
-                </button>
-            </form>
-            <div class="mt-4">
-                <a href="index.html" class="text-xs text-slate-400 hover:text-slate-200 underline">&larr; Voltar para a página inicial</a>
-            </div>
-        </div>
-    </div>
+    <!-- Cabeçalho Principal -->
+    <header class="text-center pt-8 sm:pt-12">
+        <h1 class="text-3xl sm:text-5xl font-bold mb-3 drop-shadow-md">📚 Biblioteca do Berne</h1>
+        <p class="text-sm sm:text-base text-slate-300 drop-shadow max-w-lg mx-auto">
+            Seja bem-vindo ao sistema de gerenciamento e exposição do acervo pessoal. Escolha o modo de acesso abaixo:
+        </p>
+    </header>
 
-    <!-- Conteúdo Principal Admin -->
-    <div class="max-w-6xl mx-auto">
-        <header class="mb-6 text-center flex flex-col items-center">
-            <!-- Voltar e Adicionar Obra -->
-            <div class="w-full flex justify-between sm:absolute sm:inset-x-6 sm:top-6 mb-4 sm:mb-0 px-2">
-                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2 border border-slate-700">
-                    &larr; Início
-                </a>
-                <button onclick="abrirModalAdd()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold shadow transition flex items-center gap-2">
-                    ➕ Adicionar Obra
-                </button>
+    <!-- Área de Seleção (2 Portais) -->
+    <main class="max-w-4xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 my-auto py-8">
+        
+        <!-- Opção 1: Acervo (Visitante) -->
+        <a href="acervo.html" class="card-portal rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center group">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-3xl sm:text-4xl mb-5 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                📖
             </div>
+            <h2 class="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors">Modo Visitante</h2>
+            <p class="text-xs sm:text-sm text-slate-400 leading-relaxed mb-6">
+                Explore a estante virtual, visualize as obras cadastradas, pesquise títulos e navegue livremente pelo acervo.
+            </p>
+            <span class="mt-auto inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-indigo-400 group-hover:translate-x-1 transition-transform">
+                Acessar Acervo &rarr;
+            </span>
+        </a>
 
-            <h1 class="text-2xl sm:text-4xl font-bold mb-1 drop-shadow-md">⚙️ Painel do Dono</h1>
-            <p class="text-xs sm:text-sm text-slate-300 drop-shadow">Gerenciamento completo, custos e controle de acervo</p>
-            
-            <!-- Painel de Indicadores Administrativos -->
-            <div id="stats" class="grid grid-cols-2 gap-3 my-4 w-full max-w-md">
-                <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-lg shadow-xl text-center backdrop-blur-sm">
-                    <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Total de Obras</p>
-                    <p id="stat-total" class="text-xl sm:text-2xl font-bold text-indigo-400">0</p>
-                </div>
-                <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-lg shadow-xl text-center backdrop-blur-sm">
-                    <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Investimento Total</p>
-                    <p id="stat-custo" class="text-base sm:text-2xl font-bold text-emerald-400 truncate">R$ 0,00</p>
-                </div>
+        <!-- Opção 2: Área Restrita (Gestão) -->
+        <a href="admin.html" class="card-portal rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center group">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-amber-600/20 border border-amber-500/30 flex items-center justify-center text-3xl sm:text-4xl mb-5 group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                ⚙️
             </div>
+            <h2 class="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">Área Restrita</h2>
+            <p class="text-xs sm:text-sm text-slate-400 leading-relaxed mb-6">
+                Painel de controle restrito. Adicione novos itens, substitua capas, gerencie dados e acompanhe estatísticas gerais.
+            </p>
+            <span class="mt-auto inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-amber-400 group-hover:translate-x-1 transition-transform">
+                Entrar no Painel &rarr;
+            </span>
+        </a>
 
-            <!-- Barra de Pesquisa -->
-            <div class="w-full max-w-md mt-2">
-                <input type="text" id="searchInput" placeholder="Pesquisar por título na estante..." 
-                    class="w-full px-4 py-2.5 rounded-lg bg-slate-900/90 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500 shadow-inner backdrop-blur-sm">
-            </div>
-
-            <!-- Botões de Filtros por Formato -->
-            <div id="formatFilters" class="flex overflow-x-auto w-full max-w-3xl gap-2 mt-4 pb-2 px-1 justify-start sm:justify-center scrollbar-none"></div>
-        </header>
-
-        <!-- Indicador de Carregamento -->
-        <div id="loading" class="text-center text-slate-300 py-20 text-base drop-shadow">Carregando painel administrativo...</div>
-
-        <!-- Estante de Madeira Estruturada -->
-        <div id="estanteContainer" class="hidden">
-            <div class="text-xs text-slate-300 mb-2 italic text-center sm:text-left flex items-center justify-between px-2 drop-shadow">
-                <span id="status-exibicao">Mostrando amostra inicial da estante (5x5):</span>
-                <span class="text-[11px] text-amber-300 font-medium">Modo Administrativo Ativo</span>
-            </div>
-            <div class="estante-madeira p-4 sm:p-6 rounded-xl shadow-2xl">
-                <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6"></div>
-            </div>
-        </div>
-    </div>
+    </main>
 
     <!-- Rodapé -->
-    <footer class="absolute bottom-0 left-0 w-full text-center py-3 bg-slate-950/80 backdrop-blur-md border-t border-slate-900 text-[11px] sm:text-xs text-slate-400 space-y-0.5 px-2">
+    <footer class="text-center py-4 text-xs text-slate-400 border-t border-slate-900/60 bg-slate-950/40 backdrop-blur-sm rounded-lg">
         <p>Criado por <strong class="text-slate-200">Bernardo Deguchi</strong> • 2026</p>
     </footer>
 
-    <!-- Modal de Detalhes Administrativos (Com Valores R$ e Atualização de Capa) -->
-    <div id="modalDetalhes" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 sm:p-4">
-        <div id="modalBoxContainer" class="border-2 rounded-lg max-w-4xl w-full overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative transition-all duration-300">
-            <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-200 hover:text-white bg-black/50 hover:bg-black/80 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-30">✕</button>
-            <div id="modalConteudo" class="grid grid-cols-1 md:grid-cols-2 max-h-[90vh] overflow-y-auto relative"></div>
-            <div class="hidden md:block absolute top-0 bottom-0 left-1/2 w-6 -ml-3 pointer-events-none dobra-livro z-20"></div>
-        </div>
-    </div>
-
-    <!-- Modal de Adicionar Novo Item -->
-    <div id="modalAdd" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden z-50 flex items-center justify-center p-3 sm:p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-md w-full overflow-hidden shadow-2xl relative p-4 sm:p-6">
-            <button onclick="fecharModalAdd()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-950/80 rounded-full p-2 transition">✕</button>
-            <h2 class="text-lg sm:text-xl font-bold text-white mb-3">Adicionar Nova Obra</h2>
-            
-            <form id="formAdd" onsubmit="enviarNovoItem(event)" class="space-y-2.5 max-h-[80vh] overflow-y-auto pr-1">
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Título *</label>
-                    <input type="text" id="add-titulo" required class="w-full px-3 py-2 rounded bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Formato</label>
-                    <input type="text" id="add-formato" placeholder="Ex: Livro, Formatinho..." class="w-full px-3 py-2 rounded bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Possuo</label>
-                        <input type="text" id="add-sim_adquirido" class="w-full px-3 py-2 rounded bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">Falta</label>
-                        <input type="text" id="add-nao_faltante" class="w-full px-3 py-2 rounded bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Custo (R$)</label>
-                    <input type="text" id="add-custo" placeholder="Ex: 29,90" class="w-full px-3 py-2 rounded bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
-                </div>
-                
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Enviar Foto da Capa (Arquivo)</label>
-                    <input type="file" id="add-arquivo-capa" accept="image/*" class="w-full px-3 py-1.5 rounded bg-slate-950 border border-slate-800 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Ou Link da Capa (Opcional)</label>
-                    <input type="url" id="add-capa" placeholder="https://..." class="w-full px-3 py-2 rounded bg-slate-950 border border-slate-800 text-white text-sm focus:outline-none focus:border-indigo-500">
-                </div>
-
-                <p id="msgRetorno" class="text-xs text-center mt-2"></p>
-
-                <button type="submit" id="btnSalvar" class="w-full mt-3 bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded font-semibold text-sm transition">Salvar na Planilha</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyxuYyKRAKJXYIGU-4tx8nq9i1C53QAKTgcvFzgMYhPgaf5UXEkPIGsfYmm1eGcq9oGiQ/exec';
-        let senhaAdminAtual = "";
-
-        // Gerenciamento de Autenticação na Sessão
-        document.addEventListener("DOMContentLoaded", () => {
-            const senhaSalva = sessionStorage.getItem("admin_senha_biblioteca");
-            if (senhaSalva) {
-                senhaAdminAtual = senhaSalva;
-                document.getElementById('modalAuth').classList.add('hidden');
-                carregarDados();
-            }
-        });
-
-        async function autenticarAdmin(event) {
-            event.preventDefault();
-            const senhaInput = document.getElementById('inputSenhaAdmin').value;
-            const erroEl = document.getElementById('msgAuthErro');
-
-            // Faz uma verificação rápida enviando a senha para testar se é válida no Apps Script
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ senha: senhaInput, testeAutenticacao: true })
-                });
-                const res = await response.json();
-
-                // Se o script retornar sucesso ou se aceitar salvar a credencial na sessão
-                senhaAdminAtual = senhaInput;
-                sessionStorage.setItem("admin_senha_biblioteca", senhaAdminAtual);
-                document.getElementById('modalAuth').classList.add('hidden');
-                carregarDados();
-            } catch (err) {
-                // Caso falhe a rede, assume a senha informada para permitir o fluxo administrativo ágil
-                senhaAdminAtual = senhaInput;
-                sessionStorage.setItem("admin_senha_biblioteca", senhaAdminAtual);
-                document.getElementById('modalAuth').classList.add('hidden');
-                carregarDados();
-            }
-        }
-
-        let colecao = [];
-        let formatoSelecionado = ''; 
-
-        const paletasLombadas = [
-            { bg: 'linear-gradient(90deg, #1e293b 0%, #334155 15%, #1e293b 85%, #0f172a 100%)', text: 'text-indigo-200', accent: 'bg-indigo-500', modalBg: '#111827', modalBorder: '#374151', capaFundo: '#1f2937', destaqueCor: 'text-indigo-400' },
-            { bg: 'linear-gradient(90deg, #450a0a 0%, #7f1d1d 15%, #450a0a 85%, #260505 100%)', text: 'text-rose-200', accent: 'bg-rose-500', modalBg: '#1c1010', modalBorder: '#5c1d1d', capaFundo: '#2c1515', destaqueCor: 'text-rose-400' },
-            { bg: 'linear-gradient(90deg, #064e3b 0%, #065f46 15%, #064e3b 85%, #022c22 100%)', text: 'text-emerald-200', accent: 'bg-emerald-500', modalBg: '#0b1d17', modalBorder: '#134e38', capaFundo: '#112a21', destaqueCor: 'text-emerald-400' },
-            { bg: 'linear-gradient(90deg, #3b0764 0%, #581c87 15%, #3b0764 85%, #2e1065 100%)', text: 'text-purple-200', accent: 'bg-purple-500', modalBg: '#190c24', modalBorder: '#4c1d95', capaFundo: '#251038', destaqueCor: 'text-purple-400' },
-            { bg: 'linear-gradient(90deg, #431407 0%, #78350f 15%, #431407 85%, #291104 100%)', text: 'text-amber-200', accent: 'bg-amber-500', modalBg: '#1c1208', modalBorder: '#78350f', capaFundo: '#2b1a0d', destaqueCor: 'text-amber-400' },
-            { bg: 'linear-gradient(90deg, #0f172a 0%, #1e293b 15%, #0f172a 85%, #020617 100%)', text: 'text-cyan-200', accent: 'bg-cyan-500', modalBg: '#08101a', modalBorder: '#1e3a8a', capaFundo: '#0f172a', destaqueCor: 'text-cyan-400' }
-        ];
-
-        const estilosTitulos = [
-            'font-serif tracking-wide italic font-medium',
-            'font-sans tracking-tight font-bold uppercase',
-            'font-mono tracking-normal font-semibold',
-            'font-serif tracking-widest font-bold'
-        ];
-
-        async function carregarDados() {
-            try {
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error('Erro na resposta do servidor');
-                let dadosBrutos = await response.json();
-                
-                colecao = dadosBrutos.filter(item => item.titulo && item.titulo.toString().trim() !== "");
-                
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('estanteContainer').classList.remove('hidden');
-                
-                atualizarEstatisticas(colecao);
-                criarBotoesFiltro(colecao);
-                aplicarFiltros(); 
-            } catch (error) {
-                document.getElementById('loading').innerText = 'Erro ao carregar os dados. Verifique a conexão.';
-                console.error(error);
-            }
-        }
-
-        function converterParaNumero(valorStr) {
-            if (!valorStr) return 0;
-            let str = valorStr.toString().trim();
-            if (!isNaN(str)) return parseFloat(str);
-
-            str = str.replace(/[^\d.,]/g, '');
-            if (str === '') return 0;
-
-            if (str.includes(',') && str.includes('.')) {
-                if (str.indexOf('.') < str.indexOf(',')) {
-                    str = str.replace(/\./g, '').replace(',', '.');
-                } else {
-                    str = str.replace(/,/g, '');
-                }
-            } else if (str.includes(',')) {
-                str = str.replace(',', '.');
-            }
-
-            let num = parseFloat(str);
-            return isNaN(num) ? 0 : num;
-        }
-
-        function formatarMoeda(valorStr) {
-            const num = converterParaNumero(valorStr);
-            if (num === 0 && (!valorStr || valorStr.toString().trim() === '' || valorStr.toString().includes('0'))) {
-                return valorStr ? valorStr : 'R$ 0,00';
-            }
-            return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        }
-
-        function atualizarEstatisticas(dados) {
-            const totalObras = dados.length;
-            let custoTotal = 0;
-
-            dados.forEach(item => {
-                custoTotal += converterParaNumero(item.custo);
-            });
-
-            document.getElementById('stat-total').innerText = totalObras;
-            document.getElementById('stat-custo').innerText = custoTotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        }
-
-        function criarBotoesFiltro(dados) {
-            const container = document.getElementById('formatFilters');
-            const formatosMap = {};
-
-            dados.forEach(item => {
-                let fmt = item.formato ? item.formato.toString().trim() : 'Indefinido';
-                formatosMap[fmt] = (formatosMap[fmt] || 0) + 1;
-            });
-
-            let htmlBotoes = `<button data-format="todos" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all backdrop-blur-sm">Todos (${dados.length})</button>`;
-            
-            for (let [fmt, qtd] of Object.entries(formatosMap)) {
-                htmlBotoes += `<button data-format="${fmt}" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all backdrop-blur-sm">${fmt} (${qtd})</button>`;
-            }
-            container.innerHTML = htmlBotoes;
-
-            document.querySelectorAll('.filtro-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const formatoEscolhido = e.currentTarget.getAttribute('data-format');
-                    selecionarFiltro(formatoEscolhido);
-                });
-            });
-        }
-
-        function selecionarFiltro(formato) {
-            if (formatoSelecionado === formato) {
-                formatoSelecionado = '';
-            } else {
-                formatoSelecionado = formato;
-            }
-
-            document.querySelectorAll('.filtro-btn').forEach(b => {
-                const fmtBtn = b.getAttribute('data-format');
-                if (fmtBtn === formatoSelecionado) {
-                    b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow";
-                } else {
-                    b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all backdrop-blur-sm";
-                }
-            });
-
-            aplicarFiltros();
-        }
-
-        function aplicarFiltros() {
-            const termoBusca = document.getElementById('searchInput').value.toLowerCase().trim();
-            const statusExibicao = document.getElementById('status-exibicao');
-
-            const filtrados = colecao.filter(item => {
-                const titulo = item.titulo ? item.titulo.toString().toLowerCase() : '';
-                const formatoItem = item.formato ? item.formato.toString().trim() : 'Indefinido';
-                
-                const matchTexto = termoBusca === '' || titulo.includes(termoBusca);
-                const matchFormato = formatoSelecionado === '' || formatoSelecionado === 'todos' || formatoItem.toLowerCase() === formatoSelecionado.toLowerCase();
-
-                return matchTexto && matchFormato;
-            });
-
-            let dadosParaRenderizar = filtrados;
-
-            if (termoBusca === '' && formatoSelecionado === '') {
-                const semCapa = colecao.filter(item => !item.capa || !item.capa.toString().startsWith('http'));
-                dadosParaRenderizar = semCapa.slice(0, 25);
-                statusExibicao.innerText = `Amostra da estante (25 livros sem capa - 5x5):`;
-            } else {
-                statusExibicao.innerText = `Resultados encontrados (${filtrados.length}):`;
-            }
-
-            renderizarCards(dadosParaRenderizar);
-        }
-
-        function renderizarCards(dados) {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = '';
-
-            if (dados.length === 0) {
-                grid.innerHTML = `<p class="col-span-full text-center text-slate-300 py-12 text-sm italic">Nenhum livro encontrado nesta estante com os critérios informados.</p>`;
-                return;
-            }
-
-            dados.forEach((item, index) => {
-                const titulo = item.titulo || 'Sem Título';
-                const formato = item.formato || 'Livro';
-                const custoFormatado = formatarMoeda(item.custo);
-                
-                const temCapaValida = item.capa && item.capa.toString().startsWith('http');
-                let capa = temCapaValida 
-                    ? item.capa 
-                    : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca';
-
-                const paleta = paletasLombadas[index % paletasLombadas.length];
-                const estiloTitulo = estilosTitulos[index % estilosTitulos.length];
-
-                const card = document.createElement('div');
-                card.className = 'lombada-livro card-organizando border border-slate-700/60 rounded-md p-2.5 flex flex-col justify-between cursor-pointer min-h-[220px] sm:min-h-[260px] relative overflow-hidden group';
-                
-                if (temCapaValida) {
-                    card.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${capa}')`;
-                    card.classList.add('lombada-com-capa');
-                } else {
-                    card.style.background = paleta.bg;
-                }
-
-                card.style.animationDelay = `${index * 0.02}s`;
-                
-                card.addEventListener('click', () => {
-                    abrirModalLivro(item, capa, custoFormatado, index);
-                });
-
-                card.innerHTML = `
-                    <div class="space-y-1 mb-2 z-10">
-                        <div class="border-b spine-line w-full pb-1 flex justify-between items-center">
-                            <span class="text-[8px] uppercase tracking-wider text-slate-200 font-bold truncate max-w-[80px]">${formato}</span>
-                        </div>
-                        <div class="border-b spine-line w-full"></div>
-                    </div>
-                    <div class="my-auto py-1 z-10">
-                        <h2 class="${estiloTitulo} text-xs sm:text-sm text-white group-hover:brightness-125 transition-all line-clamp-5 text-center leading-snug drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" title="${titulo}">${titulo}</h2>
-                    </div>
-                    <div class="space-y-1 mt-2 pt-1 border-t spine-line text-center z-10">
-                        <div class="w-2 h-2 rounded-full ${temCapaValida ? 'bg-amber-400' : paleta.accent} mx-auto opacity-80 group-hover:opacity-100 transition-opacity"></div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function abrirModalLivro(item, capaUrl, custoFmt, indicePaleta) {
-            const modal = document.getElementById('modalDetalhes');
-            const modalBox = document.getElementById('modalBoxContainer');
-            const conteudo = document.getElementById('modalConteudo');
-
-            const paleta = paletasLombadas[indicePaleta % paletasLombadas.length];
-
-            modalBox.style.backgroundColor = paleta.modalBg;
-            modalBox.style.borderColor = paleta.modalBorder;
-
-            let paginaEsquerda = `
-                <div class="p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-black/30 relative shadow-inner" style="background-color: ${paleta.capaFundo};">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent pointer-events-none"></div>
-                    <img src="${capaUrl}" class="w-48 h-72 sm:w-56 sm:h-80 object-cover rounded shadow-[0_15px_30px_rgba(0,0,0,0.8)] border border-black/40" alt="Capa">
-                    <span class="mt-4 text-xs tracking-widest uppercase ${paleta.destaqueCor} font-bold">${item.formato || 'Acervo'}</span>
-                </div>
-            `;
-
-            let paginaDireita = `
-                <div class="pagina-livro p-5 sm:p-7 flex flex-col justify-between text-slate-900 shadow-inner overflow-y-auto max-h-[85vh]">
-                    <div class="space-y-3">
-                        <div>
-                            <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-900 border-b border-amber-900/20 pb-2">${item.titulo || 'Sem Título'}</h2>
-                            <p class="font-bold text-base mt-1 text-emerald-800">Investimento: ${custoFmt}</p>
-                        </div>
-
-                        <div class="space-y-2 text-xs sm:text-sm">
-            `;
-
-            for (let [chave, valor] of Object.entries(item)) {
-                if (['titulo', 'formato', 'custo', 'capa'].includes(chave)) continue;
-                if (valor !== undefined && valor !== null && valor !== '') {
-                    let nomeChave = chave.replace(/_/g, ' ').toUpperCase();
-                    paginaDireita += `
-                        <div class="bg-white/90 p-2.5 rounded border border-amber-900/10 flex justify-between gap-2 shadow-sm">
-                            <span class="font-bold text-slate-600 text-[10px] uppercase">${nomeChave}:</span>
-                            <span class="text-slate-900 font-medium text-right">${valor}</span>
-                        </div>
-                    `;
-                }
-            }
-
-            paginaDireita += `
-                        </div>
-                    </div>
-
-                    <div class="mt-6 pt-4 border-t border-amber-900/20 bg-amber-100/50 p-3 rounded-lg border">
-                        <h3 class="font-bold text-xs text-slate-800 mb-2">📸 Atualizar Foto da Capa</h3>
-                        <form onsubmit="atualizarCapaItem(event, '${item.titulo.replace(/'/g, "\\'")}')" class="space-y-2">
-                            <div>
-                                <input type="file" id="update-arquivo-capa" accept="image/*" required class="w-full px-2 py-1 rounded bg-white border border-amber-900/20 text-slate-800 text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-800 file:text-white hover:file:bg-amber-900">
-                            </div>
-                            <p id="msgRetornoUpdate" class="text-xs text-center font-bold"></p>
-                            <button type="submit" id="btnAtualizarCapa" class="w-full bg-amber-800 hover:bg-amber-900 text-white py-1.5 rounded font-semibold text-xs transition shadow">Salvar Nova Capa</button>
-                        </form>
-                    </div>
-                </div>
-            `;
-
-            conteudo.innerHTML = paginaEsquerda + paginaDireita;
-            modal.classList.remove('hidden');
-        }
-
-        function fecharModal() {
-            document.getElementById('modalDetalhes').classList.add('hidden');
-        }
-
-        function abrirModalAdd() {
-            document.getElementById('modalAdd').classList.remove('hidden');
-            document.getElementById('msgRetorno').innerText = '';
-            document.getElementById('formAdd').reset();
-        }
-
-        function fecharModalAdd() {
-            document.getElementById('modalAdd').classList.add('hidden');
-        }
-
-        async function enviarNovoItem(event) {
-            event.preventDefault();
-            const btn = document.getElementById('btnSalvar');
-            const msg = document.getElementById('msgRetorno');
-            
-            btn.innerText = 'Processando imagem e salvando...';
-            btn.disabled = true;
-
-            const arquivoInput = document.getElementById('add-arquivo-capa');
-            let imagemBase64 = "";
-            let nomeArquivo = "";
-            let tipoMime = "";
-
-            if (arquivoInput.files && arquivoInput.files[0]) {
-                const file = arquivoInput.files[0];
-                nomeArquivo = file.name;
-                tipoMime = file.type;
-                
-                imagemBase64 = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
-                    reader.readAsDataURL(file);
-                });
-            }
-
-            const payload = {
-                senha: senhaAdminAtual,
-                titulo: document.getElementById('add-titulo').value,
-                formato: document.getElementById('add-formato').value,
-                sim_adquirido: document.getElementById('add-sim_adquirido').value,
-                nao_faltante: document.getElementById('add-nao_faltante').value,
-                custo: document.getElementById('add-custo').value,
-                capa: document.getElementById('add-capa').value,
-                imagemBase64: imagemBase64,
-                nomeArquivo: nomeArquivo,
-                tipoMime: tipoMime
-            };
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
-                const resultado = await response.json();
-
-                if (resultado.sucesso) {
-                    msg.className = "text-xs text-center mt-2 text-emerald-400 font-bold";
-                    msg.innerText = resultado.mensagem;
-                    setTimeout(() => {
-                        fecharModalAdd();
-                        carregarDados();
-                    }, 1500);
-                } else {
-                    msg.className = "text-xs text-center mt-2 text-rose-400 font-bold";
-                    msg.innerText = resultado.mensagem;
-                }
-            } catch (err) {
-                msg.className = "text-xs text-center mt-2 text-rose-400 font-bold";
-                msg.innerText = "Erro de conexão ao salvar.";
-            } finally {
-                btn.innerText = 'Salvar na Planilha';
-                btn.disabled = false;
-            }
-        }
-
-        async function atualizarCapaItem(event, tituloOriginal) {
-            event.preventDefault();
-            const btn = document.getElementById('btnAtualizarCapa');
-            const msg = document.getElementById('msgRetornoUpdate');
-            
-            btn.innerText = 'Atualizando capa...';
-            btn.disabled = true;
-
-            const arquivoInput = document.getElementById('update-arquivo-capa');
-            let imagemBase64 = "";
-            let nomeArquivo = "";
-            let tipoMime = "";
-
-            if (arquivoInput.files && arquivoInput.files[0]) {
-                const file = arquivoInput.files[0];
-                nomeArquivo = file.name;
-                tipoMime = file.type;
-                
-                imagemBase64 = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
-                    reader.readAsDataURL(file);
-                });
-            }
-
-            const payload = {
-                senha: senhaAdminAtual,
-                tituloOriginal: tituloOriginal,
-                imagemBase64: imagemBase64,
-                nomeArquivo: nomeArquivo,
-                tipoMime: tipoMime
-            };
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
-                const resultado = await response.json();
-
-                if (resultado.sucesso) {
-                    msg.className = "text-xs text-center text-emerald-800 font-bold";
-                    msg.innerText = resultado.mensagem;
-                    setTimeout(() => {
-                        fecharModal();
-                        carregarDados();
-                    }, 1500);
-                } else {
-                    msg.className = "text-xs text-center text-rose-800 font-bold";
-                    msg.innerText = resultado.mensagem;
-                }
-            } catch (err) {
-                msg.className = "text-xs text-center text-rose-800 font-bold";
-                msg.innerText = "Erro de conexão ao atualizar.";
-            } finally {
-                btn.innerText = 'Salvar Nova Capa';
-                btn.disabled = false;
-            }
-        }
-
-        document.getElementById('modalDetalhes').addEventListener('click', (e) => {
-            if (e.target.id === 'modalDetalhes') fecharModal();
-        });
-        document.getElementById('modalAdd').addEventListener('click', (e) => {
-            if (e.target.id === 'modalAdd') fecharModalAdd();
-        });
-
-        document.getElementById('searchInput').addEventListener('input', aplicarFiltros);
-    </script>
 </body>
 </html>
