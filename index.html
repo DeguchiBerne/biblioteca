@@ -24,24 +24,45 @@
 
         /* Efeito de Livro Aberto suave ao abrir o modal */
         #modalDetalhes > div {
-            animation: abrirLivro 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: abrirLivro 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transform-origin: center;
         }
         @keyframes abrirLivro {
             0% {
                 opacity: 0;
-                transform: scale(0.8) rotateX(10deg);
+                transform: scale(0.7) rotateY(-15deg);
             }
             100% {
                 opacity: 1;
-                transform: scale(1) rotateX(0deg);
+                transform: scale(1) rotateY(0deg);
             }
+        }
+
+        /* Animação suave para os cards ao filtrar (efeito de organização) */
+        @keyframes organizarEstante {
+            0% {
+                opacity: 0;
+                transform: translateY(15px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .card-organizando {
+            animation: organizarEstante 0.4s ease-in-out forwards;
         }
 
         /* Textura interna simulando páginas de livro antigo */
         .pagina-livro {
-            background-color: #f8fafc;
-            background-image: radial-gradient(#e2e8f0 0.75px, transparent 0.75px);
+            background-color: #fcf8f2;
+            background-image: radial-gradient(#e6dbcc 0.75px, transparent 0.75px);
             background-size: 16px 16px;
+        }
+
+        /* Efeito de marca-página/lombada central no livro aberto */
+        .dobra-livro {
+            background: linear-gradient(90deg, rgba(0,0,0,0.15), rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.25));
         }
     </style>
 </head>
@@ -93,11 +114,13 @@
         <p class="text-slate-500">Acervo sincronizado via Google Sheets • Todos os direitos reservados</p>
     </footer>
 
-    <!-- Modal de Detalhes (Livro Aberto 2 Páginas) -->
+    <!-- Modal de Detalhes (Livro Aberto 2 Páginas com Cores Dinâmicas) -->
     <div id="modalDetalhes" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 sm:p-4">
-        <div class="bg-[#1e1b18] border-2 border-[#3f352c] rounded-lg max-w-4xl w-full overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative">
-            <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-300 hover:text-white bg-black/60 hover:bg-black/95 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-30">✕</button>
-            <div id="modalConteudo" class="grid grid-cols-1 md:grid-cols-2 max-h-[90vh] overflow-y-auto"></div>
+        <div id="modalBoxContainer" class="border-2 rounded-lg max-w-4xl w-full overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative transition-all duration-300">
+            <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-200 hover:text-white bg-black/50 hover:bg-black/80 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-30">✕</button>
+            <div id="modalConteudo" class="grid grid-cols-1 md:grid-cols-2 max-h-[90vh] overflow-y-auto relative"></div>
+            <!-- Dobra central simulando a lombada interna do livro aberto -->
+            <div class="hidden md:block absolute top-0 bottom-0 left-1/2 w-6 -ml-3 pointer-events-none dobra-livro z-20"></div>
         </div>
     </div>
 
@@ -158,13 +181,14 @@
         let colecao = [];
         let formatoSelecionado = 'todos';
 
+        // Paletas expandidas com cores de capa/lombada correspondentes para o modal de livro aberto
         const paletasLombadas = [
-            { bg: 'linear-gradient(90deg, #1e293b 0%, #334155 15%, #1e293b 85%, #0f172a 100%)', text: 'text-indigo-200', accent: 'bg-indigo-500' },
-            { bg: 'linear-gradient(90deg, #450a0a 0%, #7f1d1d 15%, #450a0a 85%, #260505 100%)', text: 'text-rose-200', accent: 'bg-rose-500' },
-            { bg: 'linear-gradient(90deg, #064e3b 0%, #065f46 15%, #064e3b 85%, #022c22 100%)', text: 'text-emerald-200', accent: 'bg-emerald-500' },
-            { bg: 'linear-gradient(90deg, #3b0764 0%, #581c87 15%, #3b0764 85%, #2e1065 100%)', text: 'text-purple-200', accent: 'bg-purple-500' },
-            { bg: 'linear-gradient(90deg, #431407 0%, #78350f 15%, #431407 85%, #291104 100%)', text: 'text-amber-200', accent: 'bg-amber-500' },
-            { bg: 'linear-gradient(90deg, #0f172a 0%, #1e293b 15%, #0f172a 85%, #020617 100%)', text: 'text-cyan-200', accent: 'bg-cyan-500' }
+            { bg: 'linear-gradient(90deg, #1e293b 0%, #334155 15%, #1e293b 85%, #0f172a 100%)', text: 'text-indigo-200', accent: 'bg-indigo-500', modalBg: '#111827', modalBorder: '#374151', capaFundo: '#1f2937', destaqueCor: 'text-indigo-400' },
+            { bg: 'linear-gradient(90deg, #450a0a 0%, #7f1d1d 15%, #450a0a 85%, #260505 100%)', text: 'text-rose-200', accent: 'bg-rose-500', modalBg: '#1c1010', modalBorder: '#5c1d1d', capaFundo: '#2c1515', destaqueCor: 'text-rose-400' },
+            { bg: 'linear-gradient(90deg, #064e3b 0%, #065f46 15%, #064e3b 85%, #022c22 100%)', text: 'text-emerald-200', accent: 'bg-emerald-500', modalBg: '#0b1d17', modalBorder: '#134e38', capaFundo: '#112a21', destaqueCor: 'text-emerald-400' },
+            { bg: 'linear-gradient(90deg, #3b0764 0%, #581c87 15%, #3b0764 85%, #2e1065 100%)', text: 'text-purple-200', accent: 'bg-purple-500', modalBg: '#190c24', modalBorder: '#4c1d95', capaFundo: '#251038', destaqueCor: 'text-purple-400' },
+            { bg: 'linear-gradient(90deg, #431407 0%, #78350f 15%, #431407 85%, #291104 100%)', text: 'text-amber-200', accent: 'bg-amber-500', modalBg: '#1c1208', modalBorder: '#78350f', capaFundo: '#2b1a0d', destaqueCor: 'text-amber-400' },
+            { bg: 'linear-gradient(90deg, #0f172a 0%, #1e293b 15%, #0f172a 85%, #020617 100%)', text: 'text-cyan-200', accent: 'bg-cyan-500', modalBg: '#08101a', modalBorder: '#1e3a8a', capaFundo: '#0f172a', destaqueCor: 'text-cyan-400' }
         ];
 
         const estilosTitulos = [
@@ -244,10 +268,10 @@
                 formatosMap[fmt] = (formatosMap[fmt] || 0) + 1;
             });
 
-            let htmlBotoes = `<button data-format="todos" class="filtro-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow">Todos (${dados.length})</button>`;
+            let htmlBotoes = `<button data-format="todos" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow">Todos (${dados.length})</button>`;
             
             for (let [fmt, qtd] of Object.entries(formatosMap)) {
-                htmlBotoes += `<button data-format="${fmt}" class="filtro-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all">${fmt} (${qtd})</button>`;
+                htmlBotoes += `<button data-format="${fmt}" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all">${fmt} (${qtd})</button>`;
             }
             container.innerHTML = htmlBotoes;
 
@@ -264,9 +288,9 @@
 
             document.querySelectorAll('.filtro-btn').forEach(b => {
                 if (b.getAttribute('data-format') === formato) {
-                    b.className = "filtro-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow";
+                    b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow";
                 } else {
-                    b.className = "filtro-btn shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all";
+                    b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 hover:bg-slate-700 transition-all";
                 }
             });
 
@@ -311,12 +335,14 @@
                 const estiloTitulo = estilosTitulos[index % estilosTitulos.length];
 
                 const card = document.createElement('div');
-                card.className = 'lombada-livro border border-slate-700/60 rounded-md p-2.5 flex flex-col justify-between cursor-pointer min-h-[220px] sm:min-h-[260px] relative overflow-hidden group';
+                // Adiciona a classe de animação para simular o livro se organizando na estante
+                card.className = 'lombada-livro card-organizando border border-slate-700/60 rounded-md p-2.5 flex flex-col justify-between cursor-pointer min-h-[220px] sm:min-h-[260px] relative overflow-hidden group';
                 card.style.background = paleta.bg;
+                card.style.animationDelay = `${index * 0.03}s`;
                 
-                // Ao clicar, abre imediatamente o modal do livro aberto
+                // Ao clicar, passa o índice para o modal herdar exatamente a paleta desta lombada
                 card.addEventListener('click', () => {
-                    abrirModalLivro(item, capa, custoFormatado);
+                    abrirModalLivro(item, capa, custoFormatado, index);
                 });
 
                 card.innerHTML = `
@@ -337,26 +363,34 @@
             });
         }
 
-        function abrirModalLivro(item, capaUrl, custoFmt) {
+        function abrirModalLivro(item, capaUrl, custoFmt, indicePaleta) {
             const modal = document.getElementById('modalDetalhes');
+            const modalBox = document.getElementById('modalBoxContainer');
             const conteudo = document.getElementById('modalConteudo');
+
+            // Seleciona a mesma paleta da lombada clicada para aplicar no livro aberto
+            const paleta = paletasLombadas[indicePaleta % paletasLombadas.length];
+
+            // Aplica as cores dinâmicas no container do modal
+            modalBox.style.backgroundColor = paleta.modalBg;
+            modalBox.style.borderColor = paleta.modalBorder;
 
             // Página Esquerda (Capa em destaque estilo capa de livro físico aberto)
             let paginaEsquerda = `
-                <div class="p-6 bg-[#161412] flex flex-col items-center justify-center border-r border-[#3f352c] relative shadow-inner">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent pointer-events-none"></div>
-                    <img src="${capaUrl}" class="w-48 h-72 sm:w-56 sm:h-80 object-cover rounded shadow-[0_10px_25px_rgba(0,0,0,0.8)] border border-[#4a3f35]" alt="Capa">
-                    <span class="mt-4 text-xs tracking-wider uppercase text-amber-500/90 font-semibold">${item.formato || 'Acervo'}</span>
+                <div class="p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-black/30 relative shadow-inner" style="background-color: ${paleta.capaFundo};">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent pointer-events-none"></div>
+                    <img src="${capaUrl}" class="w-48 h-72 sm:w-56 sm:h-80 object-cover rounded shadow-[0_15px_30px_rgba(0,0,0,0.8)] border border-black/40" alt="Capa">
+                    <span class="mt-4 text-xs tracking-widest uppercase ${paleta.destaqueCor} font-bold">${item.formato || 'Acervo'}</span>
                 </div>
             `;
 
             // Página Direita (Informações detalhadas + Atualização de capa)
             let paginaDireita = `
-                <div class="pagina-livro p-5 sm:p-7 flex flex-col justify-between text-slate-800 shadow-inner overflow-y-auto max-h-[85vh]">
+                <div class="pagina-livro p-5 sm:p-7 flex flex-col justify-between text-slate-900 shadow-inner overflow-y-auto max-h-[85vh]">
                     <div class="space-y-3">
                         <div>
-                            <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-900 border-b border-slate-300 pb-2">${item.titulo || 'Sem Título'}</h2>
-                            <p class="text-emerald-700 font-bold text-base mt-1">Investimento: ${custoFmt}</p>
+                            <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-900 border-b border-amber-900/20 pb-2">${item.titulo || 'Sem Título'}</h2>
+                            <p class="font-bold text-base mt-1 text-emerald-800">Investimento: ${custoFmt}</p>
                         </div>
 
                         <div class="space-y-2 text-xs sm:text-sm">
@@ -367,8 +401,8 @@
                 if (valor !== undefined && valor !== null && valor !== '') {
                     let nomeChave = chave.replace(/_/g, ' ').toUpperCase();
                     paginaDireita += `
-                        <div class="bg-white/80 p-2 rounded border border-slate-200 flex justify-between gap-2 shadow-sm">
-                            <span class="font-bold text-slate-500 text-[10px] uppercase">${nomeChave}:</span>
+                        <div class="bg-white/90 p-2.5 rounded border border-amber-900/10 flex justify-between gap-2 shadow-sm">
+                            <span class="font-bold text-slate-600 text-[10px] uppercase">${nomeChave}:</span>
                             <span class="text-slate-900 font-medium text-right">${valor}</span>
                         </div>
                     `;
@@ -380,17 +414,17 @@
                     </div>
 
                     <!-- Seção de atualização de capa direto na página direita -->
-                    <div class="mt-6 pt-4 border-t border-slate-300 bg-slate-100/90 p-3 rounded-lg border">
-                        <h3 class="font-bold text-xs text-slate-700 mb-2">📸 Atualizar Foto da Capa</h3>
+                    <div class="mt-6 pt-4 border-t border-amber-900/20 bg-amber-100/50 p-3 rounded-lg border">
+                        <h3 class="font-bold text-xs text-slate-800 mb-2">📸 Atualizar Foto da Capa</h3>
                         <form onsubmit="atualizarCapaItem(event, '${item.titulo.replace(/'/g, "\\'")}')" class="space-y-2">
                             <div>
-                                <input type="file" id="update-arquivo-capa" accept="image/*" required class="w-full px-2 py-1 rounded bg-white border border-slate-300 text-slate-800 text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-700 file:text-white hover:file:bg-amber-800">
+                                <input type="file" id="update-arquivo-capa" accept="image/*" required class="w-full px-2 py-1 rounded bg-white border border-amber-900/20 text-slate-800 text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-800 file:text-white hover:file:bg-amber-900">
                             </div>
                             <div>
-                                <input type="password" id="update-senha" required placeholder="Digite sua senha" class="w-full px-3 py-1.5 rounded bg-white border border-slate-300 text-slate-800 text-xs focus:outline-none focus:border-amber-700">
+                                <input type="password" id="update-senha" required placeholder="Digite sua senha" class="w-full px-3 py-1.5 rounded bg-white border border-amber-900/20 text-slate-800 text-xs focus:outline-none focus:border-amber-800">
                             </div>
                             <p id="msgRetornoUpdate" class="text-xs text-center font-bold"></p>
-                            <button type="submit" id="btnAtualizarCapa" class="w-full bg-amber-700 hover:bg-amber-800 text-white py-1.5 rounded font-semibold text-xs transition shadow">Salvar Nova Capa</button>
+                            <button type="submit" id="btnAtualizarCapa" class="w-full bg-amber-800 hover:bg-amber-900 text-white py-1.5 rounded font-semibold text-xs transition shadow">Salvar Nova Capa</button>
                         </form>
                     </div>
                 </div>
@@ -520,18 +554,18 @@
                 const resultado = await response.json();
 
                 if (resultado.sucesso) {
-                    msg.className = "text-xs text-center text-emerald-700 font-bold";
+                    msg.className = "text-xs text-center text-emerald-800 font-bold";
                     msg.innerText = resultado.mensagem;
                     setTimeout(() => {
                         fecharModal();
                         carregarDados();
                     }, 1500);
                 } else {
-                    msg.className = "text-xs text-center text-rose-700 font-bold";
+                    msg.className = "text-xs text-center text-rose-800 font-bold";
                     msg.innerText = resultado.mensagem;
                 }
             } catch (err) {
-                msg.className = "text-xs text-center text-rose-700 font-bold";
+                msg.className = "text-xs text-center text-rose-800 font-bold";
                 msg.innerText = "Erro de conexão ao atualizar.";
             } finally {
                 btn.innerText = 'Salvar Nova Capa';
