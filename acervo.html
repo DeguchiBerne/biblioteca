@@ -10,29 +10,52 @@
         body {
             background-color: #0f172a;
             background-image: 
-                linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.90)), 
+                linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.92)), 
                 url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/bibliofundo.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }
 
-        /* Estrutura Realista da Prateleira de Madeira */
+        /* Container Limitado e Centralizado (Reduzido em ~1/3 para evitar sobras à direita) */
+        .shelf-container-wrapper {
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        /* Estrutura Realista e Fortemente Marcada de Prateleira de Madeira Estilizada */
         .shelf {
             display: flex;
             align-items: flex-end;
             gap: 3px;
-            padding: 0 15px;
-            min-height: 230px;
-            border-bottom: 20px solid #451a03;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%);
+            padding: 0 20px;
+            min-height: 220px;
+            /* Estilização marcante de prateleira de madeira maciça */
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.6) 100%), #311005;
+            border-top: 4px solid #6c2e12;
+            border-bottom: 22px solid #230b03;
             position: relative;
-            margin-bottom: 2.5rem;
-            border-radius: 4px;
-            box-shadow: inset 0 12px 12px -6px rgba(0,0,0,0.6), 0 12px 20px -4px rgba(0,0,0,0.6);
+            margin-bottom: 3rem;
+            border-radius: 2px 2px 6px 6px;
+            box-shadow: 
+                inset 0 15px 15px -8px rgba(0,0,0,0.8), 
+                inset 0 -4px 6px rgba(0,0,0,0.9),
+                0 18px 25px -5px rgba(0,0,0,0.7);
             overflow-x: auto;
             scrollbar-width: thin;
-            scrollbar-color: #78350f #1e293b;
+            scrollbar-color: #854d0e #1e293b;
+        }
+
+        /* Detalhe estético da borda frontal da prateleira de madeira */
+        .shelf::after {
+            content: '';
+            position: absolute;
+            bottom: -22px;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #521c08, #854d0e, #521c08);
+            opacity: 0.8;
         }
 
         /* Lombada do Livro em Pé */
@@ -131,10 +154,10 @@
 
         <div id="loading" class="text-center text-slate-300 py-20 text-base drop-shadow">Carregando estante da biblioteca...</div>
 
-        <div id="estanteContainer" class="hidden">
+        <div id="estanteContainer" class="hidden shelf-container-wrapper">
             <div class="text-xs text-slate-300 mb-2 italic text-center sm:text-left flex items-center justify-between px-2 drop-shadow">
-                <span id="status-exibicao">Mostrando estantes iniciais:</span>
-                <span class="text-[11px] text-amber-300 font-medium">Dica: Clique em qualquer lombada para ver a capa e detalhes.</span>
+                <span id="status-exibicao">Mostrando as primeiras estantes do acervo:</span>
+                <span class="text-[11px] text-amber-300 font-medium">Dica: Clique em qualquer lombada para detalhes.</span>
             </div>
             
             <div id="prateleirasWrapper" class="space-y-6"></div>
@@ -256,10 +279,9 @@
             });
 
             let dadosParaRenderizar = filtrados;
-            const itensPorPrateleira = 16;
+            const itensPorPrateleira = 11; // Ajustado proporcionalmente para a largura reduzida em 1/3
             const maxEstantesIniciais = 5;
 
-            // Se nenhum filtro ou busca estiver ativo, limita a no máximo 5 prateleiras para carregamento leve
             if (termoBusca === '' && formatoSelecionado === '') {
                 const limiteMaximoInicial = maxEstantesIniciais * itensPorPrateleira;
                 dadosParaRenderizar = colecao.slice(0, limiteMaximoInicial);
@@ -291,13 +313,12 @@
                 shelfDiv.className = 'shelf card-organizando';
                 shelfDiv.style.animationDelay = `${(i / itensPorPrateleira) * 0.1}s`;
 
-                // Vão aleatório independente por prateleira
-                const posicaoGap = 3 + ((i / itensPorPrateleira * 7) % 5);
+                const posicaoGap = 2 + ((i / itensPorPrateleira * 5) % 4);
 
                 lote.forEach((item, indexIndice) => {
                     if (indexIndice === Math.floor(posicaoGap)) {
                         const gap = document.createElement('div');
-                        const larguraGap = 55 + ((i + indexIndice) % 4) * 30;
+                        const larguraGap = 40 + ((i + indexIndice) % 3) * 25;
                         gap.className = 'shelf-gap';
                         gap.style.width = `${larguraGap}px`;
                         shelfDiv.appendChild(gap);
@@ -309,14 +330,11 @@
 
                     const seed = (i + indexIndice) * 997;
 
-                    // Altura com variação orgânica simulando ordem decrescente em blocos
                     const blocoOrdem = Math.sin((i + indexIndice) * 0.6);
-                    const altFator = Math.round(155 + (blocoOrdem * 20) + ((seed % 7) * 4)); // Varia entre ~140px e ~190px
+                    const altFator = Math.round(150 + (blocoOrdem * 18) + ((seed % 7) * 4)); 
 
-                    // Largura baseada na quantidade adquirida (mínimo ~30px, crescendo proporcionalmente)
                     const larguraFinal = Math.round(30 + (Math.max(quantidadeAdquirida, 1) * 6));
 
-                    // Letras maiores no geral (entre 10px e 12px)
                     const tamanhoLetra = 10 + (seed % 3);
                     const familiaFonte = fontesDisponiveis[seed % fontesDisponiveis.length];
 
