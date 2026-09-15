@@ -17,19 +17,20 @@
             background-attachment: fixed;
         }
 
-        /* Container Centralizado da Estante com Fundo de Madeira (remove o fundo da página entre os andares) */
+        /* Container Centralizado da Estante (Madeira mais clara) */
         .shelf-container-wrapper {
             max-width: 860px;
             margin: 0 auto;
             background: 
-                linear-gradient(rgba(15, 8, 3, 0.85), rgba(15, 8, 3, 0.9)),
+                linear-gradient(rgba(40, 22, 10, 0.4), rgba(30, 15, 5, 0.5)),
                 url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/textura-madeira.jpg');
             background-size: cover;
             background-position: center;
             padding: 25px 15px;
             border-radius: 10px;
-            border: 4px solid #2b1708;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(0,0,0,0.8);
+            border: 4px solid #5a3214;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(0,0,0,0.5);
+            filter: brightness(1.15); /* Aumenta a luminosidade geral da estante */
         }
 
         /* Prateleira Individual */
@@ -41,7 +42,7 @@
             gap: 2px;
             padding: 0 15px;
             min-height: 240px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.7) 100%);
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(255,255,255,0.05) 40%, rgba(0,0,0,0.4) 100%);
             border-top: 6px solid transparent;
             border-bottom: 26px solid transparent;
             border-image: url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/textura-madeira.jpg') 30 round;
@@ -49,8 +50,8 @@
             margin-bottom: 2rem;
             border-radius: 2px 2px 6px 6px;
             box-shadow: 
-                inset 0 20px 25px -8px rgba(0,0,0,0.9), 
-                inset 0 -8px 10px rgba(0,0,0,0.95),
+                inset 0 15px 20px -8px rgba(0,0,0,0.7), 
+                inset 0 -6px 8px rgba(0,0,0,0.7),
                 0 15px 25px -5px rgba(0,0,0,0.7);
             overflow: hidden;
         }
@@ -66,11 +67,11 @@
             left: 0;
             right: 0;
             height: 7px;
-            background: linear-gradient(90deg, rgba(0,0,0,0.7), rgba(50,20,10,0.8), rgba(0,0,0,0.7));
+            background: linear-gradient(90deg, rgba(40,20,10,0.8), rgba(90,50,30,0.9), rgba(40,20,10,0.8));
             opacity: 0.95;
         }
 
-        /* Lombada do Livro com Textura de Couro (GitHub) */
+        /* Lombada do Livro com Cores e Textura de Couro Mais Claras e Vivas */
         .book-spine {
             cursor: pointer;
             border-radius: 3px 3px 0 0;
@@ -79,21 +80,21 @@
             justify-content: space-between;
             padding: 8px 2px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: inset -5px 0 10px rgba(0,0,0,0.7), 2px 3px 8px rgba(0,0,0,0.7);
+            box-shadow: inset -4px 0 8px rgba(0,0,0,0.4), 2px 3px 8px rgba(0,0,0,0.6);
             position: relative;
             flex-shrink: 0;
             user-select: none;
-            background-blend-mode: overlay;
+            background-blend-mode: normal; /* Deixa a cor base mais realçada sem escurecer demais */
             background-image: 
                 url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/textura-couro.jpg'),
-                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.4) 100%);
+                radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25) 0%, rgba(0,0,0,0.15) 100%);
             background-size: cover;
             background-position: center;
         }
 
         .book-spine:hover {
             transform: translateY(-8px);
-            box-shadow: inset -5px 0 10px rgba(0,0,0,0.7), 4px 8px 14px rgba(0,0,0,0.9);
+            box-shadow: inset -4px 0 8px rgba(0,0,0,0.4), 4px 8px 14px rgba(0,0,0,0.8);
             z-index: 10;
         }
 
@@ -105,8 +106,8 @@
             left: 2px;
             right: 2px;
             height: 2px;
-            background: rgba(255, 220, 150, 0.3);
-            box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 12px 0 rgba(255, 220, 150, 0.2);
+            background: rgba(255, 240, 200, 0.6);
+            box-shadow: 0 4px 0 rgba(0,0,0,0.25), 0 12px 0 rgba(255, 240, 200, 0.4);
             z-index: 2;
         }
 
@@ -117,8 +118,8 @@
             left: 2px;
             right: 2px;
             height: 2px;
-            background: rgba(255, 220, 150, 0.3);
-            box-shadow: 0 -4px 0 rgba(0,0,0,0.4);
+            background: rgba(255, 240, 200, 0.6);
+            box-shadow: 0 -4px 0 rgba(0,0,0,0.25);
             z-index: 2;
         }
 
@@ -133,14 +134,14 @@
             writing-mode: vertical-rl;
             text-orientation: mixed;
             font-weight: 600;
-            color: #f8fafc;
+            color: #ffffff;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             letter-spacing: 0.4px;
             margin: auto 0;
             text-align: center;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.95);
             z-index: 3;
         }
 
@@ -202,7 +203,7 @@
         <div id="loading" class="text-center text-slate-300 py-20 text-base drop-shadow">Carregando estante da biblioteca...</div>
 
         <div id="estanteContainer" class="hidden shelf-container-wrapper">
-            <div class="text-xs text-amber-200/90 mb-4 italic text-center sm:text-left flex items-center justify-between px-2 drop-shadow border-b border-amber-900/40 pb-2">
+            <div class="text-xs text-amber-100 mb-4 italic text-center sm:text-left flex items-center justify-between px-2 drop-shadow border-b border-amber-900/40 pb-2">
                 <span id="status-exibicao">Mostrando as primeiras estantes do acervo:</span>
                 <span class="text-[11px] text-amber-300 font-medium">Dica: Clique em qualquer lombada para detalhes.</span>
             </div>
@@ -229,13 +230,14 @@
         let colecao = [];
         let formatoSelecionado = ''; 
 
+        /* Cores base mais claras e vibrantes para as lombadas */
         const paletasLombadas = [
-            { baseColor: '#2b1708', modalBg: '#1c1008', modalBorder: '#5c3317', capaFundo: '#241306', destaqueCor: 'text-amber-400' }, 
-            { baseColor: '#38120a', modalBg: '#1c0c07', modalBorder: '#612115', capaFundo: '#2b0e07', destaqueCor: 'text-rose-400' }, 
-            { baseColor: '#12261c', modalBg: '#09140f', modalBorder: '#1f4a35', capaFundo: '#0d1c15', destaqueCor: 'text-emerald-400' }, 
-            { baseColor: '#28113b', modalBg: '#160821', modalBorder: '#4a2366', capaFundo: '#1f0d2c', destaqueCor: 'text-purple-400' }, 
-            { baseColor: '#38250c', modalBg: '#1f1406', modalBorder: '#69481a', capaFundo: '#2c1b09', destaqueCor: 'text-yellow-400' }, 
-            { baseColor: '#102238', modalBg: '#08121f', modalBorder: '#20436b', capaFundo: '#0c1a2c', destaqueCor: 'text-cyan-400' }  
+            { baseColor: '#5c3317', modalBg: '#1c1008', modalBorder: '#5c3317', capaFundo: '#241306', destaqueCor: 'text-amber-400' }, 
+            { baseColor: '#7a2517', modalBg: '#1c0c07', modalBorder: '#612115', capaFundo: '#2b0e07', destaqueCor: 'text-rose-400' }, 
+            { baseColor: '#1d4a33', modalBg: '#09140f', modalBorder: '#1f4a35', capaFundo: '#0d1c15', destaqueCor: 'text-emerald-400' }, 
+            { baseColor: '#4f2373', modalBg: '#160821', modalBorder: '#4a2366', capaFundo: '#1f0d2c', destaqueCor: 'text-purple-400' }, 
+            { baseColor: '#734d17', modalBg: '#1f1406', modalBorder: '#69481a', capaFundo: '#2c1b09', destaqueCor: 'text-yellow-400' }, 
+            { baseColor: '#1b416e', modalBg: '#08121f', modalBorder: '#20436b', capaFundo: '#0c1a2c', destaqueCor: 'text-cyan-400' }  
         ];
 
         const fontesDisponiveis = [
@@ -346,7 +348,7 @@
 
             if (dados.length === 0) {
                 wrapper.innerHTML = `
-                    <div class="shelf p-8 text-center text-slate-400 italic text-sm justify-center">
+                    <div class="shelf p-8 text-center text-slate-300 italic text-sm justify-center">
                         Nenhum livro encontrado nesta estante com os critérios informados.
                     </div>
                 `;
@@ -401,7 +403,7 @@
                     spine.innerHTML = `
                         <div></div>
                         <div class="book-title-vertical" title="${titulo}" style="font-size: ${tamanhoLetra}px; font-family: ${familiaFonte}; max-height: ${altFator - 50}px;">${titulo}</div>
-                        <div class="text-center text-amber-200/90 font-semibold truncate z-10" style="font-size: ${Math.max(tamanhoLetra - 1, 9)}px;" title="${volumesTexto}">${volumesTexto}</div>
+                        <div class="text-center text-amber-100 font-semibold truncate z-10" style="font-size: ${Math.max(tamanhoLetra - 1, 9)}px;" title="${volumesTexto}">${volumesTexto}</div>
                     `;
 
                     shelfDiv.appendChild(spine);
