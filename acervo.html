@@ -23,7 +23,7 @@
             align-items: flex-end;
             gap: 3px;
             padding: 0 15px;
-            min-height: 220px;
+            min-height: 230px;
             border-bottom: 20px solid #451a03;
             background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%);
             position: relative;
@@ -42,7 +42,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 6px 2px;
+            padding: 8px 3px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             box-shadow: inset -4px 0 8px rgba(0,0,0,0.5), 2px 2px 6px rgba(0,0,0,0.6);
             position: relative;
@@ -65,12 +65,11 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            letter-spacing: 0.2px;
+            letter-spacing: 0.3px;
             margin: auto 0;
             text-align: center;
         }
 
-        /* Espaços vazios aleatórios na prateleira para action figures */
         .shelf-gap {
             flex-shrink: 0;
         }
@@ -134,7 +133,7 @@
 
         <div id="estanteContainer" class="hidden">
             <div class="text-xs text-slate-300 mb-2 italic text-center sm:text-left flex items-center justify-between px-2 drop-shadow">
-                <span id="status-exibicao">Mostrando amostra inicial da estante:</span>
+                <span id="status-exibicao">Mostrando estantes iniciais:</span>
                 <span class="text-[11px] text-amber-300 font-medium">Dica: Clique em qualquer lombada para ver a capa e detalhes.</span>
             </div>
             
@@ -257,18 +256,22 @@
             });
 
             let dadosParaRenderizar = filtrados;
+            const itensPorPrateleira = 16;
+            const maxEstantesIniciais = 5;
 
+            // Se nenhum filtro ou busca estiver ativo, limita a no máximo 5 prateleiras para carregamento leve
             if (termoBusca === '' && formatoSelecionado === '') {
-                dadosParaRenderizar = colecao; // Mostra tudo distribuído nas prateleiras para preencher a tela até a direita
-                statusExibicao.innerText = `Mostrando acervo completo nas estantes:`;
+                const limiteMaximoInicial = maxEstantesIniciais * itensPorPrateleira;
+                dadosParaRenderizar = colecao.slice(0, limiteMaximoInicial);
+                statusExibicao.innerText = `Mostrando as primeiras ${Math.min(maxEstantesIniciais, Math.ceil(colecao.length / itensPorPrateleira))} estantes do acervo:`;
             } else {
                 statusExibicao.innerText = `Resultados encontrados (${filtrados.length}):`;
             }
 
-            renderizarEstantesEmPrateleiras(dadosParaRenderizar);
+            renderizarEstantesEmPrateleiras(dadosParaRenderizar, itensPorPrateleira);
         }
 
-        function renderizarEstantesEmPrateleiras(dados) {
+        function renderizarEstantesEmPrateleiras(dados, itensPorPrateleira) {
             const wrapper = document.getElementById('prateleirasWrapper');
             wrapper.innerHTML = '';
 
@@ -281,8 +284,6 @@
                 return;
             }
 
-            // Prateleiras mais densas (aprox 16 a 18 livros por prateleira para preencher perfeitamente)
-            const itensPorPrateleira = 17;
             for (let i = 0; i < dados.length; i += itensPorPrateleira) {
                 const lote = dados.slice(i, i + itensPorPrateleira);
                 
@@ -290,39 +291,33 @@
                 shelfDiv.className = 'shelf card-organizando';
                 shelfDiv.style.animationDelay = `${(i / itensPorPrateleira) * 0.1}s`;
 
-                // Posição aleatória na prateleira para inserir o espaço vazio de decoração (ex: em prateleiras alternadas)
-                const posicaoGap = 4 + (i % 5); 
+                // Vão aleatório independente por prateleira
+                const posicaoGap = 3 + ((i / itensPorPrateleira * 7) % 5);
 
                 lote.forEach((item, indexIndice) => {
-                    // Insere espaço vazio de decoração de forma variada
-                    if (indexIndice === posicaoGap || indexIndice === posicaoGap + 7) {
+                    if (indexIndice === Math.floor(posicaoGap)) {
                         const gap = document.createElement('div');
-                        const larguraGap = 50 + ((i + indexIndice) % 3) * 35; // Varia de 50px a 120px
+                        const larguraGap = 55 + ((i + indexIndice) % 4) * 30;
                         gap.className = 'shelf-gap';
                         gap.style.width = `${larguraGap}px`;
                         shelfDiv.appendChild(gap);
                     }
 
                     const titulo = item.titulo || 'Sem Título';
-                    const formato = item.formato || 'Livro';
-                    const volumesStr = item.volumes ? item.volumes.toString() : '1';
-                    
-                    // Extrai número de volumes para calcular grossura
-                    const matchVol = volumesStr.match(/\d+/);
-                    const qtdVolumes = matchVol ? parseInt(matchVol[0]) : 1;
+                    const volumesTexto = item.volumes ? item.volumes.toString().trim() : '';
+                    const quantidadeAdquirida = item.quantidade ? parseInt(item.quantidade) : (item.qtd ? parseInt(item.qtd) : 1);
 
-                    // Variação orgânica de tamanho (Proporção máxima de até ~3.5x entre o menor e o maior)
-                    // Fatores determinísticos baseados no índice para estabilidade visual
                     const seed = (i + indexIndice) * 997;
-                    const altFator = 145 + (seed % 50);   // Altura entre 145px e 195px (Menor ~145, Maior ~195)
-                    
-                    // Grossura baseada nos volumes (mínimo 30px, aumentanto para coleções maiores)
-                    const baseLargura = 32 + ((seed % 7) * 2);
-                    const extraGrossura = Math.min(qtdVolumes * 2.5, 45); // Coleções grossas ganham destaque
-                    const larguraFinal = Math.round(baseLargura + extraGrossura);
 
-                    // Tamanho de letra variável por livro (entre 8px e 10px)
-                    const tamanhoLetra = 8 + ((seed % 3));
+                    // Altura com variação orgânica simulando ordem decrescente em blocos
+                    const blocoOrdem = Math.sin((i + indexIndice) * 0.6);
+                    const altFator = Math.round(155 + (blocoOrdem * 20) + ((seed % 7) * 4)); // Varia entre ~140px e ~190px
+
+                    // Largura baseada na quantidade adquirida (mínimo ~30px, crescendo proporcionalmente)
+                    const larguraFinal = Math.round(30 + (Math.max(quantidadeAdquirida, 1) * 6));
+
+                    // Letras maiores no geral (entre 10px e 12px)
+                    const tamanhoLetra = 10 + (seed % 3);
                     const familiaFonte = fontesDisponiveis[seed % fontesDisponiveis.length];
 
                     const temCapaValida = item.capa && item.capa.toString().startsWith('http');
@@ -341,9 +336,9 @@
                     });
 
                     spine.innerHTML = `
-                        <div class="uppercase tracking-wider text-slate-300 font-bold text-center opacity-75 truncate" style="font-size: ${Math.max(tamanhoLetra - 1, 7)}px;">${formato}</div>
+                        <div></div>
                         <div class="book-title-vertical" title="${titulo}" style="font-size: ${tamanhoLetra}px; font-family: ${familiaFonte}; max-height: ${altFator - 50}px;">${titulo}</div>
-                        <div class="text-center text-slate-300 opacity-80 truncate" style="font-size: ${Math.max(tamanhoLetra - 1, 7)}px;">${item.volumes ? 'Vol. ' + item.volumes : ''}</div>
+                        <div class="text-center text-slate-200 font-semibold opacity-90 truncate" style="font-size: ${Math.max(tamanhoLetra - 1, 9)}px;" title="${volumesTexto}">${volumesTexto}</div>
                     `;
 
                     shelfDiv.appendChild(spine);
