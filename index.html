@@ -32,14 +32,27 @@
             animation: sairEstante 0.35s ease-in-out forwards;
         }
 
-        /* Animação suave do modal abrindo como um livro */
-        #modalDetalhes > div, #modalAdd > div {
-            animation: abrirLivro 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            transform-origin: center;
+        /* Efeito de Livro Aberto com origem personalizada via JS */
+        #modalDetalhes > div {
+            transform-origin: var(--origem-x, center) var(--origem-y, center);
+            animation: abrirLivroEstendido 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        @keyframes abrirLivro {
-            0% { opacity: 0; transform: scale(0.85) perspective(1000px) rotateY(-10deg); }
-            100% { opacity: 1; transform: scale(1) perspective(1000px) rotateY(0deg); }
+        @keyframes abrirLivroEstendido {
+            0% {
+                opacity: 0;
+                transform: scale(0.15) rotateY(-30deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotateY(0deg);
+            }
+        }
+
+        /* Textura interna simulando páginas de livro */
+        .pagina-livro {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 0.75px, transparent 0.75px);
+            background-size: 16px 16px;
         }
     </style>
 </head>
@@ -91,11 +104,11 @@
         <p class="text-slate-500">Acervo sincronizado via Google Sheets • Todos os direitos reservados</p>
     </footer>
 
-    <!-- Modal de Detalhes (Livro Abrindo) -->
-    <div id="modalDetalhes" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden z-50 flex items-center justify-center p-3 sm:p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full overflow-hidden shadow-2xl relative">
-            <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-900/80 rounded-full p-2 transition z-10">✕</button>
-            <div id="modalConteudo" class="p-4 sm:p-6 space-y-4 max-h-[85vh] overflow-y-auto"></div>
+    <!-- Modal de Detalhes (Livro Aberto 2 Páginas) -->
+    <div id="modalDetalhes" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 sm:p-4 perspective-[1500px]">
+        <div class="bg-[#1e1b18] border-2 border-[#3f352c] rounded-lg max-w-4xl w-full overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative">
+            <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-300 hover:text-white bg-black/60 hover:bg-black/90 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-30">✕</button>
+            <div id="modalConteudo" class="grid grid-cols-1 md:grid-cols-2 max-h-[90vh] overflow-y-auto"></div>
         </div>
     </div>
 
@@ -156,17 +169,15 @@
         let colecao = [];
         let formatoSelecionado = 'todos';
 
-        // Paletas de cores variadas para as lombadas dos livros
         const paletasLombadas = [
-            { bg: 'linear-gradient(90deg, #1e293b 0%, #334155 15%, #1e293b 85%, #0f172a 100%)', text: 'text-indigo-200', accent: 'bg-indigo-500' }, // Azul Noite
-            { bg: 'linear-gradient(90deg, #450a0a 0%, #7f1d1d 15%, #450a0a 85%, #260505 100%)', text: 'text-rose-200', accent: 'bg-rose-500' },   // Vinho / Couro Vermelho
-            { bg: 'linear-gradient(90deg, #064e3b 0%, #065f46 15%, #064e3b 85%, #022c22 100%)', text: 'text-emerald-200', accent: 'bg-emerald-500' }, // Verde Clássico
-            { bg: 'linear-gradient(90deg, #3b0764 0%, #581c87 15%, #3b0764 85%, #2e1065 100%)', text: 'text-purple-200', accent: 'bg-purple-500' }, // Roxo Real
-            { bg: 'linear-gradient(90deg, #431407 0%, #78350f 15%, #431407 85%, #291104 100%)', text: 'text-amber-200', accent: 'bg-amber-500' },   // Marrom / Couro Antigo
-            { bg: 'linear-gradient(90deg, #0f172a 0%, #1e293b 15%, #0f172a 85%, #020617 100%)', text: 'text-cyan-200', accent: 'bg-cyan-500' }     // Grafite Escuro
+            { bg: 'linear-gradient(90deg, #1e293b 0%, #334155 15%, #1e293b 85%, #0f172a 100%)', text: 'text-indigo-200', accent: 'bg-indigo-500' },
+            { bg: 'linear-gradient(90deg, #450a0a 0%, #7f1d1d 15%, #450a0a 85%, #260505 100%)', text: 'text-rose-200', accent: 'bg-rose-500' },
+            { bg: 'linear-gradient(90deg, #064e3b 0%, #065f46 15%, #064e3b 85%, #022c22 100%)', text: 'text-emerald-200', accent: 'bg-emerald-500' },
+            { bg: 'linear-gradient(90deg, #3b0764 0%, #581c87 15%, #3b0764 85%, #2e1065 100%)', text: 'text-purple-200', accent: 'bg-purple-500' },
+            { bg: 'linear-gradient(90deg, #431407 0%, #78350f 15%, #431407 85%, #291104 100%)', text: 'text-amber-200', accent: 'bg-amber-500' },
+            { bg: 'linear-gradient(90deg, #0f172a 0%, #1e293b 15%, #0f172a 85%, #020617 100%)', text: 'text-cyan-200', accent: 'bg-cyan-500' }
         ];
 
-        // Fontes e estilos tipográficos variados para as letras dos títulos nas lombadas
         const estilosTitulos = [
             'font-serif tracking-wide italic font-medium',
             'font-sans tracking-tight font-bold uppercase',
@@ -307,7 +318,6 @@
                     ? item.capa 
                     : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca';
 
-                // Escolhe dinamicamente uma cor de lombada e um estilo de letra baseados no índice do item
                 const paleta = paletasLombadas[index % paletasLombadas.length];
                 const estiloTitulo = estilosTitulos[index % estilosTitulos.length];
 
@@ -315,30 +325,29 @@
                 card.className = 'lombada-livro border border-slate-700/60 rounded-md p-2.5 flex flex-col justify-between cursor-pointer min-h-[220px] sm:min-h-[260px] relative overflow-hidden group';
                 card.style.background = paleta.bg;
                 
-                // Ao clicar, faz a animação do livro saindo da estante e depois abre o modal
+                // Ao clicar, captura as coordenadas do clique e anima a saída do livro
                 card.addEventListener('click', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = rect.left + rect.width / 2;
+                    const y = rect.top + rect.height / 2;
+
                     card.classList.add('animando-saida');
                     setTimeout(() => {
-                        abrirModal(item, capa, custoFormatado);
+                        abrirModalLivro(item, capa, custoFormatado, x, y);
                         card.classList.remove('animando-saida');
                     }, 280);
                 });
 
                 card.innerHTML = `
-                    <!-- Detalhes superiores da lombada -->
                     <div class="space-y-1 mb-2">
                         <div class="border-b spine-line w-full pb-1 flex justify-between items-center">
                             <span class="text-[8px] uppercase tracking-wider text-slate-300 font-bold truncate max-w-[70px]">${formato}</span>
                         </div>
                         <div class="border-b spine-line w-full"></div>
                     </div>
-
-                    <!-- Título na lombada com variação de fonte/estilo -->
                     <div class="my-auto py-1">
                         <h2 class="${estiloTitulo} text-xs sm:text-sm ${paleta.text} group-hover:brightness-125 transition-all line-clamp-5 text-center leading-snug" title="${titulo}">${titulo}</h2>
                     </div>
-
-                    <!-- Detalhes inferiores da lombada -->
                     <div class="space-y-1 mt-2 pt-1 border-t spine-line text-center">
                         <div class="w-2 h-2 rounded-full ${paleta.accent} mx-auto opacity-75 group-hover:opacity-100 transition-opacity"></div>
                     </div>
@@ -347,54 +356,79 @@
             });
         }
 
-        function abrirModal(item, capaUrl, custoFmt) {
+        function abrirModalLivro(item, capaUrl, custoFmt, clickX, clickY) {
             const modal = document.getElementById('modalDetalhes');
+            const modalBox = modal.querySelector('>');
+            
+            // Define o ponto de origem exato do clique para a animação 3D do livro se abrindo
+            if (clickX && clickY) {
+                const percentX = (clickX / window.innerWidth) * 100;
+                const percentY = (clickY / window.innerHeight) * 100;
+                modalBox.style.setProperty('--origem-x', `${percentX}%`);
+                modalBox.style.setProperty('--origem-y', `${percentY}%`);
+            } else {
+                modalBox.style.setProperty('--origem-x', `50%`);
+                modalBox.style.setProperty('--origem-y', `50%`);
+            }
+
             const conteudo = document.getElementById('modalConteudo');
 
-            let detalhesHtml = `
-                <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
-                    <img src="${capaUrl}" class="w-28 h-40 sm:w-36 sm:h-52 object-cover rounded-lg border border-slate-700 shadow shrink-0" alt="Capa">
-                    <div class="space-y-1.5 sm:space-y-2 flex-1 text-center sm:text-left">
-                        <span class="text-xs font-bold px-2 py-1 bg-indigo-900 text-indigo-200 rounded inline-block">${item.formato || 'Geral'}</span>
-                        <h2 class="text-lg sm:text-xl font-bold text-white">${item.titulo || 'Sem Título'}</h2>
-                        <p class="text-emerald-400 font-bold text-base sm:text-lg">Investimento: ${custoFmt}</p>
-                    </div>
+            // Página Esquerda (Capa em destaque estilo capa de livro físico aberto)
+            let paginaEsquerda = `
+                <div class="p-6 bg-[#161412] flex flex-col items-center justify-center border-r border-[#3f352c] relative shadow-inner">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent pointer-events-none"></div>
+                    <img src="${capaUrl}" class="w-48 h-72 sm:w-56 sm:h-80 object-cover rounded shadow-[0_10px_25px_rgba(0,0,0,0.8)] border border-[#4a3f35]" alt="Capa">
+                    <span class="mt-4 text-xs tracking-wider uppercase text-amber-500/90 font-semibold">${item.formato || 'Acervo'}</span>
                 </div>
-                <div class="border-t border-slate-700 pt-3 mt-3 space-y-2 text-xs sm:text-sm">
+            `;
+
+            // Página Direita (Informações detalhadas + Atualização de capa)
+            let paginaDireita = `
+                <div class="pagina-livro p-5 sm:p-7 flex flex-col justify-between text-slate-800 shadow-inner overflow-y-auto max-h-[85vh]">
+                    <div class="space-y-3">
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-900 border-b border-slate-300 pb-2">${item.titulo || 'Sem Título'}</h2>
+                            <p class="text-emerald-700 font-bold text-base mt-1">Investimento: ${custoFmt}</p>
+                        </div>
+
+                        <div class="space-y-2 text-xs sm:text-sm">
             `;
 
             for (let [chave, valor] of Object.entries(item)) {
                 if (['titulo', 'formato', 'custo', 'capa'].includes(chave)) continue;
                 if (valor !== undefined && valor !== null && valor !== '') {
                     let nomeChave = chave.replace(/_/g, ' ').toUpperCase();
-                    detalhesHtml += `
-                        <div class="bg-slate-900/50 p-2.5 rounded-lg border border-slate-700/50 flex flex-col sm:flex-row justify-between gap-1">
-                            <strong class="text-slate-400 text-[10px] sm:text-xs uppercase">${nomeChave}:</strong>
-                            <span class="text-slate-200 text-left sm:text-right font-medium">${valor}</span>
+                    paginaDireita += `
+                        <div class="bg-white/80 p-2 rounded border border-slate-200 flex justify-between gap-2 shadow-sm">
+                            <span class="font-bold text-slate-500 text-[10px] uppercase">${nomeChave}:</span>
+                            <span class="text-slate-900 font-medium text-right">${valor}</span>
                         </div>
                     `;
                 }
             }
 
-            // Seção para alterar/atualizar a foto da capa de itens já existentes
-            detalhesHtml += `
-                </div>
-                <div class="border-t border-slate-700 pt-4 mt-4 bg-slate-900/80 p-3 rounded-lg border border-slate-700">
-                    <h3 class="font-bold text-xs text-indigo-300 mb-2">📸 Atualizar Foto da Capa</h3>
-                    <form onsubmit="atualizarCapaItem(event, '${item.titulo.replace(/'/g, "\\'")}')" class="space-y-2">
-                        <div>
-                            <input type="file" id="update-arquivo-capa" accept="image/*" required class="w-full px-2 py-1 rounded bg-slate-950 border border-slate-700 text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500">
+            paginaDireita += `
                         </div>
-                        <div>
-                            <input type="password" id="update-senha" required placeholder="Digite sua senha" class="w-full px-3 py-1.5 rounded bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-indigo-500">
-                        </div>
-                        <p id="msgRetornoUpdate" class="text-xs text-center"></p>
-                        <button type="submit" id="btnAtualizarCapa" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-1.5 rounded font-semibold text-xs transition">Salvar Nova Capa</button>
-                    </form>
+                    </div>
+
+                    <!-- Seção de atualização de capa direto na página direita -->
+                    <div class="mt-6 pt-4 border-t border-slate-300 bg-slate-100/90 p-3 rounded-lg border">
+                        <h3 class="font-bold text-xs text-slate-700 mb-2">📸 Atualizar Foto da Capa</h3>
+                        <form onsubmit="atualizarCapaItem(event, '${item.titulo.replace(/'/g, "\\'")}')" class="space-y-2">
+                            <div>
+                                <input type="file" id="update-arquivo-capa" accept="image/*" required class="w-full px-2 py-1 rounded bg-white border border-slate-300 text-slate-800 text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-700 file:text-white hover:file:bg-amber-800">
+                            </div>
+                            <div>
+                                <input type="password" id="update-senha" required placeholder="Digite sua senha" class="w-full px-3 py-1.5 rounded bg-white border border-slate-300 text-slate-800 text-xs focus:outline-none focus:border-amber-700">
+                            </div>
+                            <p id="msgRetornoUpdate" class="text-xs text-center font-bold"></p>
+                            <button type="submit" id="btnAtualizarCapa" class="w-full bg-amber-700 hover:bg-amber-800 text-white py-1.5 rounded font-semibold text-xs transition shadow">Salvar Nova Capa</button>
+                        </form>
+                    </div>
                 </div>
             `;
 
-            conteudo.innerHTML = detalhesHtml;
+            conteudo.innerHTML = paginaEsquerda + paginaDireita;
             modal.classList.remove('hidden');
         }
 
@@ -518,18 +552,18 @@
                 const resultado = await response.json();
 
                 if (resultado.sucesso) {
-                    msg.className = "text-xs text-center text-emerald-400 font-bold";
+                    msg.className = "text-xs text-center text-emerald-700 font-bold";
                     msg.innerText = resultado.mensagem;
                     setTimeout(() => {
                         fecharModal();
                         carregarDados();
                     }, 1500);
                 } else {
-                    msg.className = "text-xs text-center text-rose-400 font-bold";
+                    msg.className = "text-xs text-center text-rose-700 font-bold";
                     msg.innerText = resultado.mensagem;
                 }
             } catch (err) {
-                msg.className = "text-xs text-center text-rose-400 font-bold";
+                msg.className = "text-xs text-center text-rose-700 font-bold";
                 msg.innerText = "Erro de conexão ao atualizar.";
             } finally {
                 btn.innerText = 'Salvar Nova Capa';
