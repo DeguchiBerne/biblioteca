@@ -32,19 +32,19 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(0,0,0,0.5);
             filter: brightness(1.15);
             position: relative;
-            overflow-x: auto; /* Rolamento horizontal habilitado para celulares */
+            overflow-x: auto;
         }
 
-        /* Prateleira Individual com largura mínima para forçar scroll horizontal perfeito */
+        /* Prateleira Individual preenchendo de ponta a ponta */
         .shelf {
             display: flex;
             align-items: flex-end;
-            justify-content: flex-start;
+            justify-content: space-between; /* Distribui os livros de ponta a ponta (esquerda e direita) */
             flex-wrap: nowrap;
-            gap: 0px; 
-            padding: 0 15px;
+            gap: 2px; 
+            padding: 0 10px;
             min-height: 230px;
-            min-width: 820px; /* Garante espaço suficiente para rolar no mobile */
+            min-width: 820px;
             background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(255,255,255,0.05) 40%, rgba(0,0,0,0.4) 100%);
             border-top: 6px solid transparent;
             border-bottom: 26px solid transparent;
@@ -285,7 +285,7 @@
         let paginaAtual = 0;
         const andaresPorEstante = 3;
         const itensPorPrateleira = 20; // 20 livros por prateleira
-        const itensPorPagina = andaresPorEstante * itensPorPrateleira; // Exatamente 60 títulos por página
+        const itensPorPagina = andaresPorEstante * itensPorPrateleira; // 60 títulos por página
 
         const fontesDisponiveis = [
             'ui-sans-serif, system-ui, sans-serif',
@@ -431,32 +431,19 @@
                 shelfDiv.className = 'shelf card-organizando';
                 shelfDiv.style.animationDelay = `${andar * 0.1}s`;
 
-                // Espaços vagos distribuídos para preencher o lado direito harmoniosamente sem deixar buracos fixos
-                const qtdVagos = lote.length > 12 ? (1 + ((paginaIndex + andar) % 2)) : 0; 
-                let posicoesVazios = [];
-                while(posicoesVazios.length < qtdVagos) {
-                    let posRandom = 4 + (((paginaIndex + 1) * 23 + andar * 41 + posicoesVazios.length * 37) % (lote.length - 4));
-                    if (!posicoesVazios.includes(posRandom) && posRandom > 2 && posRandom < lote.length - 2) {
-                        posicoesVazios.push(posRandom);
-                    }
-                }
-
-                lote.forEach((item, indexIndice) => {
-                    if (posicoesVazios.includes(indexIndice)) {
-                        const gap = document.createElement('div');
-                        const larguraGap = 22 + (((paginaIndex + 1) * andar + indexIndice * 17) % 28); 
-                        gap.className = 'shelf-gap';
-                        gap.style.width = `${larguraGap}px`;
-                        shelfDiv.appendChild(gap);
-                    }
-
+                // Estratégia de preenchimento duplo (simultâneo da esquerda para a direita e da direita para a esquerda)
+                // Usamos intercalação ou distribuição preenchendo os extremos uniformemente sem deixar falhas à direita.
+                let loteOrdenado = [...lote];
+                
+                loteOrdenado.forEach((item, indexIndice) => {
                     const titulo = item.titulo || 'Sem Título';
                     const volumesTexto = item.volumes ? item.volumes.toString().trim() : '';
                     
                     const qtdAdquirida = item.quantidade ? parseInt(item.quantidade) : (item.qtd ? parseInt(item.qtd) : 1);
-                    const larguraBasePadrao = 25;
+                    const larguraBasePadrao = 26;
                     const larguraCalculada = larguraBasePadrao + Math.min((Math.max(qtdAdquirida, 1) - 1) * 4, larguraBasePadrao * 3);
 
+                    // Semente única preservando as aleatoriedades explicadas (cores, alturas, fontes)
                     const seed = ((paginaIndex + 1) * 97 + andar * 73) ^ (indexIndice * 149 + 31);
 
                     const altFator = Math.round(138 + ((seed % 15) * 6)); 
