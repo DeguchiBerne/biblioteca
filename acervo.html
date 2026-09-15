@@ -17,20 +17,21 @@
             background-attachment: fixed;
         }
 
-        /* Container Limitado e Centralizado (Reduzido em ~1/3 para evitar sobras à direita) */
+        /* Container Centralizado */
         .shelf-container-wrapper {
-            max-width: 820px;
+            max-width: 860px;
             margin: 0 auto;
         }
 
-        /* Estrutura Realista e Fortemente Marcada de Prateleira de Madeira Estilizada */
+        /* Estrutura Realista e Marcada de Prateleira de Madeira Estilizada */
         .shelf {
             display: flex;
             align-items: flex-end;
-            gap: 3px;
-            padding: 0 20px;
+            justify-content: space-between; /* Distribui os livros por toda a extensão */
+            flex-wrap: nowrap;
+            gap: 2px;
+            padding: 0 15px;
             min-height: 220px;
-            /* Estilização marcante de prateleira de madeira maciça */
             background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.6) 100%), #311005;
             border-top: 4px solid #6c2e12;
             border-bottom: 22px solid #230b03;
@@ -46,7 +47,6 @@
             scrollbar-color: #854d0e #1e293b;
         }
 
-        /* Detalhe estético da borda frontal da prateleira de madeira */
         .shelf::after {
             content: '';
             position: absolute;
@@ -65,7 +65,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 8px 3px;
+            padding: 8px 2px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             box-shadow: inset -4px 0 8px rgba(0,0,0,0.5), 2px 2px 6px rgba(0,0,0,0.6);
             position: relative;
@@ -279,7 +279,7 @@
             });
 
             let dadosParaRenderizar = filtrados;
-            const itensPorPrateleira = 11; // Ajustado proporcionalmente para a largura reduzida em 1/3
+            const itensPorPrateleira = 10; 
             const maxEstantesIniciais = 5;
 
             if (termoBusca === '' && formatoSelecionado === '') {
@@ -313,29 +313,19 @@
                 shelfDiv.className = 'shelf card-organizando';
                 shelfDiv.style.animationDelay = `${(i / itensPorPrateleira) * 0.1}s`;
 
-                const posicaoGap = 2 + ((i / itensPorPrateleira * 5) % 4);
-
                 lote.forEach((item, indexIndice) => {
-                    if (indexIndice === Math.floor(posicaoGap)) {
-                        const gap = document.createElement('div');
-                        const larguraGap = 40 + ((i + indexIndice) % 3) * 25;
-                        gap.className = 'shelf-gap';
-                        gap.style.width = `${larguraGap}px`;
-                        shelfDiv.appendChild(gap);
-                    }
-
                     const titulo = item.titulo || 'Sem Título';
                     const volumesTexto = item.volumes ? item.volumes.toString().trim() : '';
                     const quantidadeAdquirida = item.quantidade ? parseInt(item.quantidade) : (item.qtd ? parseInt(item.qtd) : 1);
 
                     const seed = (i + indexIndice) * 997;
 
-                    const blocoOrdem = Math.sin((i + indexIndice) * 0.6);
-                    const altFator = Math.round(150 + (blocoOrdem * 18) + ((seed % 7) * 4)); 
+                    // Altura proporcional que comporta perfeitamente o título e os volumes
+                    const altFator = Math.round(155 + ((seed % 7) * 5)); 
 
-                    const larguraFinal = Math.round(30 + (Math.max(quantidadeAdquirida, 1) * 6));
+                    const larguraFinal = Math.round(34 + (Math.max(quantidadeAdquirida, 1) * 6));
 
-                    const tamanhoLetra = 10 + (seed % 3);
+                    const tamanhoLetra = 11 + (seed % 3);
                     const familiaFonte = fontesDisponiveis[seed % fontesDisponiveis.length];
 
                     const temCapaValida = item.capa && item.capa.toString().startsWith('http');
