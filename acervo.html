@@ -27,7 +27,7 @@
         .shelf {
             display: flex;
             align-items: flex-end;
-            justify-content: space-between; /* Distribui os livros por toda a extensão */
+            justify-content: flex-start; /* Sem espaçamento forçado nas pontas */
             flex-wrap: nowrap;
             gap: 2px;
             padding: 0 15px;
@@ -93,6 +93,7 @@
             text-align: center;
         }
 
+        /* Espaço livre entre os livros com tamanhos variados */
         .shelf-gap {
             flex-shrink: 0;
         }
@@ -314,6 +315,15 @@
                 shelfDiv.style.animationDelay = `${(i / itensPorPrateleira) * 0.1}s`;
 
                 lote.forEach((item, indexIndice) => {
+                    // Insere espaços livres de tamanhos diferentes de forma aleatória/natural entre os livros
+                    if (indexIndice > 0 && (indexIndice % 3 === 0 || indexIndice === 4 || indexIndice === 7)) {
+                        const gap = document.createElement('div');
+                        const larguraGap = 15 + ((i + indexIndice * 13) % 35); // Variação de 15px a 50px de espaço livre
+                        gap.className = 'shelf-gap';
+                        gap.style.width = `${larguraGap}px`;
+                        shelfDiv.appendChild(gap);
+                    }
+
                     const titulo = item.titulo || 'Sem Título';
                     const volumesTexto = item.volumes ? item.volumes.toString().trim() : '';
                     const quantidadeAdquirida = item.quantidade ? parseInt(item.quantidade) : (item.qtd ? parseInt(item.qtd) : 1);
