@@ -35,13 +35,13 @@
             overflow-x: auto;
         }
 
-        /* Prateleira Individual preenchendo de ponta a ponta */
+        /* Prateleira Individual com preenchimento duplo (esquerda e direita) */
         .shelf {
             display: flex;
             align-items: flex-end;
-            justify-content: space-between; /* Distribui os livros de ponta a ponta (esquerda e direita) */
+            justify-content: space-between; /* Garante ocupação de ponta a ponta */
             flex-wrap: nowrap;
-            gap: 2px; 
+            gap: 0px; 
             padding: 0 10px;
             min-height: 230px;
             min-width: 820px;
@@ -75,7 +75,24 @@
             opacity: 0.95;
         }
 
-        /* Lombada do Livro */
+        /* Bloco de alinhamento lateral */
+        .shelf-side-group {
+            display: flex;
+            align-items: flex-end;
+            flex-wrap: nowrap;
+            gap: 0px;
+            flex: 1;
+        }
+
+        .shelf-side-group.right {
+            justify-content: flex-end;
+        }
+
+        .shelf-side-group.left {
+            justify-content: flex-start;
+        }
+
+        /* Lombada do Livro com bordas bem definidas */
         .book-spine {
             cursor: pointer;
             border-radius: 3px 3px 0 0;
@@ -408,6 +425,42 @@
             window.scrollTo({ top: 150, behavior: 'smooth' });
         }
 
+        function criarElementoLivro(item, indexIndice, paginaIndex, andar) {
+            const titulo = item.titulo || 'Sem Título';
+            const volumesTexto = item.volumes ? item.volumes.toString().trim() : '';
+            
+            const qtdAdquirida = item.quantidade ? parseInt(item.quantidade) : (item.qtd ? parseInt(item.qtd) : 1);
+            const larguraBasePadrao = 26;
+            const larguraCalculada = larguraBasePadrao + Math.min((Math.max(qtdAdquirida, 1) - 1) * 4, larguraBasePadrao * 3);
+
+            const seed = ((paginaIndex + 1) * 97 + andar * 73) ^ (indexIndice * 149 + 31);
+            const altFator = Math.round(138 + ((seed % 15) * 6)); 
+            const tamanhoLetra = 11 + (seed % 3);
+            const familiaFonte = fontesDisponiveis[seed % fontesDisponiveis.length];
+
+            const temCapaValida = item.capa && item.capa.toString().startsWith('http');
+            const capaUrl = temCapaValida ? item.capa : '';
+            const corAleatoriaLombada = gerarCorAleatoria(seed);
+
+            const spine = document.createElement('div');
+            spine.className = 'book-spine';
+            spine.style.backgroundColor = corAleatoriaLombada;
+            spine.style.height = `${altFator}px`;
+            spine.style.width = `${larguraCalculada}px`;
+
+            spine.addEventListener('click', () => {
+                abrirModalLivro(item, capaUrl, corAleatoriaLombada);
+            });
+
+            spine.innerHTML = `
+                <div></div>
+                <div class="book-title-vertical" title="${titulo}" style="font-size: ${tamanhoLetra}px; font-family: ${familiaFonte}; max-height: ${altFator - 50}px;">${titulo}</div>
+                <div class="text-center text-amber-100 font-semibold truncate z-10" style="font-size: ${Math.max(tamanhoLetra - 1, 9)}px;" title="${volumesTexto}">${volumesTexto}</div>
+            `;
+
+            return spine;
+        }
+
         function renderizarEstantesEmPrateleiras(dados, paginaIndex) {
             const wrapper = document.getElementById('prateleirasWrapper');
             wrapper.innerHTML = '';
@@ -431,49 +484,46 @@
                 shelfDiv.className = 'shelf card-organizando';
                 shelfDiv.style.animationDelay = `${andar * 0.1}s`;
 
-                // Estratégia de preenchimento duplo (simultâneo da esquerda para a direita e da direita para a esquerda)
-                // Usamos intercalação ou distribuição preenchendo os extremos uniformemente sem deixar falhas à direita.
-                let loteOrdenado = [...lote];
-                
-                loteOrdenado.forEach((item, indexIndice) => {
-                    const titulo = item.titulo || 'Sem Título';
-                    const volumesTexto = item.volumes ? item.volumes.toString().trim() : '';
-                    
-                    const qtdAdquirida = item.quantidade ? parseInt(item.quantidade) : (item.qtd ? parseInt(item.qtd) : 1);
-                    const larguraBasePadrao = 26;
-                    const larguraCalculada = larguraBasePadrao + Math.min((Math.max(qtdAdquirida, 1) - 1) * 4, larguraBasePadrao * 3);
+                // Dividir o lote ao meio: metade esquerda e metade direita
+                const meio = Math.ceil(lote.length / 2);
+                const loteEsquerda = lote.slice(0, meio);
+                const loteDireita = lote.slice(meio);
 
-                    // Semente única preservando as aleatoriedades explicadas (cores, alturas, fontes)
-                    const seed = ((paginaIndex + 1) * 97 + andar * 73) ^ (indexIndice * 149 + 31);
+                // Grupos de alinhamento nas pontas
+                const grupoEsq = document.createElement('div');
+                grupoEsq.className = 'shelf-side-group left';
 
-                    const altFator = Math.round(138 + ((seed % 15) * 6)); 
-                    const tamanhoLetra = 11 + (seed % 3);
-                    const familiaFonte = fontesDisponiveis[seed % fontesDisponiveis.length];
+                const grupoDir = document.createElement('div');
+                grupoDir.className = 'shelf-side-group right';
 
-                    const temCapaValida = item.capa && item.capa.toString().startsWith('http');
-                    const capaUrl = temCapaValida ? item.capa : '';
+                // Inserir 1 ou 2 espaços vazios (gaps) para elementos futuros de forma orgânica
+                const qtdGaps = 1 + ((paginaIndex + andar) % 2); // alterna entre 1 e 2 espaços
+                const posicaoGapEsq = Math.floor(loteEsquerda.length / 2);
 
-                    const corAleatoriaLombada = gerarCorAleatoria(seed);
-
-                    const spine = document.createElement('div');
-                    spine.className = 'book-spine';
-                    spine.style.backgroundColor = corAleatoriaLombada;
-                    spine.style.height = `${altFator}px`;
-                    spine.style.width = `${larguraCalculada}px`;
-
-                    spine.addEventListener('click', () => {
-                        abrirModalLivro(item, capaUrl, corAleatoriaLombada);
-                    });
-
-                    spine.innerHTML = `
-                        <div></div>
-                        <div class="book-title-vertical" title="${titulo}" style="font-size: ${tamanhoLetra}px; font-family: ${familiaFonte}; max-height: ${altFator - 50}px;">${titulo}</div>
-                        <div class="text-center text-amber-100 font-semibold truncate z-10" style="font-size: ${Math.max(tamanhoLetra - 1, 9)}px;" title="${volumesTexto}">${volumesTexto}</div>
-                    `;
-
-                    shelfDiv.appendChild(spine);
+                // Renderizar lado esquerdo
+                loteEsquerda.forEach((item, idx) => {
+                    grupoEsq.appendChild(criarElementoLivro(item, idx, paginaIndex, andar));
+                    if (idx === posicaoGapEsq && qtdGaps > 0) {
+                        const gap = document.createElement('div');
+                        gap.className = 'shelf-gap';
+                        gap.style.width = `${24 + ((paginaIndex + andar * 5) % 15)}px`;
+                        grupoEsq.appendChild(gap);
+                    }
                 });
 
+                // Renderizar lado direito
+                loteDireita.forEach((item, idx) => {
+                    if (idx === 1 && qtdGaps > 1) {
+                        const gap = document.createElement('div');
+                        gap.className = 'shelf-gap';
+                        gap.style.width = `${22 + ((paginaIndex * 3 + andar) % 18)}px`;
+                        grupoDir.appendChild(gap);
+                    }
+                    grupoDir.appendChild(criarElementoLivro(item, meio + idx, paginaIndex, andar));
+                });
+
+                shelfDiv.appendChild(grupoEsq);
+                shelfDiv.appendChild(grupoDir);
                 wrapper.appendChild(shelfDiv);
             }
         }
