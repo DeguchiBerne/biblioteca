@@ -1,0 +1,116 @@
+:root {
+  --shelf-wood: #5c3a21;
+  --shelf-wood-dark: #3a2313;
+  --shelf-shadow: rgba(0, 0, 0, 0.6);
+}
+
+body {
+  background-color: #1a1a1a;
+  color: #f3f4f6;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Container Geral da Estante */
+.bookshelf-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* Prateleira Individual (Efeito Madeira Realista) */
+.shelf {
+  position: relative;
+  background: linear-gradient(to bottom, #764728 0%, var(--shelf-wood) 70%, var(--shelf-wood-dark) 100%);
+  border-bottom: 16px solid #27170c;
+  border-top: 4px solid #8d5531;
+  box-shadow: inset 0 10px 15px rgba(0,0,0,0.5), 0 15px 25px var(--shelf-shadow);
+  padding: 30px 20px 0 20px;
+  margin-bottom: 60px;
+  display: flex;
+  align-items: flex-end; /* Alinha os livros na base da prateleira */
+  flex-wrap: nowrap; /* Mantém na mesma linha horizontal da prateleira */
+  overflow-x: auto; /* Permite rolar caso ultrapasse */
+  min-height: 280px;
+}
+
+/* Linha de fundo da prateleira (fundo do móvel) */
+.shelf::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(90deg, transparent, transparent 150px, rgba(0,0,0,0.08) 150px, rgba(0,0,0,0.08) 152px);
+  pointer-events: none;
+}
+
+/* Livro Individual na Estante (Variedade de Tamanhos e Estética de Lombada) */
+.book-spine {
+  position: relative;
+  background: linear-gradient(135deg, #2c3e50, #1a252f);
+  border-left: 2px solid rgba(255,255,255,0.15);
+  border-right: 3px solid rgba(0,0,0,0.4);
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  box-shadow: -3px 5px 10px rgba(0,0,0,0.4);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px 6px;
+  margin-right: 8px; /* Espaçamento natural entre os livros */
+  text-align: center;
+  user-select: none;
+}
+
+/* Efeito Hover (O livro "soa" levemente para frente ao passar o mouse) */
+.book-spine:hover {
+  transform: translateY(-8px);
+  box-shadow: -5px 12px 15px rgba(0,0,0,0.6);
+  z-index: 10;
+}
+
+/* Variação Dinâmica de Alturas e Larguras (Para quebrarem o padrão robótico) */
+.book-spine:nth-child(5n+1) { height: 210px; width: 45px; background: linear-gradient(135deg, #8b0000, #5c0000); }
+.book-spine:nth-child(5n+2) { height: 240px; width: 55px; background: linear-gradient(135deg, #1b4d3e, #0f2d24); }
+.book-spine:nth-child(5n+3) { height: 195px; width: 40px; background: linear-gradient(135deg, #3b3b6d, #20203d); }
+.book-spine:nth-child(5n+4) { height: 225px; width: 50px; background: linear-gradient(135deg, #b8860b, #705207); }
+.book-spine:nth-child(5n+5) { height: 200px; width: 48px; background: linear-gradient(135deg, #483d8b, #2a2252); }
+
+/* Textos da Lombada (Verticalizados ou Legíveis) */
+.book-title {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #f1f5f9;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  margin: 0 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 150px;
+}
+
+.book-meta {
+  font-size: 0.65rem;
+  color: #cbd5e1;
+}
+
+/* Espaços Vazios na Prateleira para Decoração (Action Figures / Itens) */
+.shelf-gap-small {
+  width: 70px;
+  flex-shrink: 0;
+}
+
+.shelf-gap-large {
+  width: 120px;
+  flex-shrink: 0;
+}
+
+/* Container de Decoração opcional encaixado na prateleira */
+.shelf-decoration {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-right: 15px;
+  cursor: default;
+}
