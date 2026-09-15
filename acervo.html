@@ -23,11 +23,11 @@
             margin: 0 auto;
         }
 
-        /* Estrutura Realista e Marcada de Prateleira de Madeira Estilizada */
+        /* Estrutura Realista e Marcada de Prateleira de Madeira Estilizada (Sem barra de rolagem) */
         .shelf {
             display: flex;
             align-items: flex-end;
-            justify-content: flex-start; /* Sem espaçamento forçado nas pontas */
+            justify-content: flex-start;
             flex-wrap: nowrap;
             gap: 2px;
             padding: 0 15px;
@@ -42,9 +42,7 @@
                 inset 0 15px 15px -8px rgba(0,0,0,0.8), 
                 inset 0 -4px 6px rgba(0,0,0,0.9),
                 0 18px 25px -5px rgba(0,0,0,0.7);
-            overflow-x: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #854d0e #1e293b;
+            overflow: hidden; /* Remove totalmente qualquer barra de rolagem */
         }
 
         .shelf::after {
@@ -91,11 +89,6 @@
             letter-spacing: 0.3px;
             margin: auto 0;
             text-align: center;
-        }
-
-        /* Espaço livre entre os livros com tamanhos variados */
-        .shelf-gap {
-            flex-shrink: 0;
         }
 
         #modalDetalhes > div {
@@ -280,7 +273,7 @@
             });
 
             let dadosParaRenderizar = filtrados;
-            const itensPorPrateleira = 10; 
+            const itensPorPrateleira = 14; // Aumentado para colocar mais livros por andar
             const maxEstantesIniciais = 5;
 
             if (termoBusca === '' && formatoSelecionado === '') {
@@ -315,25 +308,14 @@
                 shelfDiv.style.animationDelay = `${(i / itensPorPrateleira) * 0.1}s`;
 
                 lote.forEach((item, indexIndice) => {
-                    // Insere espaços livres de tamanhos diferentes de forma aleatória/natural entre os livros
-                    if (indexIndice > 0 && (indexIndice % 3 === 0 || indexIndice === 4 || indexIndice === 7)) {
-                        const gap = document.createElement('div');
-                        const larguraGap = 15 + ((i + indexIndice * 13) % 35); // Variação de 15px a 50px de espaço livre
-                        gap.className = 'shelf-gap';
-                        gap.style.width = `${larguraGap}px`;
-                        shelfDiv.appendChild(gap);
-                    }
-
                     const titulo = item.titulo || 'Sem Título';
                     const volumesTexto = item.volumes ? item.volumes.toString().trim() : '';
                     const quantidadeAdquirida = item.quantidade ? parseInt(item.quantidade) : (item.qtd ? parseInt(item.qtd) : 1);
 
                     const seed = (i + indexIndice) * 997;
 
-                    // Altura proporcional que comporta perfeitamente o título e os volumes
                     const altFator = Math.round(155 + ((seed % 7) * 5)); 
-
-                    const larguraFinal = Math.round(34 + (Math.max(quantidadeAdquirida, 1) * 6));
+                    const larguraFinal = Math.round(30 + (Math.max(quantidadeAdquirida, 1) * 5)); // Largura otimizada para caber mais livros lado a lado sem espaços vazios
 
                     const tamanhoLetra = 11 + (seed % 3);
                     const familiaFonte = fontesDisponiveis[seed % fontesDisponiveis.length];
