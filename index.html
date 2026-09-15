@@ -93,7 +93,6 @@
                     <input type="text" id="add-custo" placeholder="Ex: 29,90" class="w-full px-3 py-2 rounded bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500">
                 </div>
                 
-                <!-- Campo de Upload de Arquivo para o Google Drive -->
                 <div>
                     <label class="block text-xs text-slate-400 mb-1">Enviar Foto da Capa (Arquivo)</label>
                     <input type="file" id="add-arquivo-capa" accept="image/*" class="w-full px-3 py-1.5 rounded bg-slate-900 border border-slate-700 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500">
@@ -307,7 +306,24 @@
                 }
             }
 
-            detalhesHtml += `</div>`;
+            // Sessão para alterar/atualizar a foto da capa de itens já existentes
+            detalhesHtml += `
+                </div>
+                <div class="border-t border-slate-700 pt-4 mt-4 bg-slate-900/80 p-3 rounded-lg border border-slate-700">
+                    <h3 class="font-bold text-xs text-indigo-300 mb-2">📸 Atualizar Foto da Capa</h3>
+                    <form onsubmit="atualizarCapaItem(event, '${item.titulo.replace(/'/g, "\\'")}')" class="space-y-2">
+                        <div>
+                            <input type="file" id="update-arquivo-capa" accept="image/*" required class="w-full px-2 py-1 rounded bg-slate-950 border border-slate-700 text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500">
+                        </div>
+                        <div>
+                            <input type="password" id="update-senha" required placeholder="Digite sua senha" class="w-full px-3 py-1.5 rounded bg-slate-950 border border-slate-700 text-white text-xs focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <p id="msgRetornoUpdate" class="text-xs text-center"></p>
+                        <button type="submit" id="btnAtualizarCapa" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-1.5 rounded font-semibold text-xs transition">Salvar Nova Capa</button>
+                    </form>
+                </div>
+            `;
+
             conteudo.innerHTML = detalhesHtml;
             modal.classList.remove('hidden');
         }
@@ -387,6 +403,66 @@
                 msg.innerText = "Erro de conexão ao salvar.";
             } finally {
                 btn.innerText = 'Salvar na Planilha';
+                btn.disabled = false;
+            }
+        }
+
+        async function atualizarCapaItem(event, tituloOriginal) {
+            event.preventDefault();
+            const btn = document.getElementById('btnAtualizarCapa');
+            const msg = document.getElementById('msgRetornoUpdate');
+            
+            btn.innerText = 'Atualizando capa...';
+            btn.disabled = true;
+
+            const arquivoInput = document.getElementById('update-arquivo-capa');
+            let imagemBase64 = "";
+            let nomeArquivo = "";
+            let tipoMime = "";
+
+            if (arquivoInput.files && arquivoInput.files[0]) {
+                const file = arquivoInput.files[0];
+                nomeArquivo = file.name;
+                tipoMime = file.type;
+                
+                imagemBase64 = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result.split(',')[1]);
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            const payload = {
+                senha: document.getElementById('update-senha').value,
+                tituloOriginal: tituloOriginal,
+                imagemBase64: imagemBase64,
+                nomeArquivo: nomeArquivo,
+                tipoMime: tipoMime
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                const resultado = await response.json();
+
+                if (resultado.sucesso) {
+                    msg.className = "text-xs text-center text-emerald-400 font-bold";
+                    msg.innerText = resultado.mensagem;
+                    setTimeout(() => {
+                        fecharModal();
+                        carregarDados();
+                    }, 1500);
+                } else {
+                    msg.className = "text-xs text-center text-rose-400 font-bold";
+                    msg.innerText = resultado.mensagem;
+                }
+            } catch (err) {
+                msg.className = "text-xs text-center text-rose-400 font-bold";
+                msg.innerText = "Erro de conexão ao atualizar.";
+            } finally {
+                btn.innerText = 'Salvar Nova Capa';
                 btn.disabled = false;
             }
         }
