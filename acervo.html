@@ -17,9 +17,9 @@
             background-attachment: fixed;
         }
 
-        /* Container Centralizado da Estante Compactado */
+        /* Container Centralizado da Estante com rolamento horizontal habilitado para mobile */
         .shelf-container-wrapper {
-            max-width: 780px;
+            max-width: 820px;
             margin: 0 auto;
             background: 
                 linear-gradient(rgba(40, 22, 10, 0.4), rgba(30, 15, 5, 0.5)),
@@ -32,9 +32,10 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(0,0,0,0.5);
             filter: brightness(1.15);
             position: relative;
+            overflow-x: auto; /* Rolamento horizontal habilitado para celulares */
         }
 
-        /* Prateleira Individual */
+        /* Prateleira Individual com largura mínima para forçar scroll horizontal perfeito */
         .shelf {
             display: flex;
             align-items: flex-end;
@@ -43,6 +44,7 @@
             gap: 0px; 
             padding: 0 15px;
             min-height: 230px;
+            min-width: 820px; /* Garante espaço suficiente para rolar no mobile */
             background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(255,255,255,0.05) 40%, rgba(0,0,0,0.4) 100%);
             border-top: 6px solid transparent;
             border-bottom: 26px solid transparent;
@@ -54,7 +56,8 @@
                 inset 0 15px 20px -8px rgba(0,0,0,0.7), 
                 inset 0 -6px 8px rgba(0,0,0,0.7),
                 0 15px 25px -5px rgba(0,0,0,0.7);
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: hidden;
         }
 
         .shelf:last-child {
@@ -185,7 +188,7 @@
         .alavanca-esq { left: -52px; }
         .alavanca-dir { right: -52px; }
 
-        @media (max-width: 920px) {
+        @media (max-width: 960px) {
             .alavanca-esq { left: 5px; z-index: 40; }
             .alavanca-dir { right: 5px; z-index: 40; }
             .shelf-container-wrapper { padding: 25px 45px; }
@@ -255,7 +258,7 @@
 
             <div class="text-xs text-amber-100 mb-4 italic text-center sm:text-left flex flex-col sm:flex-row items-center justify-between px-2 drop-shadow border-b border-amber-900/40 pb-2 gap-1">
                 <span id="status-exibicao">Carregando status do acervo...</span>
-                <span class="text-[11px] text-amber-300 font-medium">Dica: Clique em qualquer lombada para detalhes.</span>
+                <span class="text-[11px] text-amber-300 font-medium">Dica: Arraste para o lado ou clique nas lombadas.</span>
             </div>
             
             <div id="prateleirasWrapper" class="space-y-6"></div>
@@ -281,8 +284,8 @@
         let formatoSelecionado = ''; 
         let paginaAtual = 0;
         const andaresPorEstante = 3;
-        const itensPorPrateleira = 16; // Maior densidade por prateleira para preencher o espaço reduzido
-        const itensPorPagina = andaresPorEstante * itensPorPrateleira; // 48 livros por página (3 andares)
+        const itensPorPrateleira = 20; // 20 livros por prateleira
+        const itensPorPagina = andaresPorEstante * itensPorPrateleira; // Exatamente 60 títulos por página
 
         const fontesDisponiveis = [
             'ui-sans-serif, system-ui, sans-serif',
@@ -418,23 +421,22 @@
                 return;
             }
 
-            // Garante exatamente 3 andares por página (distribuindo os itens disponíveis)
             for (let andar = 0; andar < andaresPorEstante; andar++) {
                 const inicioLote = andar * itensPorPrateleira;
                 const lote = dados.slice(inicioLote, inicioLote + itensPorPrateleira);
 
-                if (lote.length === 0 && andar > 0) continue; // Pula andar vazio se houver poucos livros na última página
+                if (lote.length === 0 && andar > 0) continue; 
 
                 const shelfDiv = document.createElement('div');
                 shelfDiv.className = 'shelf card-organizando';
                 shelfDiv.style.animationDelay = `${andar * 0.1}s`;
 
-                // Espaços vagos aleatórios (1 ou 2 por andar)
-                const qtdVagos = 1 + ((paginaIndex * 5 + andar * 7) % 2); 
+                // Espaços vagos distribuídos para preencher o lado direito harmoniosamente sem deixar buracos fixos
+                const qtdVagos = lote.length > 12 ? (1 + ((paginaIndex + andar) % 2)) : 0; 
                 let posicoesVazios = [];
-                while(lote.length > 5 && posicoesVazios.length < qtdVagos) {
-                    let posRandom = 2 + (((paginaIndex + 1) * 31 + andar * 47 + posicoesVazios.length * 19) % (lote.length - 3));
-                    if (!posicoesVazios.includes(posRandom) && posRandom > 0 && posRandom < lote.length - 1) {
+                while(posicoesVazios.length < qtdVagos) {
+                    let posRandom = 4 + (((paginaIndex + 1) * 23 + andar * 41 + posicoesVazios.length * 37) % (lote.length - 4));
+                    if (!posicoesVazios.includes(posRandom) && posRandom > 2 && posRandom < lote.length - 2) {
                         posicoesVazios.push(posRandom);
                     }
                 }
@@ -442,7 +444,7 @@
                 lote.forEach((item, indexIndice) => {
                     if (posicoesVazios.includes(indexIndice)) {
                         const gap = document.createElement('div');
-                        const larguraGap = 25 + (((paginaIndex + 1) * andar + indexIndice * 13) % 30); 
+                        const larguraGap = 22 + (((paginaIndex + 1) * andar + indexIndice * 17) % 28); 
                         gap.className = 'shelf-gap';
                         gap.style.width = `${larguraGap}px`;
                         shelfDiv.appendChild(gap);
@@ -452,13 +454,12 @@
                     const volumesTexto = item.volumes ? item.volumes.toString().trim() : '';
                     
                     const qtdAdquirida = item.quantidade ? parseInt(item.quantidade) : (item.qtd ? parseInt(item.qtd) : 1);
-                    const larguraBasePadrao = 26;
-                    const larguraCalculada = larguraBasePadrao + Math.min((Math.max(qtdAdquirida, 1) - 1) * 4.5, larguraBasePadrao * 3);
+                    const larguraBasePadrao = 25;
+                    const larguraCalculada = larguraBasePadrao + Math.min((Math.max(qtdAdquirida, 1) - 1) * 4, larguraBasePadrao * 3);
 
-                    // Semente única combinando página, andar e índice para variação total e independente
                     const seed = ((paginaIndex + 1) * 97 + andar * 73) ^ (indexIndice * 149 + 31);
 
-                    const altFator = Math.round(140 + ((seed % 13) * 6)); 
+                    const altFator = Math.round(138 + ((seed % 15) * 6)); 
                     const tamanhoLetra = 11 + (seed % 3);
                     const familiaFonte = fontesDisponiveis[seed % fontesDisponiveis.length];
 
