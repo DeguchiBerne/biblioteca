@@ -7,7 +7,7 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilos base das lombadas com paletas variadas geradas dinamicamente */
+        /* Estilos base das lombadas */
         .lombada-livro {
             box-shadow: inset 4px 0 8px rgba(255, 255, 255, 0.08), inset -4px 0 10px rgba(0, 0, 0, 0.5), 0 8px 12px -3px rgba(0, 0, 0, 0.6);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -22,33 +22,22 @@
             border-color: rgba(255, 255, 255, 0.2);
         }
 
-        /* Animação do livro saindo da estante ao clicar */
-        @keyframes sairEstante {
-            0% { transform: scale(1) translateY(0); opacity: 1; }
-            50% { transform: scale(1.1) translateY(-15px) rotate(2deg); opacity: 0.9; }
-            100% { transform: scale(1.2) translateY(-30px); opacity: 0; }
-        }
-        .animando-saida {
-            animation: sairEstante 0.35s ease-in-out forwards;
-        }
-
-        /* Efeito de Livro Aberto com origem personalizada via JS */
+        /* Efeito de Livro Aberto suave ao abrir o modal */
         #modalDetalhes > div {
-            transform-origin: var(--origem-x, center) var(--origem-y, center);
-            animation: abrirLivroEstendido 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: abrirLivro 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        @keyframes abrirLivroEstendido {
+        @keyframes abrirLivro {
             0% {
                 opacity: 0;
-                transform: scale(0.15) rotateY(-30deg);
+                transform: scale(0.8) rotateX(10deg);
             }
             100% {
                 opacity: 1;
-                transform: scale(1) rotateY(0deg);
+                transform: scale(1) rotateX(0deg);
             }
         }
 
-        /* Textura interna simulando páginas de livro */
+        /* Textura interna simulando páginas de livro antigo */
         .pagina-livro {
             background-color: #f8fafc;
             background-image: radial-gradient(#e2e8f0 0.75px, transparent 0.75px);
@@ -105,9 +94,9 @@
     </footer>
 
     <!-- Modal de Detalhes (Livro Aberto 2 Páginas) -->
-    <div id="modalDetalhes" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 sm:p-4 perspective-[1500px]">
+    <div id="modalDetalhes" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 sm:p-4">
         <div class="bg-[#1e1b18] border-2 border-[#3f352c] rounded-lg max-w-4xl w-full overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative">
-            <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-300 hover:text-white bg-black/60 hover:bg-black/90 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-30">✕</button>
+            <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-300 hover:text-white bg-black/60 hover:bg-black/95 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-30">✕</button>
             <div id="modalConteudo" class="grid grid-cols-1 md:grid-cols-2 max-h-[90vh] overflow-y-auto"></div>
         </div>
     </div>
@@ -325,17 +314,9 @@
                 card.className = 'lombada-livro border border-slate-700/60 rounded-md p-2.5 flex flex-col justify-between cursor-pointer min-h-[220px] sm:min-h-[260px] relative overflow-hidden group';
                 card.style.background = paleta.bg;
                 
-                // Ao clicar, captura as coordenadas do clique e anima a saída do livro
-                card.addEventListener('click', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = rect.left + rect.width / 2;
-                    const y = rect.top + rect.height / 2;
-
-                    card.classList.add('animando-saida');
-                    setTimeout(() => {
-                        abrirModalLivro(item, capa, custoFormatado, x, y);
-                        card.classList.remove('animando-saida');
-                    }, 280);
+                // Ao clicar, abre imediatamente o modal do livro aberto
+                card.addEventListener('click', () => {
+                    abrirModalLivro(item, capa, custoFormatado);
                 });
 
                 card.innerHTML = `
@@ -356,21 +337,8 @@
             });
         }
 
-        function abrirModalLivro(item, capaUrl, custoFmt, clickX, clickY) {
+        function abrirModalLivro(item, capaUrl, custoFmt) {
             const modal = document.getElementById('modalDetalhes');
-            const modalBox = modal.querySelector('>');
-            
-            // Define o ponto de origem exato do clique para a animação 3D do livro se abrindo
-            if (clickX && clickY) {
-                const percentX = (clickX / window.innerWidth) * 100;
-                const percentY = (clickY / window.innerHeight) * 100;
-                modalBox.style.setProperty('--origem-x', `${percentX}%`);
-                modalBox.style.setProperty('--origem-y', `${percentY}%`);
-            } else {
-                modalBox.style.setProperty('--origem-x', `50%`);
-                modalBox.style.setProperty('--origem-y', `50%`);
-            }
-
             const conteudo = document.getElementById('modalConteudo');
 
             // Página Esquerda (Capa em destaque estilo capa de livro físico aberto)
