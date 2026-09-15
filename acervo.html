@@ -6,6 +6,8 @@
     <title>Acervo - Biblioteca do Berne</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Estilos Personalizados da Estante Realista -->
+    <link rel="stylesheet" href="style.css">
     <style>
         /* Background geral da página com a imagem do GitHub e transparência */
         body {
@@ -16,38 +18,6 @@
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-        }
-
-        /* Estilos base das lombadas */
-        .lombada-livro {
-            box-shadow: inset 4px 0 8px rgba(255, 255, 255, 0.08), inset -4px 0 10px rgba(0, 0, 0, 0.5), 0 8px 12px -3px rgba(0, 0, 0, 0.6);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            transform-style: preserve-3d;
-        }
-        .lombada-livro:hover {
-            transform: translateY(-8px) scale(1.03) translateZ(10px);
-            box-shadow: inset 4px 0 12px rgba(255, 255, 255, 0.15), inset -4px 0 14px rgba(0, 0, 0, 0.6), 0 18px 30px -5px rgba(0, 0, 0, 0.8);
-            z-index: 10;
-        }
-        .spine-line {
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Efeito de pixelização da capa na lombada */
-        .lombada-com-capa {
-            background-size: cover;
-            background-position: center;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-            filter: contrast(1.1) saturate(1.2);
-        }
-
-        /* Estrutura de Prateleiras de Madeira Pura (CSS) */
-        .estante-madeira {
-            background: linear-gradient(135deg, #3d2314 0%, #29150a 100%);
-            border: 8px solid #1a0d06;
-            box-shadow: inset 0 15px 25px rgba(0,0,0,0.8), 0 20px 40px rgba(0,0,0,0.6);
-            position: relative;
         }
 
         /* Efeito de Livro Aberto suave ao abrir o modal */
@@ -128,12 +98,12 @@
         <!-- Estante de Madeira Estruturada -->
         <div id="estanteContainer" class="hidden">
             <div class="text-xs text-slate-300 mb-2 italic text-center sm:text-left flex items-center justify-between px-2 drop-shadow">
-                <span id="status-exibicao">Mostrando amostra inicial da estante (5x5):</span>
+                <span id="status-exibicao">Mostrando amostra inicial da estante:</span>
                 <span class="text-[11px] text-amber-300 font-medium">Dica: Use a pesquisa ou os filtros acima para encontrar obras específicas.</span>
             </div>
-            <div class="estante-madeira p-4 sm:p-6 rounded-xl shadow-2xl">
-                <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6"></div>
-            </div>
+            
+            <!-- Aqui as prateleiras de madeira serão geradas dinamicamente com espaços de decoração -->
+            <div id="prateleirasWrapper" class="space-y-6"></div>
         </div>
     </div>
 
@@ -142,7 +112,7 @@
         <p>Criado por <strong class="text-slate-200">Bernardo Deguchi</strong> • 2026</p>
     </footer>
 
-    <!-- Modal de Detalhes (Estilo Livro Aberto - Sem Valores R$) -->
+    <!-- Modal de Detalhes (Estilo Livro Aberto com Capa em Alta Definição) -->
     <div id="modalDetalhes" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 sm:p-4">
         <div id="modalBoxContainer" class="border-2 rounded-lg max-w-4xl w-full overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative transition-all duration-300">
             <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-200 hover:text-white bg-black/50 hover:bg-black/80 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-30">✕</button>
@@ -158,19 +128,12 @@
         let formatoSelecionado = ''; 
 
         const paletasLombadas = [
-            { bg: 'linear-gradient(90deg, #1e293b 0%, #334155 15%, #1e293b 85%, #0f172a 100%)', text: 'text-indigo-200', accent: 'bg-indigo-500', modalBg: '#111827', modalBorder: '#374151', capaFundo: '#1f2937', destaqueCor: 'text-indigo-400' },
-            { bg: 'linear-gradient(90deg, #450a0a 0%, #7f1d1d 15%, #450a0a 85%, #260505 100%)', text: 'text-rose-200', accent: 'bg-rose-500', modalBg: '#1c1010', modalBorder: '#5c1d1d', capaFundo: '#2c1515', destaqueCor: 'text-rose-400' },
-            { bg: 'linear-gradient(90deg, #064e3b 0%, #065f46 15%, #064e3b 85%, #022c22 100%)', text: 'text-emerald-200', accent: 'bg-emerald-500', modalBg: '#0b1d17', modalBorder: '#134e38', capaFundo: '#112a21', destaqueCor: 'text-emerald-400' },
-            { bg: 'linear-gradient(90deg, #3b0764 0%, #581c87 15%, #3b0764 85%, #2e1065 100%)', text: 'text-purple-200', accent: 'bg-purple-500', modalBg: '#190c24', modalBorder: '#4c1d95', capaFundo: '#251038', destaqueCor: 'text-purple-400' },
-            { bg: 'linear-gradient(90deg, #431407 0%, #78350f 15%, #431407 85%, #291104 100%)', text: 'text-amber-200', accent: 'bg-amber-500', modalBg: '#1c1208', modalBorder: '#78350f', capaFundo: '#2b1a0d', destaqueCor: 'text-amber-400' },
-            { bg: 'linear-gradient(90deg, #0f172a 0%, #1e293b 15%, #0f172a 85%, #020617 100%)', text: 'text-cyan-200', accent: 'bg-cyan-500', modalBg: '#08101a', modalBorder: '#1e3a8a', capaFundo: '#0f172a', destaqueCor: 'text-cyan-400' }
-        ];
-
-        const estilosTitulos = [
-            'font-serif tracking-wide italic font-medium',
-            'font-sans tracking-tight font-bold uppercase',
-            'font-mono tracking-normal font-semibold',
-            'font-serif tracking-widest font-bold'
+            { bg: 'linear-gradient(135deg, #1e293b, #0f172a)', accent: 'bg-indigo-500', modalBg: '#111827', modalBorder: '#374151', capaFundo: '#1f2937', destaqueCor: 'text-indigo-400' },
+            { bg: 'linear-gradient(135deg, #450a0a, #260505)', accent: 'bg-rose-500', modalBg: '#1c1010', modalBorder: '#5c1d1d', capaFundo: '#2c1515', destaqueCor: 'text-rose-400' },
+            { bg: 'linear-gradient(135deg, #064e3b, #022c22)', accent: 'bg-emerald-500', modalBg: '#0b1d17', modalBorder: '#134e38', capaFundo: '#112a21', destaqueCor: 'text-emerald-400' },
+            { bg: 'linear-gradient(135deg, #3b0764, #2e1065)', accent: 'bg-purple-500', modalBg: '#190c24', modalBorder: '#4c1d95', capaFundo: '#251038', destaqueCor: 'text-purple-400' },
+            { bg: 'linear-gradient(135deg, #431407, #291104)', accent: 'bg-amber-500', modalBg: '#1c1208', modalBorder: '#78350f', capaFundo: '#2b1a0d', destaqueCor: 'text-amber-400' },
+            { bg: 'linear-gradient(135deg, #1e3a8a, #0f172a)', accent: 'bg-cyan-500', modalBg: '#08101a', modalBorder: '#1e3a8a', capaFundo: '#0f172a', destaqueCor: 'text-cyan-400' }
         ];
 
         async function carregarDados() {
@@ -257,69 +220,73 @@
             let dadosParaRenderizar = filtrados;
 
             if (termoBusca === '' && formatoSelecionado === '') {
-                const semCapa = colecao.filter(item => !item.capa || !item.capa.toString().startsWith('http'));
-                dadosParaRenderizar = semCapa.slice(0, 25);
-                statusExibicao.innerText = `Amostra da estante (25 livros sem capa - 5x5):`;
+                dadosParaRenderizar = colecao.slice(0, 30);
+                statusExibicao.innerText = `Mostrando amostra inicial da estante (30 obras):`;
             } else {
                 statusExibicao.innerText = `Resultados encontrados (${filtrados.length}):`;
             }
 
-            renderizarCards(dadosParaRenderizar);
+            renderizarEstantesEmPrateleiras(dadosParaRenderizar);
         }
 
-        function renderizarCards(dados) {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = '';
+        function renderizarEstantesEmPrateleiras(dados) {
+            const wrapper = document.getElementById('prateleirasWrapper');
+            wrapper.innerHTML = '';
 
             if (dados.length === 0) {
-                grid.innerHTML = `<p class="col-span-full text-center text-slate-300 py-12 text-sm italic">Nenhum livro encontrado nesta estante com os critérios informados.</p>`;
+                wrapper.innerHTML = `
+                    <div class="shelf p-8 text-center text-slate-400 italic text-sm">
+                        Nenhum livro encontrado nesta estante com os critérios informados.
+                    </div>
+                `;
                 return;
             }
 
-            dados.forEach((item, index) => {
-                const titulo = item.titulo || 'Sem Título';
-                const formato = item.formato || 'Livro';
+            // Divide os livros em lotes (ex: 8 a 10 livros por prateleira para dar o efeito de móvel cheio com espaços)
+            const itensPorPrateleira = 9;
+            for (let i = 0; i < dados.length; i += itensPorPrateleira) {
+                const lote = dados.slice(i, i + itensPorPrateleira);
                 
-                const temCapaValida = item.capa && item.capa.toString().startsWith('http');
-                let capa = temCapaValida 
-                    ? item.capa 
-                    : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca';
+                const shelfDiv = document.createElement('div');
+                shelfDiv.className = 'shelf card-organizando';
+                shelfDiv.style.animationDelay = `${(i / itensPorPrateleira) * 0.1}s`;
 
-                const paleta = paletasLombadas[index % paletasLombadas.length];
-                const estiloTitulo = estilosTitulos[index % estilosTitulos.length];
+                lote.forEach((item, indexIndice) => {
+                    const titulo = item.titulo || 'Sem Título';
+                    const formato = item.formato || 'Livro';
+                    const volumes = item.volumes ? `Vol. ${item.volumes}` : '';
+                    
+                    const temCapaValida = item.capa && item.capa.toString().startsWith('http');
+                    const capaUrl = temCapaValida ? item.capa : '';
 
-                const card = document.createElement('div');
-                card.className = 'lombada-livro card-organizando border border-slate-700/60 rounded-md p-2.5 flex flex-col justify-between cursor-pointer min-h-[220px] sm:min-h-[260px] relative overflow-hidden group';
-                
-                if (temCapaValida) {
-                    card.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${capa}')`;
-                    card.classList.add('lombada-com-capa');
-                } else {
-                    card.style.background = paleta.bg;
-                }
+                    const paleta = paletasLombadas[(i + indexIndice) % paletasLombadas.length];
 
-                card.style.animationDelay = `${index * 0.02}s`;
-                
-                card.addEventListener('click', () => {
-                    abrirModalLivro(item, capa, index);
+                    const spine = document.createElement('div');
+                    spine.className = 'book-spine';
+                    spine.style.background = paleta.bg;
+
+                    spine.addEventListener('click', () => {
+                        abrirModalLivro(item, capaUrl, i + indexIndice);
+                    });
+
+                    spine.innerHTML = `
+                        <div class="text-[9px] uppercase tracking-wider text-slate-300 font-bold truncate text-center opacity-80">${formato}</div>
+                        <div class="book-title" title="${titulo}">${titulo}</div>
+                        <div class="book-meta text-center">${volumes}</div>
+                    `;
+
+                    shelfDiv.appendChild(spine);
+
+                    // Insere estrategicamente um espaço vazio para decoração a cada 3 ou 4 livros simulando o vão do action figure
+                    if ((indexIndice + 1) % 4 === 0 && indexIndice < lote.length - 1) {
+                        const gap = document.createElement('div');
+                        gap.className = (indexIndice % 8 === 0) ? 'shelf-gap-large' : 'shelf-gap-small';
+                        shelfDiv.appendChild(gap);
+                    }
                 });
 
-                card.innerHTML = `
-                    <div class="space-y-1 mb-2 z-10">
-                        <div class="border-b spine-line w-full pb-1 flex justify-between items-center">
-                            <span class="text-[8px] uppercase tracking-wider text-slate-200 font-bold truncate max-w-[80px]">${formato}</span>
-                        </div>
-                        <div class="border-b spine-line w-full"></div>
-                    </div>
-                    <div class="my-auto py-1 z-10">
-                        <h2 class="${estiloTitulo} text-xs sm:text-sm text-white group-hover:brightness-125 transition-all line-clamp-5 text-center leading-snug drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]" title="${titulo}">${titulo}</h2>
-                    </div>
-                    <div class="space-y-1 mt-2 pt-1 border-t spine-line text-center z-10">
-                        <div class="w-2 h-2 rounded-full ${temCapaValida ? 'bg-amber-400' : paleta.accent} mx-auto opacity-80 group-hover:opacity-100 transition-opacity"></div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
+                wrapper.appendChild(shelfDiv);
+            }
         }
 
         function abrirModalLivro(item, capaUrl, indicePaleta) {
@@ -328,14 +295,16 @@
             const conteudo = document.getElementById('modalConteudo');
 
             const paleta = paletasLombadas[indicePaleta % paletasLombadas.length];
-
             modalBox.style.backgroundColor = paleta.modalBg;
             modalBox.style.borderColor = paleta.modalBorder;
+
+            const temCapaReal = capaUrl && capaUrl.startsWith('http');
+            const imagemExibida = temCapaReal ? capaUrl : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca';
 
             let paginaEsquerda = `
                 <div class="p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-black/30 relative shadow-inner" style="background-color: ${paleta.capaFundo};">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent pointer-events-none"></div>
-                    <img src="${capaUrl}" class="w-48 h-72 sm:w-56 sm:h-80 object-cover rounded shadow-[0_15px_30px_rgba(0,0,0,0.8)] border border-black/40" alt="Capa">
+                    <img src="${imagemExibida}" class="w-48 h-72 sm:w-56 sm:h-80 object-cover rounded shadow-[0_15px_30px_rgba(0,0,0,0.8)] border border-black/40" alt="Capa da Obra">
                     <span class="mt-4 text-xs tracking-widest uppercase ${paleta.destaqueCor} font-bold">${item.formato || 'Acervo'}</span>
                 </div>
             `;
@@ -351,7 +320,7 @@
             `;
 
             for (let [chave, valor] of Object.entries(item)) {
-                // Oculta custos/valores e campos técnicos de controle interno do visitante
+                // Oculta custos e capas na listagem textual do modal do visitante
                 if (['titulo', 'formato', 'custo', 'capa'].includes(chave)) continue;
                 if (valor !== undefined && valor !== null && valor !== '') {
                     let nomeChave = chave.replace(/_/g, ' ').toUpperCase();
