@@ -6,10 +6,8 @@
     <title>Acervo - Biblioteca do Berne</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Estilos Personalizados da Estante Realista -->
-    <link rel="stylesheet" href="style.css">
     <style>
-        /* Background geral da página com a imagem do GitHub e transparência */
+        /* Background geral da página */
         body {
             background-color: #0f172a;
             background-image: 
@@ -20,31 +18,86 @@
             background-attachment: fixed;
         }
 
+        /* Estrutura Realista da Prateleira de Madeira */
+        .shelf {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            padding: 0 20px;
+            min-height: 210px;
+            /* Prateleira de madeira tridimensional na base */
+            border-bottom: 18px solid #451a03;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.45) 100%);
+            position: relative;
+            margin-bottom: 2.5rem;
+            border-radius: 4px;
+            box-shadow: inset 0 12px 12px -6px rgba(0,0,0,0.6), 0 12px 20px -4px rgba(0,0,0,0.6);
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #78350f #1e293b;
+        }
+
+        /* Lombada do Livro em Pé */
+        .book-spine {
+            width: 44px;
+            height: 175px;
+            cursor: pointer;
+            border-radius: 3px 3px 0 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px 3px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: inset -4px 0 8px rgba(0,0,0,0.5), 2px 2px 6px rgba(0,0,0,0.6);
+            position: relative;
+            flex-shrink: 0;
+            user-select: none;
+        }
+
+        .book-spine:hover {
+            transform: translateY(-8px);
+            box-shadow: inset -4px 0 8px rgba(0,0,0,0.5), 4px 6px 12px rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+
+        /* Título na lombada em modo vertical simulado */
+        .book-title-vertical {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-size: 10px;
+            font-weight: 600;
+            color: #f8fafc;
+            max-height: 110px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+            margin: auto 0;
+        }
+
+        /* Espaços vazios na prateleira para action figures e decorações */
+        .shelf-gap-small {
+            width: 50px;
+            flex-shrink: 0;
+        }
+        .shelf-gap-large {
+            width: 100px;
+            flex-shrink: 0;
+        }
+
         /* Efeito de Livro Aberto suave ao abrir o modal */
         #modalDetalhes > div {
             animation: abrirLivro 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             transform-origin: center;
         }
         @keyframes abrirLivro {
-            0% {
-                opacity: 0;
-                transform: scale(0.7) rotateY(-15deg);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) rotateY(0deg);
-            }
+            0% { opacity: 0; transform: scale(0.7) rotateY(-15deg); }
+            100% { opacity: 1; transform: scale(1) rotateY(0deg); }
         }
 
         @keyframes organizarEstante {
-            0% {
-                opacity: 0;
-                transform: translateY(15px) scale(0.95);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            0% { opacity: 0; transform: translateY(15px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         .card-organizando {
             animation: organizarEstante 0.4s ease-in-out forwards;
@@ -74,7 +127,7 @@
             <h1 class="text-2xl sm:text-4xl font-bold mb-1 drop-shadow-md">📖 Acervo da Biblioteca</h1>
             <p class="text-xs sm:text-sm text-slate-300 drop-shadow">Modo de visualização pública para visitantes</p>
             
-            <!-- Indicador Simples de Total de Obras Visíveis -->
+            <!-- Indicador de Total -->
             <div id="stats" class="my-4 w-full max-w-xs">
                 <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-lg shadow-xl text-center backdrop-blur-sm">
                     <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Obras no Acervo</p>
@@ -99,10 +152,10 @@
         <div id="estanteContainer" class="hidden">
             <div class="text-xs text-slate-300 mb-2 italic text-center sm:text-left flex items-center justify-between px-2 drop-shadow">
                 <span id="status-exibicao">Mostrando amostra inicial da estante:</span>
-                <span class="text-[11px] text-amber-300 font-medium">Dica: Use a pesquisa ou os filtros acima para encontrar obras específicas.</span>
+                <span class="text-[11px] text-amber-300 font-medium">Dica: Clique em qualquer livro para ver a capa e detalhes.</span>
             </div>
             
-            <!-- Aqui as prateleiras de madeira serão geradas dinamicamente com espaços de decoração -->
+            <!-- Prateleiras geradas dinamicamente -->
             <div id="prateleirasWrapper" class="space-y-6"></div>
         </div>
     </div>
@@ -112,7 +165,7 @@
         <p>Criado por <strong class="text-slate-200">Bernardo Deguchi</strong> • 2026</p>
     </footer>
 
-    <!-- Modal de Detalhes (Estilo Livro Aberto com Capa em Alta Definição) -->
+    <!-- Modal de Detalhes -->
     <div id="modalDetalhes" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 sm:p-4">
         <div id="modalBoxContainer" class="border-2 rounded-lg max-w-4xl w-full overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative transition-all duration-300">
             <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-200 hover:text-white bg-black/50 hover:bg-black/80 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-30">✕</button>
@@ -220,8 +273,8 @@
             let dadosParaRenderizar = filtrados;
 
             if (termoBusca === '' && formatoSelecionado === '') {
-                dadosParaRenderizar = colecao.slice(0, 30);
-                statusExibicao.innerText = `Mostrando amostra inicial da estante (30 obras):`;
+                dadosParaRenderizar = colecao.slice(0, 32);
+                statusExibicao.innerText = `Mostrando amostra inicial da estante (32 obras):`;
             } else {
                 statusExibicao.innerText = `Resultados encontrados (${filtrados.length}):`;
             }
@@ -235,15 +288,15 @@
 
             if (dados.length === 0) {
                 wrapper.innerHTML = `
-                    <div class="shelf p-8 text-center text-slate-400 italic text-sm">
+                    <div class="shelf p-8 text-center text-slate-400 italic text-sm justify-center">
                         Nenhum livro encontrado nesta estante com os critérios informados.
                     </div>
                 `;
                 return;
             }
 
-            // Divide os livros em lotes (ex: 8 a 10 livros por prateleira para dar o efeito de móvel cheio com espaços)
-            const itensPorPrateleira = 9;
+            // Aprox. 10 a 12 livros por prateleira
+            const itensPorPrateleira = 10;
             for (let i = 0; i < dados.length; i += itensPorPrateleira) {
                 const lote = dados.slice(i, i + itensPorPrateleira);
                 
@@ -270,14 +323,14 @@
                     });
 
                     spine.innerHTML = `
-                        <div class="text-[9px] uppercase tracking-wider text-slate-300 font-bold truncate text-center opacity-80">${formato}</div>
-                        <div class="book-title" title="${titulo}">${titulo}</div>
-                        <div class="book-meta text-center">${volumes}</div>
+                        <div class="text-[8px] uppercase tracking-wider text-slate-300 font-bold text-center opacity-75 truncate">${formato}</div>
+                        <div class="book-title-vertical" title="${titulo}">${titulo}</div>
+                        <div class="text-[8px] text-center text-slate-300 opacity-80 truncate">${volumes}</div>
                     `;
 
                     shelfDiv.appendChild(spine);
 
-                    // Insere estrategicamente um espaço vazio para decoração a cada 3 ou 4 livros simulando o vão do action figure
+                    // Insere um espaço vazio para decoração/action figures a cada 4 livros
                     if ((indexIndice + 1) % 4 === 0 && indexIndice < lote.length - 1) {
                         const gap = document.createElement('div');
                         gap.className = (indexIndice % 8 === 0) ? 'shelf-gap-large' : 'shelf-gap-small';
@@ -320,7 +373,6 @@
             `;
 
             for (let [chave, valor] of Object.entries(item)) {
-                // Oculta custos e capas na listagem textual do modal do visitante
                 if (['titulo', 'formato', 'custo', 'capa'].includes(chave)) continue;
                 if (valor !== undefined && valor !== null && valor !== '') {
                     let nomeChave = chave.replace(/_/g, ' ').toUpperCase();
