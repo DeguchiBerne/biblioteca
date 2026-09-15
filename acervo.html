@@ -8,9 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background-color: #0f172a;
+            background-color: #090d16;
             background-image: 
-                linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.92)), 
+                linear-gradient(rgba(9, 13, 22, 0.85), rgba(9, 13, 22, 0.95)), 
                 url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/bibliofundo.jpg');
             background-size: cover;
             background-position: center;
@@ -23,40 +23,43 @@
             margin: 0 auto;
         }
 
-        /* Estrutura Realista e Contínua da Prateleira de Madeira */
+        /* Prateleira com Textura de Madeira Rústica e Envelhecida */
         .shelf {
             display: flex;
             align-items: flex-end;
-            justify-content: space-between; /* Distribui blocos e livros por toda a extensão */
+            justify-content: space-between;
             flex-wrap: nowrap;
             gap: 2px;
             padding: 0 15px;
-            min-height: 235px; /* Altura garantida para cobrir perfeitamente o andar */
-            background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.5) 100%), #311005;
-            border-top: 4px solid #6c2e12;
-            border-bottom: 24px solid #230b03;
+            min-height: 240px;
+            background: 
+                radial-gradient(ellipse at center top, rgba(255, 200, 120, 0.08) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(20,8,3,0.6) 50%, rgba(10,3,1,0.9) 100%), 
+                #210b04;
+            border-top: 5px solid #4a1c0b;
+            border-bottom: 26px solid #170702;
             position: relative;
-            margin-bottom: 2.5rem; /* Espaçamento ajustado entre as prateleiras sem vazios */
+            margin-bottom: 2.8rem;
             border-radius: 2px 2px 6px 6px;
             box-shadow: 
-                inset 0 15px 15px -8px rgba(0,0,0,0.8), 
-                inset 0 -4px 6px rgba(0,0,0,0.9),
-                0 18px 25px -5px rgba(0,0,0,0.7);
+                inset 0 18px 20px -8px rgba(0,0,0,0.9), 
+                inset 0 -6px 8px rgba(0,0,0,0.95),
+                0 20px 30px -5px rgba(0,0,0,0.8);
             overflow: hidden;
         }
 
         .shelf::after {
             content: '';
             position: absolute;
-            bottom: -24px;
+            bottom: -26px;
             left: 0;
             right: 0;
-            height: 6px;
-            background: linear-gradient(90deg, #521c08, #854d0e, #521c08);
-            opacity: 0.9;
+            height: 7px;
+            background: linear-gradient(90deg, #2b0e04, #5c240b, #3b1305, #5c240b, #2b0e04);
+            opacity: 0.95;
         }
 
-        /* Lombada do Livro em Pé */
+        /* Lombada do Livro com Textura Estilo Couro/Pergaminho Antigo */
         .book-spine {
             cursor: pointer;
             border-radius: 3px 3px 0 0;
@@ -65,36 +68,64 @@
             justify-content: space-between;
             padding: 8px 2px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: inset -4px 0 8px rgba(0,0,0,0.5), 2px 2px 6px rgba(0,0,0,0.6);
+            box-shadow: inset -5px 0 10px rgba(0,0,0,0.6), 2px 3px 8px rgba(0,0,0,0.7);
             position: relative;
             flex-shrink: 0;
             user-select: none;
+            /* Textura sutil simulando papel envelhecido/tecido sobre a cor */
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.35) 100%),
+                repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px);
         }
 
         .book-spine:hover {
             transform: translateY(-8px);
-            box-shadow: inset -4px 0 8px rgba(0,0,0,0.5), 4px 6px 12px rgba(0,0,0,0.8);
+            box-shadow: inset -5px 0 10px rgba(0,0,0,0.6), 4px 8px 14px rgba(0,0,0,0.9);
             z-index: 10;
         }
 
-        /* Espaço livre entre os livros na prateleira (mostrando madeira) */
+        /* Relevos decorativos nas extremidades da lombada (estilo livro antigo) */
+        .book-spine::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 2px;
+            right: 2px;
+            height: 2px;
+            background: rgba(255, 220, 150, 0.25);
+            box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 12px 0 rgba(255, 220, 150, 0.15);
+        }
+
+        .book-spine::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 2px;
+            right: 2px;
+            height: 2px;
+            background: rgba(255, 220, 150, 0.25);
+            box-shadow: 0 -4px 0 rgba(0,0,0,0.3);
+        }
+
+        /* Espaço livre entre os livros na prateleira */
         .shelf-gap {
             flex-shrink: 0;
             background: transparent;
         }
 
-        /* Título na lombada em modo vertical simulado */
+        /* Título na lombada em modo vertical */
         .book-title-vertical {
             writing-mode: vertical-rl;
             text-orientation: mixed;
             font-weight: 600;
-            color: #f8fafc;
+            color: #f1f5f9;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.4px;
             margin: auto 0;
             text-align: center;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         }
 
         #modalDetalhes > div {
@@ -129,7 +160,7 @@
     <div class="max-w-7xl mx-auto">
         <header class="mb-6 text-center flex flex-col items-center">
             <div class="w-full flex justify-start sm:absolute sm:left-6 sm:top-6 mb-4 sm:mb-0">
-                <a href="index.html" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2 border border-slate-700">
+                <a href="index.html" class="bg-slate-900 hover:bg-slate-800 text-slate-200 px-4 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2 border border-slate-700">
                     &larr; Voltar ao Início
                 </a>
             </div>
@@ -140,13 +171,13 @@
             <div id="stats" class="my-4 w-full max-w-xs">
                 <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-lg shadow-xl text-center backdrop-blur-sm">
                     <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Obras no Acervo</p>
-                    <p id="stat-total" class="text-xl sm:text-2xl font-bold text-indigo-400">0</p>
+                    <p id="stat-total" class="text-xl sm:text-2xl font-bold text-amber-400">0</p>
                 </div>
             </div>
 
             <div class="w-full max-w-md mt-2">
                 <input type="text" id="searchInput" placeholder="Pesquisar por título na estante..." 
-                    class="w-full px-4 py-2.5 rounded-lg bg-slate-900/90 border border-slate-700 text-white text-sm focus:outline-none focus:border-indigo-500 shadow-inner backdrop-blur-sm">
+                    class="w-full px-4 py-2.5 rounded-lg bg-slate-900/90 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500 shadow-inner backdrop-blur-sm">
             </div>
 
             <div id="formatFilters" class="flex overflow-x-auto w-full max-w-3xl gap-2 mt-4 pb-2 px-1 justify-start sm:justify-center scrollbar-none"></div>
@@ -164,7 +195,7 @@
         </div>
     </div>
 
-    <footer class="absolute bottom-0 left-0 w-full text-center py-3 bg-slate-950/80 backdrop-blur-md border-t border-slate-900 text-[11px] sm:text-xs text-slate-400 space-y-0.5 px-2">
+    <footer class="absolute bottom-0 left-0 w-full text-center py-3 bg-slate-950/90 backdrop-blur-md border-t border-slate-900 text-[11px] sm:text-xs text-slate-400 space-y-0.5 px-2">
         <p>Criado por <strong class="text-slate-200">Bernardo Deguchi</strong> • 2026</p>
     </footer>
 
@@ -182,13 +213,14 @@
         let colecao = [];
         let formatoSelecionado = ''; 
 
+        // Paletas de cores inspiradas em tons clássicos de couro envelhecido e madeira rústica
         const paletasLombadas = [
-            { bg: 'linear-gradient(135deg, #1e293b, #0f172a)', modalBg: '#111827', modalBorder: '#374151', capaFundo: '#1f2937', destaqueCor: 'text-indigo-400' },
-            { bg: 'linear-gradient(135deg, #450a0a, #260505)', modalBg: '#1c1010', modalBorder: '#5c1d1d', capaFundo: '#2c1515', destaqueCor: 'text-rose-400' },
-            { bg: 'linear-gradient(135deg, #064e3b, #022c22)', modalBg: '#0b1d17', modalBorder: '#134e38', capaFundo: '#112a21', destaqueCor: 'text-emerald-400' },
-            { bg: 'linear-gradient(135deg, #3b0764, #2e1065)', modalBg: '#190c24', modalBorder: '#4c1d95', capaFundo: '#251038', destaqueCor: 'text-purple-400' },
-            { bg: 'linear-gradient(135deg, #431407, #291104)', modalBg: '#1c1208', modalBorder: '#78350f', capaFundo: '#2b1a0d', destaqueCor: 'text-amber-400' },
-            { bg: 'linear-gradient(135deg, #1e3a8a, #0f172a)', modalBg: '#08101a', modalBorder: '#1e3a8a', capaFundo: '#0f172a', destaqueCor: 'text-cyan-400' }
+            { baseColor: '#2b1708', modalBg: '#1c1008', modalBorder: '#5c3317', capaFundo: '#241306', destaqueCor: 'text-amber-400' }, // Marrom Café Clássico
+            { baseColor: '#38120a', modalBg: '#1c0c07', modalBorder: '#612115', capaFundo: '#2b0e07', destaqueCor: 'text-rose-400' }, // Vinho / Bordeaux
+            { baseColor: '#12261c', modalBg: '#09140f', modalBorder: '#1f4a35', capaFundo: '#0d1c15', destaqueCor: 'text-emerald-400' }, // Verde Musgo Antigo
+            { baseColor: '#28113b', modalBg: '#160821', modalBorder: '#4a2366', capaFundo: '#1f0d2c', destaqueCor: 'text-purple-400' }, // Roxo Real Envelhecido
+            { baseColor: '#38250c', modalBg: '#1f1406', modalBorder: '#69481a', capaFundo: '#2c1b09', destaqueCor: 'text-yellow-400' }, // Ocre / Couro Queimado
+            { baseColor: '#102238', modalBg: '#08121f', modalBorder: '#20436b', capaFundo: '#0c1a2c', destaqueCor: 'text-cyan-400' }  // Azul Marinho Clássico
         ];
 
         const fontesDisponiveis = [
@@ -255,7 +287,7 @@
             document.querySelectorAll('.filtro-btn').forEach(b => {
                 const fmtBtn = b.getAttribute('data-format');
                 if (fmtBtn === formatoSelecionado) {
-                    b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white transition-all shadow";
+                    b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-amber-600 text-white transition-all shadow";
                 } else {
                     b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all backdrop-blur-sm";
                 }
@@ -279,7 +311,7 @@
             });
 
             let dadosParaRenderizar = filtrados;
-            const itensPorPrateleira = 15; // Quantidade ideal para preencher de ponta a ponta
+            const itensPorPrateleira = 15; 
             const maxEstantesIniciais = 5;
 
             if (termoBusca === '' && formatoSelecionado === '') {
@@ -313,14 +345,12 @@
                 shelfDiv.className = 'shelf card-organizando';
                 shelfDiv.style.animationDelay = `${(i / itensPorPrateleira) * 0.1}s`;
 
-                // Definimos posições estratégicas para inserir 2 a 3 vãos de tamanhos variados por andar
                 const posicoesVazios = [5, 10]; 
 
                 lote.forEach((item, indexIndice) => {
-                    // Adiciona espaço livre de madeira entre os livros em pontos específicos
                     if (posicoesVazios.includes(indexIndice)) {
                         const gap = document.createElement('div');
-                        const larguraGap = 25 + ((i + indexIndice * 17) % 35); // Variação de tamanho do vão
+                        const larguraGap = 25 + ((i + indexIndice * 17) % 35); 
                         gap.className = 'shelf-gap';
                         gap.style.width = `${larguraGap}px`;
                         shelfDiv.appendChild(gap);
@@ -345,7 +375,8 @@
 
                     const spine = document.createElement('div');
                     spine.className = 'book-spine';
-                    spine.style.background = paleta.bg;
+                    // Fundo com cor base + textura sutil simulando encadernação antiga
+                    spine.style.backgroundColor = paleta.baseColor;
                     spine.style.height = `${altFator}px`;
                     spine.style.width = `${larguraFinal}px`;
 
@@ -356,7 +387,7 @@
                     spine.innerHTML = `
                         <div></div>
                         <div class="book-title-vertical" title="${titulo}" style="font-size: ${tamanhoLetra}px; font-family: ${familiaFonte}; max-height: ${altFator - 50}px;">${titulo}</div>
-                        <div class="text-center text-slate-200 font-semibold opacity-90 truncate" style="font-size: ${Math.max(tamanhoLetra - 1, 9)}px;" title="${volumesTexto}">${volumesTexto}</div>
+                        <div class="text-center text-amber-200/90 font-semibold truncate" style="font-size: ${Math.max(tamanhoLetra - 1, 9)}px;" title="${volumesTexto}">${volumesTexto}</div>
                     `;
 
                     shelfDiv.appendChild(spine);
@@ -379,9 +410,9 @@
             const imagemExibida = temCapaReal ? capaUrl : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca';
 
             let paginaEsquerda = `
-                <div class="p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-black/30 relative shadow-inner" style="background-color: ${paleta.capaFundo};">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent pointer-events-none"></div>
-                    <img src="${imagemExibida}" class="w-48 h-72 sm:w-56 sm:h-80 object-cover rounded shadow-[0_15px_30px_rgba(0,0,0,0.8)] border border-black/40" alt="Capa da Obra">
+                <div class="p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-black/40 relative shadow-inner" style="background-color: ${paleta.capaFundo};">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent pointer-events-none"></div>
+                    <img src="${imagemExibida}" class="w-48 h-72 sm:w-56 sm:h-80 object-cover rounded shadow-[0_15px_30px_rgba(0,0,0,0.8)] border border-black/50" alt="Capa da Obra">
                     <span class="mt-4 text-xs tracking-widest uppercase ${paleta.destaqueCor} font-bold">${item.formato || 'Acervo'}</span>
                 </div>
             `;
