@@ -6,6 +6,31 @@
     <title>Biblioteca do Berne</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilo personalizado para simular lombadas de livros */
+        .lombada-livro {
+            background: linear-gradient(90deg, rgba(30,41,59,0.95) 0%, rgba(51,65,85,0.9) 15%, rgba(30,41,59,0.95) 85%, rgba(15,23,42,0.95) 100%);
+            box-shadow: inset 4px 0 8px rgba(255, 255, 255, 0.05), inset -4px 0 8px rgba(0, 0, 0, 0.4), 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            transition: all 0.25s ease;
+        }
+        .lombada-livro:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: inset 4px 0 10px rgba(255, 255, 255, 0.1), inset -4px 0 10px rgba(0, 0, 0, 0.5), 0 15px 25px -5px rgba(99, 102, 241, 0.3);
+        }
+        /* Linhas decorativas da lombada */
+        .spine-line {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        /* Animação suave do modal */
+        #modalDetalhes > div, #modalAdd > div {
+            animation: abrirLivro 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transform-origin: center;
+        }
+        @keyframes abrirLivro {
+            0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+    </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen p-3 sm:p-6 pb-28 relative bg-cover bg-center bg-fixed" style="background-image: linear-gradient(rgba(15, 23, 42, 0.93), rgba(15, 23, 42, 0.93)), url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/bibliofundo.jpg');">
     <div class="max-w-7xl mx-auto">
@@ -43,10 +68,10 @@
         </header>
 
         <!-- Indicador de Carregamento -->
-        <div id="loading" class="text-center text-slate-400 py-20 text-base">Carregando sua coleção da planilha...</div>
+        <div id="loading" class="text-center text-slate-400 py-20 text-base">Organizando a estante virtual...</div>
 
-        <!-- Grade de Livros/Quadrinhos -->
-        <div id="grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"></div>
+        <!-- Grade de Lombadas de Livros -->
+        <div id="grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-4"></div>
     </div>
 
     <!-- Rodapé -->
@@ -55,7 +80,7 @@
         <p class="text-slate-500">Acervo sincronizado via Google Sheets • Todos os direitos reservados</p>
     </footer>
 
-    <!-- Modal de Detalhes -->
+    <!-- Modal de Detalhes (Livro Abrindo) -->
     <div id="modalDetalhes" class="fixed inset-0 bg-black/75 backdrop-blur-sm hidden z-50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-xl max-w-lg w-full overflow-hidden shadow-2xl relative">
             <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white bg-slate-900/80 rounded-full p-2 transition z-10">✕</button>
@@ -240,37 +265,42 @@
             grid.innerHTML = '';
 
             if (dados.length === 0) {
-                grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-10 text-sm">Nenhum item encontrado.</p>`;
+                grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-10 text-sm">Nenhum item encontrado na estante.</p>`;
                 return;
             }
 
             dados.forEach((item) => {
                 const titulo = item.titulo || 'Sem Título';
-                const formato = item.formato || 'Desconhecido';
+                const formato = item.formato || 'Livro';
                 const custoFormatado = formatarMoeda(item.custo);
                 
                 let capa = item.capa && item.capa.toString().startsWith('http') 
                     ? item.capa 
-                    : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca+do+Berne';
+                    : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca';
 
                 const card = document.createElement('div');
-                card.className = 'bg-slate-800/80 backdrop-blur border border-slate-700 rounded-lg overflow-hidden flex flex-col justify-between shadow-lg hover:border-indigo-500 cursor-pointer transition-all';
+                // Estilo de lombada de livro vertical (sem mostrar preço na estante)
+                card.className = 'lombada-livro border border-slate-700 rounded-md p-2.5 flex flex-col justify-between cursor-pointer min-h-[210px] sm:min-h-[250px] relative overflow-hidden group';
                 
                 card.addEventListener('click', () => abrirModal(item, capa, custoFormatado));
 
                 card.innerHTML = `
-                    <div>
-                        <div class="h-48 sm:h-64 w-full bg-slate-900 overflow-hidden relative">
-                            <img src="${capa}" alt="${titulo}" class="w-full h-full object-cover object-center" onerror="this.src='https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca+do+Berne'">
-                            <span class="absolute top-1.5 left-1.5 text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 bg-slate-900/80 backdrop-blur text-indigo-200 rounded uppercase tracking-wide border border-slate-700">${formato}</span>
-                            <span class="absolute top-1.5 right-1.5 text-[10px] sm:text-xs font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 bg-emerald-900/90 text-emerald-200 rounded border border-emerald-700">${custoFormatado}</span>
+                    <!-- Linhas de relevo simulando a lombada no topo -->
+                    <div class="space-y-1 mb-2">
+                        <div class="border-b spine-line w-full pb-1 flex justify-between items-center">
+                            <span class="text-[8px] uppercase tracking-wider text-indigo-300 font-bold truncate max-w-[70px]">${formato}</span>
                         </div>
-                        <div class="p-3 sm:p-4">
-                            <h2 class="font-bold text-xs sm:text-base text-white line-clamp-2" title="${titulo}">${titulo}</h2>
-                        </div>
+                        <div class="border-b spine-line w-full"></div>
                     </div>
-                    <div class="px-3 pb-2.5 pt-1.5 text-[10px] sm:text-xs text-slate-400 border-t border-slate-700/60 bg-slate-800/50 text-center">
-                        <span>Ver detalhes</span>
+
+                    <!-- Título na lombada -->
+                    <div class="my-auto py-1">
+                        <h2 class="font-bold text-xs sm:text-sm text-slate-200 group-hover:text-indigo-300 transition-colors line-clamp-5 text-center leading-snug" title="${titulo}">${titulo}</h2>
+                    </div>
+
+                    <!-- Detalhes inferiores da lombada -->
+                    <div class="space-y-1 mt-2 pt-1 border-t spine-line text-center">
+                        <div class="w-2 h-2 rounded-full bg-slate-700 mx-auto group-hover:bg-indigo-500 transition-colors"></div>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -287,7 +317,7 @@
                     <div class="space-y-1.5 sm:space-y-2 flex-1 text-center sm:text-left">
                         <span class="text-xs font-bold px-2 py-1 bg-indigo-900 text-indigo-200 rounded inline-block">${item.formato || 'Geral'}</span>
                         <h2 class="text-lg sm:text-xl font-bold text-white">${item.titulo || 'Sem Título'}</h2>
-                        <p class="text-emerald-400 font-bold text-base sm:text-lg">${custoFmt}</p>
+                        <p class="text-emerald-400 font-bold text-base sm:text-lg">Investimento: ${custoFmt}</p>
                     </div>
                 </div>
                 <div class="border-t border-slate-700 pt-3 mt-3 space-y-2 text-xs sm:text-sm">
