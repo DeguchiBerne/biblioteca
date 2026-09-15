@@ -37,9 +37,9 @@
         .shelf {
             display: flex;
             align-items: flex-end;
-            justify-content: space-between;
+            justify-content: flex-start;
             flex-wrap: nowrap;
-            gap: 2px;
+            gap: 0px; /* Livros encostados lado a lado */
             padding: 0 15px;
             min-height: 240px;
             background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(255,255,255,0.05) 40%, rgba(0,0,0,0.4) 100%);
@@ -71,7 +71,7 @@
             opacity: 0.95;
         }
 
-        /* Lombada do Livro com Textura de Couro e Cores Variadas por Cima */
+        /* Lombada do Livro com Borda bem definida para separação visual */
         .book-spine {
             cursor: pointer;
             border-radius: 3px 3px 0 0;
@@ -80,14 +80,20 @@
             justify-content: space-between;
             padding: 8px 2px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: inset -4px 0 8px rgba(0,0,0,0.4), 2px 3px 8px rgba(0,0,0,0.6);
+            /* Sombra interna e borda lateral escura marcante para separar os livros colados */
+            box-shadow: 
+                inset -3px 0 6px rgba(0,0,0,0.45), 
+                inset 3px 0 4px rgba(255,255,255,0.2), 
+                2px 3px 8px rgba(0,0,0,0.6);
+            border-right: 1px solid rgba(0, 0, 0, 0.7);
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
             position: relative;
             flex-shrink: 0;
             user-select: none;
-            background-blend-mode: multiply; /* Mistura a cor base com a textura de couro mantendo a variação */
+            background-blend-mode: multiply;
             background-image: 
                 url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/textura-couro.jpg'),
-                radial-gradient(circle at 50% 30%, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.2) 100%);
+                radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25) 0%, rgba(0,0,0,0.25) 100%);
             background-size: cover;
             background-position: center;
         }
@@ -230,22 +236,19 @@
         let colecao = [];
         let formatoSelecionado = ''; 
 
-        /* Paletas coloridas variadas aplicadas sobre a textura de couro */
-        const paletasLombadas = [
-            { baseColor: '#8c4b26', modalBg: '#1c1008', modalBorder: '#5c3317', capaFundo: '#241306', destaqueCor: 'text-amber-400' }, // Castanho / Terracota
-            { baseColor: '#b83b2c', modalBg: '#1c0c07', modalBorder: '#612115', capaFundo: '#2b0e07', destaqueCor: 'text-rose-400' }, // Vermelho Bordô
-            { baseColor: '#1d6b47', modalBg: '#09140f', modalBorder: '#1f4a35', capaFundo: '#0d1c15', destaqueCor: 'text-emerald-400' }, // Verde Floresta
-            { baseColor: '#683296', modalBg: '#160821', modalBorder: '#4a2366', capaFundo: '#1f0d2c', destaqueCor: 'text-purple-400' }, // Roxo / Lilás escuro
-            { baseColor: '#a67324', modalBg: '#1f1406', modalBorder: '#69481a', capaFundo: '#2c1b09', destaqueCor: 'text-yellow-400' }, // Ocre / Amarelo Queimado
-            { baseColor: '#245f9e', modalBg: '#08121f', modalBorder: '#20436b', capaFundo: '#0c1a2c', destaqueCor: 'text-cyan-400' }, // Azul Escuro / Índigo
-            { baseColor: '#268a7d', modalBg: '#081c19', modalBorder: '#1c5c53', capaFundo: '#0c2622', destaqueCor: 'text-teal-400' }  // Verde Petróleo / Azulado
-        ];
-
         const fontesDisponiveis = [
             'ui-sans-serif, system-ui, sans-serif',
             'ui-serif, Georgia, Cambria, serif',
             'ui-monospace, SFMono-Regular, monospace'
         ];
+
+        /* Função para gerar cor totalmente aleatória e rica em tons pastel/profundos para o couro */
+        function gerarCorAleatoria(seed) {
+            const hue = (seed * 137.5) % 360; // Distribuição uniforme no círculo cromático
+            const saturation = 45 + (seed % 35); // Saturação entre 45% e 80%
+            const lightness = 28 + (seed % 22);  // Luminosidade entre 28% e 50% (tons ricos e escuros o bastante)
+            return `hsl(${Math.round(hue)}, ${Math.round(saturation)}%, ${Math.round(lightness)}%)`;
+        }
 
         async function carregarDados() {
             try {
@@ -329,7 +332,7 @@
             });
 
             let dadosParaRenderizar = filtrados;
-            const itensPorPrateleira = 15; 
+            const itensPorPrateleira = 14; 
             const maxEstantesIniciais = 5;
 
             if (termoBusca === '' && formatoSelecionado === '') {
@@ -363,12 +366,21 @@
                 shelfDiv.className = 'shelf card-organizando';
                 shelfDiv.style.animationDelay = `${(i / itensPorPrateleira) * 0.1}s`;
 
-                const posicoesVazios = [5, 10]; 
+                // Determina aleatoriamente 1 ou 2 posições de espaços vagos por prateleira (excluindo as pontas)
+                const qtdVagos = 1 + ((i * 7) % 2); // Gera 1 ou 2 espaços
+                let posicoesVazios = [];
+                while(posicoesVazios.length < qtdVagos) {
+                    let posRandom = 3 + ((i * 31 + posicoesVazios.length * 47) % (lote.length - 4));
+                    if (!posicoesVazios.includes(posRandom) && posRandom > 1 && posRandom < lote.length - 1) {
+                        posicoesVazios.push(posRandom);
+                    }
+                }
 
                 lote.forEach((item, indexIndice) => {
+                    // Insere o espaço vago aleatório se corresponder à posição
                     if (posicoesVazios.includes(indexIndice)) {
                         const gap = document.createElement('div');
-                        const larguraGap = 25 + ((i + indexIndice * 17) % 35); 
+                        const larguraGap = 30 + ((i + indexIndice * 19) % 35); 
                         gap.className = 'shelf-gap';
                         gap.style.width = `${larguraGap}px`;
                         shelfDiv.appendChild(gap);
@@ -378,10 +390,10 @@
                     const volumesTexto = item.volumes ? item.volumes.toString().trim() : '';
                     const quantidadeAdquirida = item.quantidade ? parseInt(item.quantidade) : (item.qtd ? parseInt(item.qtd) : 1);
 
-                    const seed = (i + indexIndice) * 997;
+                    const seed = (i * 31) + (indexIndice * 73);
 
                     const altFator = Math.round(155 + ((seed % 7) * 5)); 
-                    const larguraFinal = Math.round(28 + (Math.max(quantidadeAdquirida, 1) * 4.5)); 
+                    const larguraFinal = Math.round(28 + (Math.max(quantidadeAdquirida, 1) * 4.2)); 
 
                     const tamanhoLetra = 11 + (seed % 3);
                     const familiaFonte = fontesDisponiveis[seed % fontesDisponiveis.length];
@@ -389,17 +401,16 @@
                     const temCapaValida = item.capa && item.capa.toString().startsWith('http');
                     const capaUrl = temCapaValida ? item.capa : '';
 
-                    /* Seleciona uma cor de forma variada para cada livro com base na posição/índice */
-                    const paleta = paletasLombadas[(i * 3 + indexIndice * 7) % paletasLombadas.length];
+                    const corAleatoriaLombada = gerarCorAleatoria(seed);
 
                     const spine = document.createElement('div');
                     spine.className = 'book-spine';
-                    spine.style.backgroundColor = paleta.baseColor;
+                    spine.style.backgroundColor = corAleatoriaLombada;
                     spine.style.height = `${altFator}px`;
                     spine.style.width = `${larguraFinal}px`;
 
                     spine.addEventListener('click', () => {
-                        abrirModalLivro(item, capaUrl, (i * 3 + indexIndice * 7));
+                        abrirModalLivro(item, capaUrl, corAleatoriaLombada);
                     });
 
                     spine.innerHTML = `
@@ -415,23 +426,22 @@
             }
         }
 
-        function abrirModalLivro(item, capaUrl, indicePaleta) {
+        function abrirModalLivro(item, capaUrl, corBase) {
             const modal = document.getElementById('modalDetalhes');
             const modalBox = document.getElementById('modalBoxContainer');
             const conteudo = document.getElementById('modalConteudo');
 
-            const paleta = paletasLombadas[indicePaleta % paletasLombadas.length];
-            modalBox.style.backgroundColor = paleta.modalBg;
-            modalBox.style.borderColor = paleta.modalBorder;
+            modalBox.style.backgroundColor = '#150c07';
+            modalBox.style.borderColor = corBase;
 
             const temCapaReal = capaUrl && capaUrl.startsWith('http');
             const imagemExibida = temCapaReal ? capaUrl : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca';
 
             let paginaEsquerda = `
-                <div class="p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-black/40 relative shadow-inner" style="background-color: ${paleta.capaFundo};">
+                <div class="p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-black/40 relative shadow-inner" style="background-color: #201108;">
                     <div class="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent pointer-events-none"></div>
                     <img src="${imagemExibida}" class="w-48 h-72 sm:w-56 sm:h-80 object-cover rounded shadow-[0_15px_30px_rgba(0,0,0,0.8)] border border-black/50" alt="Capa da Obra">
-                    <span class="mt-4 text-xs tracking-widest uppercase ${paleta.destaqueCor} font-bold">${item.formato || 'Acervo'}</span>
+                    <span class="mt-4 text-xs tracking-widest uppercase text-amber-400 font-bold">${item.formato || 'Acervo'}</span>
                 </div>
             `;
 
