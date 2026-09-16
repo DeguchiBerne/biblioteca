@@ -18,8 +18,6 @@ body {
 }
 
 /* Prateleira Individual (Efeito Madeira Realista) */
-
-/* Prateleira Individual (Efeito Madeira Realista) */
 .shelf {
   position: relative;
   background: linear-gradient(to bottom, #764728 0%, var(--shelf-wood) 70%, var(--shelf-wood-dark) 100%);
@@ -37,14 +35,22 @@ body {
   overflow-x: auto; 
 }
 
-/* No Computador (Desktop): Força a quebra de linha e elimina o scroll lateral */
+/* No Computador (Desktop): Força quebra de linha limpa e sem scroll */
 @media (min-width: 768px) {
   .shelf {
     flex-wrap: wrap !important;
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
+    overflow: visible !important;
     width: 100% !important;
   }
+}
+
+/* Linha de fundo da prateleira (fundo do móvel) */
+.shelf::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(90deg, transparent, transparent 150px, rgba(0,0,0,0.08) 150px, rgba(0,0,0,0.08) 152px);
+  pointer-events: none;
 }
 
 /* Livro Individual na Estante */
@@ -66,7 +72,13 @@ body {
   margin-bottom: 10px; 
   text-align: center;
   user-select: none;
-  flex-shrink: 0; /* Impede que o livro encolha à força no mobile */
+}
+
+/* No Mobile mantém rigidez, no Desktop permite flexibilidade para encaixar perfeito */
+@media (max-width: 767px) {
+  .book-spine {
+    flex-shrink: 0;
+  }
 }
 
 /* Efeito Hover */
@@ -102,7 +114,7 @@ body {
   color: #cbd5e1;
 }
 
-/* Container da Paginação (Garante que apareça visível na tela) */
+/* Container da Paginação */
 .pagination-container {
   display: flex;
   justify-content: center;
