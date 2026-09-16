@@ -352,7 +352,7 @@
         let formatoSelecionado = ''; 
         let paginaAtual = 0;
 
-function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9) {
+        function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9) {
             return new Promise((resolve, reject) => {
                 const leitor = new FileReader();
                 leitor.readAsDataURL(arquivo);
@@ -406,7 +406,7 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
 
         const andaresPorEstante = 4;
         const itensPorPrateleira = 25;
-        const itensPorPagina = andaresPorEstante * itensPorPrateleira; // 100 títulos por página
+        const itensPorPagina = andaresPorEstante * itensPorPrateleira;
 
         const fontesDisponiveis = [
             'ui-sans-serif, system-ui, sans-serif',
@@ -432,10 +432,8 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
                 
                 let dadosBrutos = await response.json();
                 
-                // Trata caso venha encapsulado ou como array direto
                 let lista = Array.isArray(dadosBrutos) ? dadosBrutos : (dadosBrutos.dados || dadosBrutos.resultado || []);
                 
-                // Normaliza as chaves (ex: "Título" ou "TITULO" vira "titulo") para o filtro funcionar 100%
                 colecao = lista.map(item => {
                     let itemNormalizado = {};
                     for (let chave in item) {
@@ -456,6 +454,7 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
                 console.error("Detalhes do erro:", error);
             }
         }
+
         function atualizarEstatisticas(dados) {
             document.getElementById('stat-total').innerText = dados.length;
         }
@@ -737,7 +736,7 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
             document.getElementById('formQuantidade').value = item.quantidade || item.qtd || 1;
             document.getElementById('formCusto').value = item.custo || '';
             document.getElementById('formCapa').value = item.capa || '';
-            document.getElementById('formDetalhes').value = item.detalhes || '';
+            document.getElementById('formDetalhes').value = item.observacao || item.detalhes || '';
             document.getElementById('modalForm').classList.remove('hidden');
         }
 
@@ -747,15 +746,103 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
 
         async function salvarLivro(event) {
             event.preventDefault();
-            alert('Função de salvamento conectada à sua API.');
-            fecharModalForm();
+
+            const btnSalvar = document.getElementById('btnSalvarForm');
+            const textoOriginalBtn = btnSalvar.innerText;
+            btnSalvar.innerText = "Salvando obra e processando capa...";
+            btnSalvar.disabled = true;
+
+            const tituloOriginal = document.getElementById('formIndex').value;
+            const titulo = document.getElementById('formTitulo').value.trim();
+            const formato = document.getElementById('formFormato').value.trim();
+            const volumes = document.getElementById('formVolumes').value.trim();
+            const quantidade = document.getElementById('formQuantidade').value;
+            const custo = document.getElementById('formCusto').value.trim();
+            const capaUrlInput = document.getElementById('formCapa').value.trim();
+            const detalhes = document.getElementById('formDetalhes').value.trim();
+            const inputArquivo = document.getElementById('formArquivoCapa');
+
+            let imagemBase64 = "";
+            let nomeArquivo = "";
+            let tipoMime = "";
+            let capaFinal = capaUrlInput;
+
+            try {
+                if (inputArquivo.files && inputArquivo.files[0]) {
+                    const arquivo = inputArquivo.files[0];
+                    nomeArquivo = arquivo.name;
+                    tipoMime = arquivo.type;
+                    
+                    imagemBase64 = await comprimirImagem(arquivo, 500, 0.85);
+                    imagemBase64 = imagemBase64.split(',')[1];
+                }
+
+                const dadosPayload = {
+                    tituloOriginal: tituloOriginal,
+                    titulo: titulo,
+                    formato: formato,
+                    volumes: volumes,
+                    quantidade: quantidade,
+                    custo: custo,
+                    capa: capaFinal,
+                    observacao: detalhes,
+                    detalhes: detalhes,
+                    imagemBase64: imagemBase64,
+                    nomeArquivo: nomeArquivo,
+                    tipoMime: tipoMime
+                };
+
+                const resposta = await fetch(API_URL, {
+                    method: 'POST',
+                    redirect: 'follow',
+                    body: JSON.stringify(dadosPayload)
+                });
+
+                const resultado = await resposta.json();
+
+                if (resultado.sucesso) {
+                    alert(resultado.mensagem || "Obra salva com sucesso!");
+                    fecharModalForm();
+                    fecharModal();
+                    carregarDados();
+                } else {
+                    alert("Erro ao salvar: " + (resultado.mensagem || resultado.erro || "Desconhecido"));
+                }
+
+            } catch (erro) {
+                console.error("Erro na requisição:", erro);
+                alert("Ocorreu um erro ao comunicar com a API.");
+            } finally {
+                btnSalvar.innerText = textoOriginalBtn;
+                btnSalvar.disabled = false;
+            }
         }
 
         async function excluirLivro(titulo) {
-            if (confirm(`Deseja realmente excluir "${titulo}"?`)) {
-                alert('Livro excluído com sucesso.');
-                fecharModal();
-                carregarDados();
+            if (confirm(`Deseja realmente excluir "${titulo}" e movê-lo para a lixeira?`)) {
+                try {
+                    const resposta = await fetch(API_URL, {
+                        method: 'POST',
+                        redirect: 'follow',
+                        body: JSON.stringify({
+                            acao: "excluir",
+                            titulo: titulo
+                        })
+                    });
+
+                    const resultado = await resposta.json();
+
+                    if (resultado.sucesso) {
+                        alert("Item excluído com sucesso!");
+                        fecharModal();
+                        carregarDados();
+                    } else {
+                        alert("Erro ao excluir: " + (resultado.erro || "Desconhecido"));
+                    }
+                } catch (erro) {
+                    console.error("Erro na exclusão:", erro);
+                    alert("Erro ao conectar com a API para exclusão.");
+                }
             }
         }
 
