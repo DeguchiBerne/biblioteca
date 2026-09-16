@@ -738,7 +738,6 @@ async function salvarLivro(event) {
             const inputArquivo = document.getElementById('formArquivoCapa');
             let capaUrl = document.getElementById('formCapa').value;
 
-            // Se o usuário selecionou um arquivo local, comprime ele antes de enviar
             if (inputArquivo.files && inputArquivo.files[0]) {
                 try {
                     document.getElementById('btnSalvarForm').innerText = "Processando imagem...";
@@ -755,36 +754,44 @@ async function salvarLivro(event) {
             }
 
             const dadosLivro = {
-                acao: "salvar", // Identificador para a API saber o que fazer
-                tituloOriginal: document.getElementById('formIndex').value, // Para saber se está editando
+                acao: "salvar",
+                tituloOriginal: document.getElementById('formIndex').value,
                 titulo: document.getElementById('formTitulo').value,
                 formato: document.getElementById('formFormato').value,
                 volumes: document.getElementById('formVolumes').value,
                 quantidade: document.getElementById('formQuantidade').value,
                 custo: document.getElementById('formCusto').value,
-                capa: capaUrl, // Aqui vai a imagem comprimida (Base64) ou a URL antiga
+                capa: capaUrl,
                 detalhes: document.getElementById('formDetalhes').value
             };
 
             try {
-                // Envia para o seu Google Apps Script via POST
+                console.log("Enviando dados...", dadosLivro);
                 const resposta = await fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify(dadosLivro)
                 });
 
-                const resultado = await resposta.json();
+                const textoResposta = await resposta.text();
+                console.log("Resposta bruta do servidor:", textoResposta);
+
+                let resultado;
+                try {
+                    resultado = JSON.parse(textoResposta);
+                } catch (e) {
+                    throw new Error("O servidor não retornou um JSON válido: " + textoResposta);
+                }
                 
-                if (resultado.sucesso || resposta.ok) {
+                if (resultado.sucesso) {
                     alert('Obra e foto salvas com sucesso!');
                     fecharModalForm();
-                    carregarDados(); // Recarrega a estante
+                    carregarDados();
                 } else {
-                    alert('Erro ao salvar no servidor.');
+                    alert('Erro retornado pelo servidor: ' + (resultado.erro || 'Desconhecido'));
                 }
             } catch (erro) {
-                console.error("Erro na requisição:", erro);
-                alert('Erro de conexão ao salvar.');
+                console.error("Erro detalhado na requisição:", erro);
+                alert('Erro ao salvar: ' + erro.message);
             } finally {
                 document.getElementById('btnSalvarForm').innerText = "Salvar Obra";
                 document.getElementById('btnSalvarForm').disabled = false;
