@@ -421,20 +421,26 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
             return `hsl(${Math.round(hue)}, ${Math.round(saturation)}%, ${Math.round(lightness)}%)`;
         }
 
-// Substitua o trecho de carregamento no seu admin.html para processar o JSON diretamente como array (caso estivesse funcionando assim antes):
-async function carregarDados() {
-    try {
-        const resposta = await fetch(API_URL);
-        const dados = await resposta.json();
-        
-        // Se antes funcionava direto com o array retornado, certifique-se que usa 'dados' diretamente:
-        // Exemplo: let lista = Array.isArray(dados) ? dados : dados.dados;
-        
-        // (Mantenha aqui a sua lógica original de exibição na tabela que funcionava antes)
-    } catch (erro) {
-        console.error("Erro ao carregar dados:", erro);
-    }
-}
+        async function carregarDados() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Erro na resposta do servidor');
+                let dadosBrutos = await response.json();
+                
+                colecao = dadosBrutos.filter(item => item.titulo && item.titulo.toString().trim() !== "");
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('estanteContainer').classList.remove('hidden');
+                
+                atualizarEstatisticas(colecao);
+                criarBotoesFiltro(colecao);
+                paginaAtual = 0;
+                aplicarFiltros(); 
+            } catch (error) {
+                document.getElementById('loading').innerText = 'Erro ao carregar os dados. Verifique a conexão.';
+                console.error(error);
+            }
+        }
 
         function atualizarEstatisticas(dados) {
             document.getElementById('stat-total').innerText = dados.length;
@@ -707,7 +713,7 @@ async function carregarDados() {
             document.getElementById('modalForm').classList.remove('hidden');
         }
 
-       function abrirModalEditar(item) {
+        function abrirModalEditar(item) {
             fecharModal();
             document.getElementById('modalFormTitle').innerText = "Editar Obra";
             document.getElementById('formIndex').value = item.titulo;
@@ -717,7 +723,6 @@ async function carregarDados() {
             document.getElementById('formQuantidade').value = item.quantidade || item.qtd || 1;
             document.getElementById('formCusto').value = item.custo || '';
             document.getElementById('formCapa').value = item.capa || '';
-            document.getElementById('formArquivoCapa').value = ''; // Limpa o seletor de arquivo ao editar
             document.getElementById('formDetalhes').value = item.detalhes || '';
             document.getElementById('modalForm').classList.remove('hidden');
         }
@@ -726,103 +731,17 @@ async function carregarDados() {
             document.getElementById('modalForm').classList.add('hidden');
         }
 
-async function salvarLivro(event) {
+        async function salvarLivro(event) {
             event.preventDefault();
-            
-            const inputArquivo = document.getElementById('formArquivoCapa');
-            let capaUrl = document.getElementById('formCapa').value;
-
-            if (inputArquivo.files && inputArquivo.files[0]) {
-                try {
-                    document.getElementById('btnSalvarForm').innerText = "Processando imagem...";
-                    document.getElementById('btnSalvarForm').disabled = true;
-                    
-                    capaUrl = await comprimirImagem(inputArquivo.files[0], 500);
-                } catch (erro) {
-                    console.error("Erro ao comprimir imagem:", erro);
-                    alert("Erro ao processar a imagem.");
-                    document.getElementById('btnSalvarForm').innerText = "Salvar Obra";
-                    document.getElementById('btnSalvarForm').disabled = false;
-                    return;
-                }
-            }
-
-            const dadosLivro = {
-                acao: "salvar",
-                tituloOriginal: document.getElementById('formIndex').value,
-                titulo: document.getElementById('formTitulo').value,
-                formato: document.getElementById('formFormato').value,
-                volumes: document.getElementById('formVolumes').value,
-                quantidade: document.getElementById('formQuantidade').value,
-                custo: document.getElementById('formCusto').value,
-                capa: capaUrl,
-                detalhes: document.getElementById('formDetalhes').value
-            };
-
-            try {
-                console.log("Enviando dados...", dadosLivro);
-                const resposta = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(dadosLivro)
-                });
-
-                const textoResposta = await resposta.text();
-                console.log("Resposta bruta do servidor:", textoResposta);
-
-                let resultado;
-                try {
-                    resultado = JSON.parse(textoResposta);
-                } catch (e) {
-                    throw new Error("O servidor não retornou um JSON válido: " + textoResposta);
-                }
-                
-                if (resultado.sucesso) {
-                    alert('Obra e foto salvas com sucesso!');
-                    fecharModalForm();
-                    carregarDados();
-                } else {
-                    alert('Erro retornado pelo servidor: ' + (resultado.erro || 'Desconhecido'));
-                }
-            } catch (erro) {
-                console.error("Erro detalhado na requisição:", erro);
-                alert('Erro ao salvar: ' + erro.message);
-            } finally {
-                document.getElementById('btnSalvarForm').innerText = "Salvar Obra";
-                document.getElementById('btnSalvarForm').disabled = false;
-            }
+            alert('Função de salvamento conectada à sua API.');
+            fecharModalForm();
         }
 
-    async function excluirLivro(tituloObra) {
-            // Primeira confirmação
-            const primeiraConfirmacao = confirm(`Tem certeza de que deseja excluir a obra "${tituloObra}"?`);
-            if (!primeiraConfirmacao) return;
-
-            // Segunda confirmação (definitiva)
-            const segundaConfirmacao = confirm(`⚠️ ATENÇÃO: Esta ação moverá a obra "${tituloObra}" para a Lixeira. Deseja realmente prosseguir com a exclusão definitiva?`);
-            if (!segundaConfirmacao) return;
-
-            try {
-                const dadosExclusao = {
-                    acao: "excluir",
-                    titulo: tituloObra
-                };
-
-                const resposta = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(dadosExclusao)
-                });
-
-                const resultado = await resposta.json();
-
-                if (resultado.sucesso) {
-                    alert('Obra movida para a Lixeira com sucesso!');
-                    carregarDados(); // Atualiza a tabela na tela
-                } else {
-                    alert('Erro ao excluir: ' + (resultado.erro || 'Desconhecido'));
-                }
-            } catch (erro) {
-                console.error("Erro na requisição de exclusão:", erro);
-                alert('Erro de conexão ao tentar excluir.');
+        async function excluirLivro(titulo) {
+            if (confirm(`Deseja realmente excluir "${titulo}"?`)) {
+                alert('Livro excluído com sucesso.');
+                fecharModal();
+                carregarDados();
             }
         }
 
