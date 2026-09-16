@@ -18,6 +18,8 @@ body {
 }
 
 /* Prateleira Individual (Efeito Madeira Realista) */
+
+/* Prateleira Individual (Efeito Madeira Realista) */
 .shelf {
   position: relative;
   background: linear-gradient(to bottom, #764728 0%, var(--shelf-wood) 70%, var(--shelf-wood-dark) 100%);
@@ -30,27 +32,19 @@ body {
   align-items: flex-end; 
   min-height: 280px;
   
-  /* Mobile: Rolagem horizontal */
+  /* Padrão para Celular (Mobile): mantém rolagem horizontal */
   flex-wrap: nowrap; 
   overflow-x: auto; 
 }
 
-/* Desktop: Força a quebra de linha para caber tudo na tela sem rolagem lateral */
+/* No Computador (Desktop): Força a quebra de linha e elimina o scroll lateral */
 @media (min-width: 768px) {
   .shelf {
     flex-wrap: wrap !important;
-    overflow-x: visible !important;
-    justify-content: flex-start;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    width: 100% !important;
   }
-}
-
-/* Linha de fundo da prateleira (fundo do móvel) */
-.shelf::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: repeating-linear-gradient(90deg, transparent, transparent 150px, rgba(0,0,0,0.08) 150px, rgba(0,0,0,0.08) 152px);
-  pointer-events: none;
 }
 
 /* Livro Individual na Estante */
@@ -106,26 +100,6 @@ body {
 .book-meta {
   font-size: 0.65rem;
   color: #cbd5e1;
-}
-
-/* Espaços Vazios na Prateleira */
-.shelf-gap-small {
-  width: 70px;
-  flex-shrink: 0;
-}
-
-.shelf-gap-large {
-  width: 120px;
-  flex-shrink: 0;
-}
-
-/* Container de Decoração */
-.shelf-decoration {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  margin-right: 15px;
-  cursor: default;
 }
 
 /* Container da Paginação (Garante que apareça visível na tela) */
