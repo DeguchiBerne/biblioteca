@@ -27,20 +27,20 @@ body {
   padding: 30px 20px 0 20px;
   margin-bottom: 60px;
   display: flex;
-  align-items: flex-end; /* Alinha os livros na base da prateleira */
+  align-items: flex-end; 
+  min-height: 280px;
   
-  /* Padrão para Dispositivos Móveis (Celular): mantém rolagem horizontal */
+  /* Mobile: Rolagem horizontal */
   flex-wrap: nowrap; 
   overflow-x: auto; 
-  min-height: 280px;
 }
 
-/* No Computador (Desktop): quebra a linha para caber tudo e remove o scroll */
+/* Desktop: Força a quebra de linha para caber tudo na tela sem rolagem lateral */
 @media (min-width: 768px) {
   .shelf {
-    flex-wrap: wrap;       /* Permite que os livros quebrem linha e apareçam todos */
-    overflow-x: visible;   /* Remove a rolagem horizontal */
-    justify-content: flex-start; /* Alinha os livros organizados desde o início */
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+    justify-content: flex-start;
   }
 }
 
@@ -53,7 +53,7 @@ body {
   pointer-events: none;
 }
 
-/* Livro Individual na Estante (Variedade de Tamanhos e Estética de Lombada) */
+/* Livro Individual na Estante */
 .book-spine {
   position: relative;
   background: linear-gradient(135deg, #2c3e50, #1a252f);
@@ -68,27 +68,28 @@ body {
   flex-direction: column;
   justify-content: space-between;
   padding: 12px 6px;
-  margin-right: 8px; /* Espaçamento natural entre os livros */
-  margin-bottom: 10px; /* Garante espaço caso quebre linha no desktop */
+  margin-right: 8px; 
+  margin-bottom: 10px; 
   text-align: center;
   user-select: none;
+  flex-shrink: 0; /* Impede que o livro encolha à força no mobile */
 }
 
-/* Efeito Hover (O livro "soa" levemente para frente ao passar o mouse) */
+/* Efeito Hover */
 .book-spine:hover {
   transform: translateY(-8px);
   box-shadow: -5px 12px 15px rgba(0,0,0,0.6);
   z-index: 10;
 }
 
-/* Variação Dinâmica de Alturas e Larguras (Para quebrarem o padrão robótico) */
+/* Variação Dinâmica de Alturas e Larguras */
 .book-spine:nth-child(5n+1) { height: 210px; width: 45px; background: linear-gradient(135deg, #8b0000, #5c0000); }
 .book-spine:nth-child(5n+2) { height: 240px; width: 55px; background: linear-gradient(135deg, #1b4d3e, #0f2d24); }
 .book-spine:nth-child(5n+3) { height: 195px; width: 40px; background: linear-gradient(135deg, #3b3b6d, #20203d); }
 .book-spine:nth-child(5n+4) { height: 225px; width: 50px; background: linear-gradient(135deg, #b8860b, #705207); }
 .book-spine:nth-child(5n+5) { height: 200px; width: 48px; background: linear-gradient(135deg, #483d8b, #2a2252); }
 
-/* Textos da Lombada (Verticalizados ou Legíveis) */
+/* Textos da Lombada */
 .book-title {
   font-size: 0.75rem;
   font-weight: bold;
@@ -107,7 +108,7 @@ body {
   color: #cbd5e1;
 }
 
-/* Espaços Vazios na Prateleira para Decoração (Action Figures / Itens) */
+/* Espaços Vazios na Prateleira */
 .shelf-gap-small {
   width: 70px;
   flex-shrink: 0;
@@ -118,11 +119,43 @@ body {
   flex-shrink: 0;
 }
 
-/* Container de Decoração opcional encaixado na prateleira */
+/* Container de Decoração */
 .shelf-decoration {
   display: flex;
   align-items: flex-end;
   justify-content: center;
   margin-right: 15px;
   cursor: default;
+}
+
+/* Container da Paginação (Garante que apareça visível na tela) */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 30px 0 50px 0;
+  width: 100%;
+}
+
+.pagination-btn {
+  background-color: #764728;
+  color: #fff;
+  border: 1px solid #8d5531;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background-color: #8d5531;
+}
+
+.pagination-btn:disabled {
+  background-color: #3a2313;
+  color: #777;
+  cursor: not-allowed;
+  border-color: #27170c;
 }
