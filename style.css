@@ -28,9 +28,20 @@ body {
   margin-bottom: 60px;
   display: flex;
   align-items: flex-end; /* Alinha os livros na base da prateleira */
-  flex-wrap: nowrap; /* Mantém na mesma linha horizontal da prateleira */
-  overflow-x: auto; /* Permite rolar caso ultrapasse */
+  
+  /* Padrão para Dispositivos Móveis (Celular): mantém rolagem horizontal */
+  flex-wrap: nowrap; 
+  overflow-x: auto; 
   min-height: 280px;
+}
+
+/* No Computador (Desktop): quebra a linha para caber tudo e remove o scroll */
+@media (min-width: 768px) {
+  .shelf {
+    flex-wrap: wrap;       /* Permite que os livros quebrem linha e apareçam todos */
+    overflow-x: visible;   /* Remove a rolagem horizontal */
+    justify-content: flex-start; /* Alinha os livros organizados desde o início */
+  }
 }
 
 /* Linha de fundo da prateleira (fundo do móvel) */
@@ -58,6 +69,7 @@ body {
   justify-content: space-between;
   padding: 12px 6px;
   margin-right: 8px; /* Espaçamento natural entre os livros */
+  margin-bottom: 10px; /* Garante espaço caso quebre linha no desktop */
   text-align: center;
   user-select: none;
 }
