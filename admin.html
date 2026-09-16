@@ -423,11 +423,26 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
 
         async function carregarDados() {
             try {
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error('Erro na resposta do servidor');
+                const response = await fetch(API_URL, {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
+
+                if (!response.ok) throw new Error('Erro na resposta do servidor (Status: ' + response.status + ')');
+                
                 let dadosBrutos = await response.json();
                 
-                colecao = dadosBrutos.filter(item => item.titulo && item.titulo.toString().trim() !== "");
+                // Trata caso venha encapsulado ou como array direto
+                let lista = Array.isArray(dadosBrutos) ? dadosBrutos : (dadosBrutos.dados || dadosBrutos.resultado || []);
+                
+                // Normaliza as chaves (ex: "Título" ou "TITULO" vira "titulo") para o filtro funcionar 100%
+                colecao = lista.map(item => {
+                    let itemNormalizado = {};
+                    for (let chave in item) {
+                        itemNormalizado[chave.trim().toLowerCase()] = item[chave];
+                    }
+                    return itemNormalizado;
+                }).filter(item => item.titulo && item.titulo.toString().trim() !== "");
                 
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('estanteContainer').classList.remove('hidden');
@@ -438,10 +453,9 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
                 aplicarFiltros(); 
             } catch (error) {
                 document.getElementById('loading').innerText = 'Erro ao carregar os dados. Verifique a conexão.';
-                console.error(error);
+                console.error("Detalhes do erro:", error);
             }
         }
-
         function atualizarEstatisticas(dados) {
             document.getElementById('stat-total').innerText = dados.length;
         }
