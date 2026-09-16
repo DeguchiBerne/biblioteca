@@ -421,26 +421,20 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
             return `hsl(${Math.round(hue)}, ${Math.round(saturation)}%, ${Math.round(lightness)}%)`;
         }
 
-        async function carregarDados() {
-            try {
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error('Erro na resposta do servidor');
-                let dadosBrutos = await response.json();
-                
-                colecao = dadosBrutos.filter(item => item.titulo && item.titulo.toString().trim() !== "");
-                
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('estanteContainer').classList.remove('hidden');
-                
-                atualizarEstatisticas(colecao);
-                criarBotoesFiltro(colecao);
-                paginaAtual = 0;
-                aplicarFiltros(); 
-            } catch (error) {
-                document.getElementById('loading').innerText = 'Erro ao carregar os dados. Verifique a conexão.';
-                console.error(error);
-            }
-        }
+// Substitua o trecho de carregamento no seu admin.html para processar o JSON diretamente como array (caso estivesse funcionando assim antes):
+async function carregarDados() {
+    try {
+        const resposta = await fetch(API_URL);
+        const dados = await resposta.json();
+        
+        // Se antes funcionava direto com o array retornado, certifique-se que usa 'dados' diretamente:
+        // Exemplo: let lista = Array.isArray(dados) ? dados : dados.dados;
+        
+        // (Mantenha aqui a sua lógica original de exibição na tabela que funcionava antes)
+    } catch (erro) {
+        console.error("Erro ao carregar dados:", erro);
+    }
+}
 
         function atualizarEstatisticas(dados) {
             document.getElementById('stat-total').innerText = dados.length;
