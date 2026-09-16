@@ -318,26 +318,45 @@
         }
 
         async function carregarDados() {
-            try {
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error('Erro na resposta do servidor');
-                let dadosBrutos = await response.json();
-                
-                colecao = dadosBrutos.filter(item => item.titulo && item.titulo.toString().trim() !== "");
-                
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('estanteContainer').classList.remove('hidden');
-                
-                atualizarEstatisticas(colecao);
-                criarBotoesFiltro(colecao);
-                paginaAtual = 0;
-                aplicarFiltros(); 
-            } catch (error) {
-                document.getElementById('loading').innerText = 'Erro ao carregar os dados. Verifique a conexão.';
-                console.error(error);
-            }
-        }
+    try {
+        const response = await fetch(API_URL, {
+            method: 'GET',
+            redirect: 'follow' // Garante que o fetch siga redirecionamentos do Google Apps Script corretamente
+        });
 
+        if (!response.ok) throw new Error('Erro na resposta do servidor (Status: ' + response.status + ')');
+        
+        let dadosBrutos = await response.json();
+        
+        // Se a resposta vier encapsulada em um objeto { dados: [...] } ou for um array direto
+        let lista = Array.isArray(dadosBrutos) ? dadosBrutos : (dadosBrutos.dados || dadosBrutos.resultado || []);
+        
+        // Normaliza as chaves do objeto para minúsculas para evitar problemas com "Título" vs "titulo"
+        colecao = lista.map(item => {
+            let itemNormalizado = {};
+            for (let chave in item) {
+                itemNormalizado[chave.trim().toLowerCase()] = item[chave];
+            }
+            return itemNormalizado;
+        }).filter(item => item.titulo && item.titulo.toString().trim() !== "");
+        
+        document.getElementById('loading').style.display = 'none';
+        const estante = document.getElementById('estanteContainer');
+        if (estante) estante.classList.remove('hidden');
+        
+        atualizarEstatisticas(colecao);
+        criarBotoesFiltro(colecao);
+        paginaAtual = 0;
+        aplicarFiltros(); 
+
+    } catch (error) {
+        const loadingEl = document.getElementById('loading');
+        if (loadingEl) {
+            loadingEl.innerText = 'Erro ao carregar os dados. Verifique a conexão ou a URL da API.';
+        }
+        console.error("Detalhes do erro:", error);
+    }
+}
         function atualizarEstatisticas(dados) {
             document.getElementById('stat-total').innerText = dados.length;
         }
