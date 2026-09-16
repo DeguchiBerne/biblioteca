@@ -732,16 +732,16 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
             document.getElementById('modalForm').classList.add('hidden');
         }
 
-        async function salvarLivro(event) {
+async function salvarLivro(event) {
             event.preventDefault();
             
             const inputArquivo = document.getElementById('formArquivoCapa');
             let capaUrl = document.getElementById('formCapa').value;
 
-            // Se o usuário selecionou um arquivo local, comprime ele antes de salvar
+            // Se o usuário selecionou um arquivo local, comprime ele antes de enviar
             if (inputArquivo.files && inputArquivo.files[0]) {
                 try {
-                    document.getElementById('btnSalvarForm').innerText = "Comprimindo imagem...";
+                    document.getElementById('btnSalvarForm').innerText = "Processando imagem...";
                     document.getElementById('btnSalvarForm').disabled = true;
                     
                     capaUrl = await comprimirImagem(inputArquivo.files[0], 500);
@@ -754,24 +754,41 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
                 }
             }
 
-            // Monte o objeto com os dados para enviar à API
             const dadosLivro = {
-                indice: document.getElementById('formIndex').value,
+                acao: "salvar", // Identificador para a API saber o que fazer
+                tituloOriginal: document.getElementById('formIndex').value, // Para saber se está editando
                 titulo: document.getElementById('formTitulo').value,
                 formato: document.getElementById('formFormato').value,
                 volumes: document.getElementById('formVolumes').value,
                 quantidade: document.getElementById('formQuantidade').value,
                 custo: document.getElementById('formCusto').value,
-                capa: capaUrl,
+                capa: capaUrl, // Aqui vai a imagem comprimida (Base64) ou a URL antiga
                 detalhes: document.getElementById('formDetalhes').value
             };
 
-            console.log("Dados prontos para envio:", dadosLivro);
-            alert('Imagem comprimida e pronta para envio!');
-            
-            document.getElementById('btnSalvarForm').innerText = "Salvar Obra";
-            document.getElementById('btnSalvarForm').disabled = false;
-            fecharModalForm();
+            try {
+                // Envia para o seu Google Apps Script via POST
+                const resposta = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(dadosLivro)
+                });
+
+                const resultado = await resposta.json();
+                
+                if (resultado.sucesso || resposta.ok) {
+                    alert('Obra e foto salvas com sucesso!');
+                    fecharModalForm();
+                    carregarDados(); // Recarrega a estante
+                } else {
+                    alert('Erro ao salvar no servidor.');
+                }
+            } catch (erro) {
+                console.error("Erro na requisição:", erro);
+                alert('Erro de conexão ao salvar.');
+            } finally {
+                document.getElementById('btnSalvarForm').innerText = "Salvar Obra";
+                document.getElementById('btnSalvarForm').disabled = false;
+            }
         }
 
         async function excluirLivro(titulo) {
