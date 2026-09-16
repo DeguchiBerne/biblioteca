@@ -791,11 +791,37 @@ async function salvarLivro(event) {
             }
         }
 
-        async function excluirLivro(titulo) {
-            if (confirm(`Deseja realmente excluir "${titulo}"?`)) {
-                alert('Livro excluído com sucesso.');
-                fecharModal();
-                carregarDados();
+    async function excluirLivro(tituloObra) {
+            // Primeira confirmação
+            const primeiraConfirmacao = confirm(`Tem certeza de que deseja excluir a obra "${tituloObra}"?`);
+            if (!primeiraConfirmacao) return;
+
+            // Segunda confirmação (definitiva)
+            const segundaConfirmacao = confirm(`⚠️ ATENÇÃO: Esta ação moverá a obra "${tituloObra}" para a Lixeira. Deseja realmente prosseguir com a exclusão definitiva?`);
+            if (!segundaConfirmacao) return;
+
+            try {
+                const dadosExclusao = {
+                    acao: "excluir",
+                    titulo: tituloObra
+                };
+
+                const resposta = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(dadosExclusao)
+                });
+
+                const resultado = await resposta.json();
+
+                if (resultado.sucesso) {
+                    alert('Obra movida para a Lixeira com sucesso!');
+                    carregarDados(); // Atualiza a tabela na tela
+                } else {
+                    alert('Erro ao excluir: ' + (resultado.erro || 'Desconhecido'));
+                }
+            } catch (erro) {
+                console.error("Erro na requisição de exclusão:", erro);
+                alert('Erro de conexão ao tentar excluir.');
             }
         }
 
