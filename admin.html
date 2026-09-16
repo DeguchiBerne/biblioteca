@@ -713,7 +713,7 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
             document.getElementById('modalForm').classList.remove('hidden');
         }
 
-        function abrirModalEditar(item) {
+       function abrirModalEditar(item) {
             fecharModal();
             document.getElementById('modalFormTitle').innerText = "Editar Obra";
             document.getElementById('formIndex').value = item.titulo;
@@ -723,6 +723,7 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
             document.getElementById('formQuantidade').value = item.quantidade || item.qtd || 1;
             document.getElementById('formCusto').value = item.custo || '';
             document.getElementById('formCapa').value = item.capa || '';
+            document.getElementById('formArquivoCapa').value = ''; // Limpa o seletor de arquivo ao editar
             document.getElementById('formDetalhes').value = item.detalhes || '';
             document.getElementById('modalForm').classList.remove('hidden');
         }
@@ -733,7 +734,43 @@ function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9)
 
         async function salvarLivro(event) {
             event.preventDefault();
-            alert('Função de salvamento conectada à sua API.');
+            
+            const inputArquivo = document.getElementById('formArquivoCapa');
+            let capaUrl = document.getElementById('formCapa').value;
+
+            // Se o usuário selecionou um arquivo local, comprime ele antes de salvar
+            if (inputArquivo.files && inputArquivo.files[0]) {
+                try {
+                    document.getElementById('btnSalvarForm').innerText = "Comprimindo imagem...";
+                    document.getElementById('btnSalvarForm').disabled = true;
+                    
+                    capaUrl = await comprimirImagem(inputArquivo.files[0], 500);
+                } catch (erro) {
+                    console.error("Erro ao comprimir imagem:", erro);
+                    alert("Erro ao processar a imagem.");
+                    document.getElementById('btnSalvarForm').innerText = "Salvar Obra";
+                    document.getElementById('btnSalvarForm').disabled = false;
+                    return;
+                }
+            }
+
+            // Monte o objeto com os dados para enviar à API
+            const dadosLivro = {
+                indice: document.getElementById('formIndex').value,
+                titulo: document.getElementById('formTitulo').value,
+                formato: document.getElementById('formFormato').value,
+                volumes: document.getElementById('formVolumes').value,
+                quantidade: document.getElementById('formQuantidade').value,
+                custo: document.getElementById('formCusto').value,
+                capa: capaUrl,
+                detalhes: document.getElementById('formDetalhes').value
+            };
+
+            console.log("Dados prontos para envio:", dadosLivro);
+            alert('Imagem comprimida e pronta para envio!');
+            
+            document.getElementById('btnSalvarForm').innerText = "Salvar Obra";
+            document.getElementById('btnSalvarForm').disabled = false;
             fecharModalForm();
         }
 
