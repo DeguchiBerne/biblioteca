@@ -3,96 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel do Administrador - Biblioteca</title>
+    <title>Painel de Controle e Gestão - Biblioteca</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background-color: #090d16;
-            background-image: 
-                linear-gradient(rgba(9, 13, 22, 0.85), rgba(9, 13, 22, 0.95)), 
-                url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/bibliofundo.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background-color: #0c0a1d;
+            color: #f3e8ff;
+            font-family: ui-sans-serif, system-ui, sans-serif;
         }
 
-        /* Container Centralizado da Estante com rolamento horizontal habilitado para mobile */
         .shelf-container-wrapper {
-            max-width: 820px;
+            max-width: 1000px;
             margin: 0 auto;
             background: 
-                linear-gradient(rgba(40, 22, 10, 0.4), rgba(30, 15, 5, 0.5)),
+                linear-gradient(rgba(20, 10, 30, 0.6), rgba(10, 5, 20, 0.8)),
                 url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/textura-madeira.jpg');
             background-size: cover;
             background-position: center;
-            padding: 25px 0px;
-            border-radius: 10px;
-            border: 4px solid #5a3214;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(0,0,0,0.5);
-            filter: brightness(1.15);
-            position: relative;
+            padding: 25px 15px;
+            border-radius: 12px;
+            border: 4px solid #3b1f4f;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
             overflow-x: auto;
         }
 
-        /* Prateleira Individual com preenchimento duplo (esquerda e direita) */
         .shelf {
             display: flex;
             align-items: flex-end;
-            justify-content: space-between;
+            justify-content: flex-start;
             flex-wrap: nowrap;
-            gap: 0px; 
-            padding: 0px;
-            min-height: 230px;
-            min-width: 820px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(255,255,255,0.05) 40%, rgba(0,0,0,0.4) 100%);
+            min-height: 210px;
+            min-width: 850px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(255,255,255,0.02) 40%, rgba(0,0,0,0.5) 100%);
             border-top: 6px solid transparent;
-            border-bottom: 26px solid transparent;
+            border-bottom: 22px solid transparent;
             border-image: url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/textura-madeira.jpg') 30 round;
             position: relative;
             margin-bottom: 2rem;
-            border-radius: 2px 2px 6px 6px;
-            box-shadow: 
-                inset 0 15px 20px -8px rgba(0,0,0,0.7), 
-                inset 0 -6px 8px rgba(0,0,0,0.7),
-                0 15px 25px -5px rgba(0,0,0,0.7);
-            overflow-x: auto;
-            overflow-y: hidden;
+            border-radius: 2px;
+            gap: 2px;
+            padding-left: 10px;
         }
 
-        .shelf:last-child {
-            margin-bottom: 0;
-        }
+        .shelf:last-child { margin-bottom: 0; }
 
-        .shelf::after {
-            content: '';
-            position: absolute;
-            bottom: -26px;
-            left: 0;
-            right: 0;
-            height: 7px;
-            background: linear-gradient(90deg, rgba(40,20,10,0.8), rgba(90,50,30,0.9), rgba(40,20,10,0.8));
-            opacity: 0.95;
-        }
-
-        /* Bloco de alinhamento lateral */
-        .shelf-side-group {
-            display: flex;
-            align-items: flex-end;
-            flex-wrap: nowrap;
-            gap: 0px;
-            flex: 1;
-        }
-
-        .shelf-side-group.right {
-            justify-content: flex-end;
-        }
-
-        .shelf-side-group.left {
-            justify-content: flex-start;
-        }
-
-        /* Lombada do Livro com bordas bem definidas */
         .book-spine {
             cursor: pointer;
             border-radius: 3px 3px 0 0;
@@ -101,245 +56,255 @@
             justify-content: space-between;
             padding: 8px 2px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 
-                inset -3px 0 6px rgba(0,0,0,0.45), 
-                inset 3px 0 4px rgba(255,255,255,0.2), 
-                2px 3px 8px rgba(0,0,0,0.6);
-            border-right: 1px solid rgba(0, 0, 0, 0.7);
-            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: inset -3px 0 6px rgba(0,0,0,0.2), 2px 3px 8px rgba(0,0,0,0.4);
+            border-right: 1px solid rgba(255, 255, 255, 0.25);
+            border-left: 1px solid rgba(255, 255, 255, 0.4);
             position: relative;
             flex-shrink: 0;
-            user-select: none;
-            background-blend-mode: multiply;
             background-image: 
-                url('https://raw.githubusercontent.com/DeguchiBerne/biblioteca/main/textura-couro.jpg'),
-                radial-gradient(circle at 50% 30%, rgba(255,255,255,0.25) 0%, rgba(0,0,0,0.25) 100%);
+                radial-gradient(circle at 40% 30%, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.1) 60%, rgba(0,0,0,0.15) 100%);
             background-size: cover;
-            background-position: center;
         }
 
         .book-spine:hover {
             transform: translateY(-8px);
-            box-shadow: inset -4px 0 8px rgba(0,0,0,0.4), 4px 8px 14px rgba(0,0,0,0.8);
+            box-shadow: inset -4px 0 8px rgba(0,0,0,0.1), 4px 8px 14px rgba(0,0,0,0.6);
             z-index: 10;
-        }
-
-        .book-spine::before {
-            content: '';
-            position: absolute;
-            top: 6px;
-            left: 2px;
-            right: 2px;
-            height: 2px;
-            background: rgba(255, 240, 200, 0.6);
-            box-shadow: 0 4px 0 rgba(0,0,0,0.25), 0 12px 0 rgba(255, 240, 200, 0.4);
-            z-index: 2;
-        }
-
-        .book-spine::after {
-            content: '';
-            position: absolute;
-            bottom: 6px;
-            left: 2px;
-            right: 2px;
-            height: 2px;
-            background: rgba(255, 240, 200, 0.6);
-            box-shadow: 0 -4px 0 rgba(0,0,0,0.25);
-            z-index: 2;
-        }
-
-        .shelf-gap {
-            flex-shrink: 0;
-            background: transparent;
         }
 
         .book-title-vertical {
             writing-mode: vertical-rl;
             text-orientation: mixed;
-            font-weight: 600;
+            font-weight: 700;
             color: #ffffff;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            letter-spacing: 0.4px;
             margin: auto 0;
             text-align: center;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.95);
-            z-index: 3;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 8px rgba(255,255,255,0.4);
         }
 
-        /* Alavancas de Paginação Laterais */
-        .alavanca-lateral {
+        /* Células com tamanho padrão e controle de texto excedente */
+        table {
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        th, td {
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            height: 45px;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .resizer {
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: linear-gradient(135deg, #4a2810, #241205);
-            color: #fcd34d;
-            border: 2px solid #78350f;
-            width: 42px;
-            height: 64px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 2px 3px rgba(255,255,255,0.2);
-            transition: all 0.2s ease;
-            z-index: 30;
+            top: 0;
+            right: 0;
+            width: 5px;
+            cursor: col-resize;
+            user-select: none;
+            touch-action: none;
+            height: 100%;
         }
-
-        .alavanca-lateral:hover:not(:disabled) {
-            background: linear-gradient(135deg, #78350f, #4a2810);
-            transform: translateY(-50%) scale(1.08);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.9), inset 0 2px 5px rgba(255,255,255,0.3);
-            color: #fff;
-        }
-
-        .alavanca-lateral:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-            filter: grayscale(80%);
-        }
-
-        .alavanca-esq { left: -52px; }
-        .alavanca-dir { right: -52px; }
-
-        @media (max-width: 960px) {
-            .alavanca-esq { left: 5px; z-index: 40; }
-            .alavanca-dir { right: 5px; z-index: 40; }
-            .shelf-container-wrapper { padding: 25px 5px; }
-        }
-
-        #modalDetalhes > div {
-            animation: abrirLivro 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            transform-origin: center;
-        }
-        @keyframes abrirLivro {
-            0% { opacity: 0; transform: scale(0.7) rotateY(-15deg); }
-            100% { opacity: 1; transform: scale(1) rotateY(0deg); }
-        }
-
-        @keyframes organizarEstante {
-            0% { opacity: 0; transform: translateY(15px) scale(0.95); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .card-organizando {
-            animation: organizarEstante 0.4s ease-in-out forwards;
-        }
-
-        .pagina-livro {
-            background-color: #fcf8f2;
-            background-image: radial-gradient(#e6dbcc 0.75px, transparent 0.75px);
-            background-size: 16px 16px;
-        }
-
-        .dobra-livro {
-            background: linear-gradient(90deg, rgba(0,0,0,0.15), rgba(0,0,0,0.05) 50%, rgba(0,0,0,0.25));
+        .resizer:hover, .resizing {
+            background-color: rgba(168, 85, 247, 0.6);
         }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen p-3 sm:p-6 pb-28 relative">
+<body class="min-h-screen p-4 sm:p-6 pb-28 relative">
     <div class="max-w-7xl mx-auto">
-        <header class="mb-6 text-center flex flex-col items-center">
-            <div class="w-full flex justify-between items-center sm:absolute sm:left-6 sm:top-6 mb-4 sm:mb-0 px-2 sm:px-0">
-                <a href="index.html" class="bg-slate-900 hover:bg-slate-800 text-slate-200 px-4 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2 border border-slate-700">
-                    &larr; Voltar ao Início
+        <!-- Cabeçalho Administrativo -->
+        <header class="mb-8 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-purple-900/50 pb-6">
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                <a href="index.html" class="bg-slate-900 hover:bg-slate-800 text-purple-200 px-4 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2 border border-purple-900/40">
+                    &larr; Ver Site Público
                 </a>
-                <button onclick="abrirModalAdicionar()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2 border border-emerald-500">
-                    + Adicionar Livro
+                <button onclick="abrirModalAdicionar()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2">
+                    + Adicionar Obra
                 </button>
             </div>
 
-            <h1 class="text-2xl sm:text-4xl font-bold mb-1 drop-shadow-md">⚙️ Painel do Administrador</h1>
-            <p class="text-xs sm:text-sm text-slate-300 drop-shadow">Gerenciamento completo do acervo da biblioteca</p>
-            
-            <div id="stats" class="my-4 w-full max-w-xs">
-                <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-lg shadow-xl text-center backdrop-blur-sm">
-                    <p class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Obras no Acervo</p>
-                    <p id="stat-total" class="text-xl sm:text-2xl font-bold text-amber-400">0</p>
-                </div>
+            <div class="text-center md:text-left">
+                <h1 class="text-2xl sm:text-3xl font-bold text-purple-100 flex items-center gap-2 justify-center md:justify-start">
+                    🔮 Painel de Gestão Avançado
+                </h1>
+                <p class="text-xs text-purple-300/70">Controle completo, acervo tabular e estante dinâmica</p>
             </div>
 
-            <div class="w-full max-w-md mt-2">
-                <input type="text" id="searchInput" placeholder="Pesquisar por título na estante..." 
-                    class="w-full px-4 py-2.5 rounded-lg bg-slate-900/90 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500 shadow-inner backdrop-blur-sm">
+            <!-- Alternância de Visão -->
+            <div class="flex items-center bg-slate-900 border border-purple-900/50 p-1 rounded-lg">
+                <button id="btnModoTabela" onclick="mudarModoVisualizacao('tabela')" class="px-3 py-1.5 rounded text-xs font-medium transition bg-purple-700 text-white shadow">
+                    📊 Tabela Gerencial
+                </button>
+                <button id="btnModoEstante" onclick="mudarModoVisualizacao('estante')" class="px-3 py-1.5 rounded text-xs font-medium transition text-purple-300 hover:text-white">
+                    🪵 Estante Visual
+                </button>
             </div>
-
-            <div id="formatFilters" class="flex overflow-x-auto w-full max-w-3xl gap-2 mt-4 pb-2 px-1 justify-start sm:justify-center scrollbar-none"></div>
         </header>
 
-        <div id="loading" class="text-center text-slate-300 py-20 text-base drop-shadow">Carregando estante administrativa...</div>
-
-        <div id="estanteContainer" class="hidden shelf-container-wrapper">
-            <!-- Alavancas laterais de paginação -->
-            <button id="btnAnterior" onclick="mudarPagina(-1)" class="alavanca-lateral alavanca-esq" title="Livros Anteriores">◀</button>
-            <button id="btnProximo" onclick="mudarPagina(1)" class="alavanca-lateral alavanca-dir" title="Próximos Livros">▶</button>
-
-            <div class="text-xs text-amber-100 mb-4 italic text-center sm:text-left flex flex-col sm:flex-row items-center justify-between px-2 drop-shadow border-b border-amber-900/40 pb-2 gap-1">
-                <span id="status-exibicao">Carregando status do acervo...</span>
-                <span class="text-[11px] text-amber-300 font-medium">Dica: Clique em qualquer lombada para gerenciar a obra.</span>
+        <!-- Dashboard de Métricas -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div class="bg-slate-900/90 border border-purple-900/40 p-4 rounded-xl shadow-lg flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-purple-300 uppercase tracking-wider font-semibold">Total de Obras</p>
+                    <p id="stat-total" class="text-2xl font-bold text-purple-400 mt-1">0</p>
+                </div>
+                <div class="p-3 bg-purple-500/10 text-purple-400 rounded-lg text-xl">📚</div>
             </div>
-            
+            <div class="bg-slate-900/90 border border-purple-900/40 p-4 rounded-xl shadow-lg flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-purple-300 uppercase tracking-wider font-semibold">Volume Físico Total</p>
+                    <p id="stat-qtd-fisica" class="text-2xl font-bold text-sky-400 mt-1">0</p>
+                </div>
+                <div class="p-3 bg-sky-500/10 text-sky-400 rounded-lg text-xl">📦</div>
+            </div>
+            <div class="bg-slate-900/90 border border-purple-900/40 p-4 rounded-xl shadow-lg flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-purple-300 uppercase tracking-wider font-semibold">Investimento (Custo)</p>
+                    <p id="stat-custo-total" class="text-2xl font-bold text-emerald-400 mt-1">R$ 0,00</p>
+                </div>
+                <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg text-xl">💰</div>
+            </div>
+        </div>
+
+        <!-- Barra de Busca Global por Título e Paginação Controls -->
+        <div class="flex flex-col lg:flex-row gap-3 mb-4 items-center justify-between bg-slate-900/60 p-3 rounded-xl border border-purple-900/40">
+            <div class="w-full lg:w-96">
+                <input type="text" id="searchInput" placeholder="Buscar estritamente pelo Título da obra..." 
+                    class="w-full px-4 py-2.5 rounded-lg bg-slate-950 border border-purple-900/60 text-white text-xs focus:outline-none focus:border-purple-500 shadow-inner">
+            </div>
+            <div class="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
+                <div class="flex items-center gap-2 text-xs text-purple-300">
+                    <span>Mostrar:</span>
+                    <select id="selectItensPorPagina" onchange="mudarItensPorPagina()" class="bg-slate-950 border border-purple-900/60 rounded px-2 py-1 text-white focus:outline-none focus:border-purple-500">
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="40">40</option>
+                    </select>
+                    <span>por página</span>
+                </div>
+                <div id="paginacaoControles" class="flex items-center gap-1"></div>
+            </div>
+        </div>
+
+        <!-- Painel de Filtros de Formato e Exibição de Colunas Opcionais -->
+        <div class="bg-slate-900/80 border border-purple-900/40 p-4 rounded-xl mb-6 shadow-lg space-y-4">
+            <!-- Filtros de Formato (Botões de Filtro de Dados) -->
+            <div>
+                <div class="flex items-center justify-between border-b border-purple-900/30 pb-2 mb-2">
+                    <span class="text-xs font-bold text-purple-200 uppercase tracking-wider">🏷️ Filtrar por Formato (Múltipla seleção)</span>
+                    <button onclick="limparFiltroFormatos()" class="text-[11px] text-purple-400 hover:text-purple-200 underline">Limpar Formatos</button>
+                </div>
+                <div id="formatosFiltroContainer" class="flex flex-wrap gap-2 text-xs"></div>
+            </div>
+
+            <!-- Alternar Colunas Visíveis na Tabela (Caixas de Seleção) -->
+            <div>
+                <div class="flex items-center justify-between border-b border-purple-900/30 pb-2 mb-2">
+                    <span class="text-xs font-bold text-purple-200 uppercase tracking-wider">☑️ Selecione as Colunas Opcionais para Exibir</span>
+                    <button onclick="limparColunasVisiveis()" class="text-[11px] text-purple-400 hover:text-purple-200 underline">Desmarcar Todas</button>
+                </div>
+                <div id="colunasVisiveisContainer" class="flex flex-wrap gap-3 text-xs mt-2"></div>
+            </div>
+        </div>
+
+        <div id="loading" class="text-center text-purple-300 py-20 text-sm">Carregando dados do acervo...</div>
+
+        <!-- Tabela Gerencial Completa -->
+        <div id="containerTabelaGerencial" class="bg-slate-900 border border-purple-900/40 rounded-xl overflow-hidden shadow-2xl">
+            <div class="overflow-x-auto">
+                <table id="tabelaAcervo" class="w-full text-left border-collapse text-xs">
+                    <thead id="tabelaCabecalho"></thead>
+                    <tbody id="tabelaCorpo" class="divide-y divide-purple-900/30 text-purple-100"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Estante Visual Otimizada -->
+        <div id="estanteContainer" class="hidden shelf-container-wrapper relative">
+            <div class="flex justify-between items-center mb-4 px-2 text-xs text-purple-200 border-b border-purple-900/40 pb-2">
+                <span id="status-exibicao">Estante contínua com lombadas iluminadas</span>
+                <span>Clique em qualquer lombada para gerenciar</span>
+            </div>
             <div id="prateleirasWrapper" class="space-y-6"></div>
         </div>
     </div>
 
-    <footer class="absolute bottom-0 left-0 w-full text-center py-3 bg-slate-950/90 backdrop-blur-md border-t border-slate-900 text-[11px] sm:text-xs text-slate-400 space-y-0.5 px-2">
-        <p>Criado por <strong class="text-slate-200">Bernardo Deguchi</strong> • 2026</p>
-    </footer>
-
-    <!-- Modal Detalhes / Edição Admin -->
-    <div id="modalDetalhes" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-2 sm:p-4">
-        <div id="modalBoxContainer" class="border-2 rounded-lg max-w-4xl w-full overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative transition-all duration-300 bg-slate-950">
-            <button onclick="fecharModal()" class="absolute top-3 right-3 text-slate-200 hover:text-white bg-black/50 hover:bg-black/80 rounded-full w-8 h-8 flex items-center justify-center font-bold transition z-30">✕</button>
-            <div id="modalConteudo" class="grid grid-cols-1 md:grid-cols-2 max-h-[90vh] overflow-y-auto relative"></div>
-            <div class="hidden md:block absolute top-0 bottom-0 left-1/2 w-6 -ml-3 pointer-events-none dobra-livro z-20"></div>
-        </div>
-    </div>
-
-    <!-- Modal Formulário Adicionar / Editar -->
+    <!-- Modal de Formulário -->
     <div id="modalForm" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-50 flex items-center justify-center p-3">
-        <div class="bg-slate-900 border border-slate-800 rounded-lg max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <h2 id="modalFormTitle" class="text-xl font-bold mb-4 text-amber-400">Adicionar Nova Obra</h2>
-            <form id="bookForm" onsubmit="salvarLivro(event)" class="space-y-3 text-sm">
+        <div class="bg-slate-900 border border-purple-900/50 rounded-xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <h2 id="modalFormTitle" class="text-lg font-bold mb-4 text-purple-400">Adicionar Nova Obra</h2>
+            <form id="bookForm" onsubmit="salvarLivro(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="formIndex">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Título *</label>
-                    <input type="text" id="formTitulo" required class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-white focus:outline-none focus:border-amber-500">
+                    <label class="block text-purple-300 mb-1">Título *</label>
+                    <input type="text" id="formTitulo" required class="w-full px-3 py-2 bg-slate-950 border border-purple-900/60 rounded text-white focus:outline-none focus:border-purple-500">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Formato</label>
-                        <input type="text" id="formFormato" placeholder="Ex: Livro, Mangá..." class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-white focus:outline-none focus:border-amber-500">
+                        <label class="block text-purple-300 mb-1">Formato</label>
+                        <input type="text" id="formFormato" class="w-full px-3 py-2 bg-slate-950 border border-purple-900/60 rounded text-white focus:outline-none focus:border-purple-500">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Volumes / Edição</label>
-                        <input type="text" id="formVolumes" placeholder="Ex: Vol. 1" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-white focus:outline-none focus:border-amber-500">
+                        <label class="block text-purple-300 mb-1">Volumes (Totais)</label>
+                        <input type="text" id="formVolumes" class="w-full px-3 py-2 bg-slate-950 border border-purple-900/60 rounded text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-purple-300 mb-1">Edição</label>
+                        <input type="text" id="formEdicao" class="w-full px-3 py-2 bg-slate-950 border border-purple-900/60 rounded text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-purple-300 mb-1">Ano</label>
+                        <input type="text" id="formAno" class="w-full px-3 py-2 bg-slate-950 border border-purple-900/60 rounded text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-purple-300 mb-1">Custo (R$)</label>
+                        <input type="text" id="formCusto" class="w-full px-3 py-2 bg-slate-950 border border-purple-900/60 rounded text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-purple-300 mb-1">Adquirido</label>
+                        <input type="text" id="formAdquirido" class="w-full px-3 py-2 bg-slate-950 border border-purple-900/60 rounded text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-purple-300 mb-1">Faltante</label>
+                        <input type="text" id="formFaltante" class="w-full px-3 py-2 bg-slate-950 border border-purple-900/60 rounded text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-purple-300 mb-1">Porcentagem</label>
+                        <input type="text" id="formPorcentagem" class="w-full px-3 py-2 bg-slate-950 border border-purple-900/60 rounded text-white focus:outline-none focus:border-purple-500">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Quantidade</label>
-                        <input type="number" id="formQuantidade" value="1" min="1" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-white focus:outline-none focus:border-amber-500">
+                        <label class="block text-purple-300 mb-1">Raridade</label>
+                        <input type="text" id="formRaridade" class="w-full px-3 py-2 bg-slate-950 border border-purple-900/60 rounded text-white focus:outline-none focus:border-purple-500">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Custo (R$)</label>
-                        <input type="text" id="formCusto" placeholder="0,00" class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-white focus:outline-none focus:border-amber-500">
+                        <label class="block text-purple-300 mb-1">Estilo Literário</label>
+                        <input type="text" id="formEstilo" class="w-full px-3 py-2 bg-slate-950 border border-purple-900/60 rounded text-white focus:outline-none focus:border-purple-500">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Capa da Obra (Arquivo ou URL)</label>
-                    <input type="file" id="formArquivoCapa" accept="image/*" class="w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-amber-600 file:text-white hover:file:bg-amber-500 mb-2">
-                    <input type="url" id="formCapa" placeholder="Ou cole a URL da imagem aqui..." class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-white text-xs focus:outline-none focus:border-amber-500">
+                    <label class="block text-purple-300 mb-1">Capa (URL ou Arquivo)</label>
+                    <input type="file" id="formArquivoCapa" accept="image/*" class="w-full text-purple-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-purple-700 file:text-white hover:file:bg-purple-600 mb-2">
+                    <input type="url" id="formCapa" placeholder="Ou URL direta..." class="w-full px-3 py-2 bg-slate-950 border border-purple-900/60 rounded text-white focus:outline-none focus:border-purple-500">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Detalhes / Observações Adicionais</label>
-                    <textarea id="formDetalhes" rows="3" placeholder="Informações extras..." class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded text-white focus:outline-none focus:border-amber-500"></textarea>
+                    <label class="block text-purple-300 mb-1">Observação</label>
+                    <textarea id="formObservacao" rows="2" class="w-full px-3 py-2 bg-slate-950 border border-purple-900/60 rounded text-white focus:outline-none focus:border-purple-500"></textarea>
                 </div>
-                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
-                    <button type="button" onclick="fecharModalForm()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-semibold transition">Cancelar</button>
-                    <button type="submit" id="btnSalvarForm" class="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded text-xs font-semibold shadow transition">Salvar Obra</button>
+                <div class="flex justify-end gap-3 pt-3 border-t border-purple-900/50">
+                    <button type="button" onclick="fecharModalForm()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-purple-300 rounded font-semibold transition">Cancelar</button>
+                    <button type="submit" id="btnSalvarForm" class="px-5 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded font-semibold shadow transition">Salvar Obra</button>
                 </div>
             </form>
         </div>
@@ -349,23 +314,49 @@
         const API_URL = 'https://script.google.com/macros/s/AKfycbyxuYyKRAKJXYIGU-4tx8nq9i1C53QAKTgcvFzgMYhPgaf5UXEkPIGsfYmm1eGcq9oGiQ/exec';
 
         let colecao = [];
-        let formatoSelecionado = ''; 
-        let paginaAtual = 0;
+        
+        // Colunas essenciais fixas
+        const colunasBase = ['CAPA', 'TITULO', 'FORMATO'];
+        // Colunas opcionais que podem ser ativadas via caixa de seleção
+        const colunasOpcionaisDisponiveis = ['VOLUMES (TOTAIS)', 'EDICAO', 'ANO', 'CUSTO', 'ADQUIRIDO', 'FALTANTE', 'PORCENTAGEM', 'OBSERVACAO', 'RARIDADE', 'ESTILO LITERÁRIO'];
+        
+        let colunasOpcionaisAtivas = new Set();
+        let formatosSelecionados = new Set();
+
+        let modoVisualizacao = 'tabela';
+        let ordenacaoColuna = '';
+        let ordenacaoDirecao = 'asc';
+        let paginaAtual = 1;
+        let itensPorPagina = 20;
+
+        const paletaCoresFormatos = {
+            'manga': '#8b5cf6',
+            'livro': '#3b82f6',
+            'hq': '#ec4899',
+            'quadrinho': '#f59e0b',
+            'padrao': '#6366f1'
+        };
+
+        function obterCorPorFormato(formato) {
+            if (!formato) return paletaCoresFormatos['padrao'];
+            let fmt = formato.toString().toLowerCase().trim();
+            for (let chave in paletaCoresFormatos) {
+                if (fmt.includes(chave)) return paletaCoresFormatos[chave];
+            }
+            return paletaCoresFormatos['padrao'];
+        }
 
         function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9) {
             return new Promise((resolve, reject) => {
                 const leitor = new FileReader();
                 leitor.readAsDataURL(arquivo);
-                
                 leitor.onload = (evento) => {
                     const imagem = new Image();
                     imagem.src = evento.target.result;
-                    
                     imagem.onload = () => {
                         const canvas = document.createElement('canvas');
                         let largura = imagem.width;
                         let altura = imagem.height;
-
                         const maxDimensoes = 1200;
                         if (largura > maxDimensoes || altura > maxDimensoes) {
                             if (largura > altura) {
@@ -376,7 +367,6 @@
                                 altura = maxDimensoes;
                             }
                         }
-
                         canvas.width = largura;
                         canvas.height = altura;
                         const ctx = canvas.getContext('2d');
@@ -395,328 +385,374 @@
                             qualidade -= 0.1;
                             dadosURL = canvas.toDataURL('image/jpeg', qualidade);
                         }
-
                         resolve(dadosURL);
                     };
-                    imagem.onerror = (erro) => reject(erro);
+                    imagem.onerror = (e) => reject(e);
                 };
-                leitor.onerror = (erro) => reject(erro);
+                leitor.onerror = (e) => reject(e);
             });
-        }
-
-        const andaresPorEstante = 4;
-        const itensPorPrateleira = 25;
-        const itensPorPagina = andaresPorEstante * itensPorPrateleira;
-
-        const fontesDisponiveis = [
-            'ui-sans-serif, system-ui, sans-serif',
-            'ui-serif, Georgia, Cambria, serif',
-            'ui-monospace, SFMono-Regular, monospace'
-        ];
-
-        function gerarCorAleatoria(seed) {
-            const hue = (seed * 137.5) % 360; 
-            const saturation = 45 + (seed % 35); 
-            const lightness = 28 + (seed % 22);  
-            return `hsl(${Math.round(hue)}, ${Math.round(saturation)}%, ${Math.round(lightness)}%)`;
         }
 
         async function carregarDados() {
             try {
-                const response = await fetch(API_URL, {
-                    method: 'GET',
-                    redirect: 'follow'
-                });
-
-                if (!response.ok) throw new Error('Erro na resposta do servidor (Status: ' + response.status + ')');
-                
+                const response = await fetch(API_URL, { method: 'GET', redirect: 'follow' });
+                if (!response.ok) throw new Error('Erro na conexão com a API');
                 let dadosBrutos = await response.json();
-                
                 let lista = Array.isArray(dadosBrutos) ? dadosBrutos : (dadosBrutos.dados || dadosBrutos.resultado || []);
-                
+
                 colecao = lista.map(item => {
                     let itemNormalizado = {};
                     for (let chave in item) {
-                        itemNormalizado[chave.trim().toLowerCase()] = item[chave];
+                        itemNormalizado[chave.trim().toUpperCase()] = item[chave];
                     }
+                    itemNormalizado._original = item;
                     return itemNormalizado;
-                }).filter(item => item.titulo && item.titulo.toString().trim() !== "");
+                }).filter(item => item.TITULO && item.TITULO.toString().trim() !== "");
                 
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('estanteContainer').classList.remove('hidden');
-                
-                atualizarEstatisticas(colecao);
-                criarBotoesFiltro(colecao);
-                paginaAtual = 0;
-                aplicarFiltros(); 
+                atualizarMetricas(colecao);
+                gerarPaineisFiltros(colecao);
+                aplicarFiltros();
             } catch (error) {
-                document.getElementById('loading').innerText = 'Erro ao carregar os dados. Verifique a conexão.';
-                console.error("Detalhes do erro:", error);
+                document.getElementById('loading').innerText = 'Erro ao carregar dados do acervo.';
+                console.error(error);
             }
         }
 
-        function atualizarEstatisticas(dados) {
-            document.getElementById('stat-total').innerText = dados.length;
-        }
-
-        function criarBotoesFiltro(dados) {
-            const container = document.getElementById('formatFilters');
-            const formatosMap = {};
+        function atualizarMetricas(dados) {
+            const totalObras = dados.length;
+            let qtdFisicaTotal = 0;
+            let custoTotalAcervo = 0;
 
             dados.forEach(item => {
-                let fmt = item.formato ? item.formato.toString().trim() : 'Indefinido';
+                const qtdStr = item.ADQUIRIDO || item.QUANTIDADE || '1';
+                const qtd = parseInt(qtdStr) || 1;
+                qtdFisicaTotal += qtd;
+
+                let custoStr = item.CUSTO ? item.CUSTO.toString().replace('R$', '').trim().replace(',', '.') : '0';
+                let custoNum = parseFloat(custoStr) || 0;
+                custoTotalAcervo += (custoNum * qtd);
+            });
+
+            document.getElementById('stat-total').innerText = totalObras;
+            document.getElementById('stat-qtd-fisica').innerText = qtdFisicaTotal;
+            document.getElementById('stat-custo-total').innerText = `R$ ${custoTotalAcervo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        function gerarPaineisFiltros(dados) {
+            // 1. Gerar botões de formato
+            const formatosMap = {};
+            dados.forEach(item => {
+                let fmt = item.FORMATO ? item.FORMATO.toString().trim() : 'Indefinido';
                 formatosMap[fmt] = (formatosMap[fmt] || 0) + 1;
             });
 
-            let htmlBotoes = `<button data-format="todos" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all backdrop-blur-sm">Todos (${dados.length})</button>`;
-            
+            const containerFormatos = document.getElementById('formatosFiltroContainer');
+            let htmlFmt = '';
             for (let [fmt, qtd] of Object.entries(formatosMap)) {
-                htmlBotoes += `<button data-format="${fmt}" class="filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all backdrop-blur-sm">${fmt} (${qtd})</button>`;
+                const ativo = formatosSelecionados.has(fmt);
+                const classeBtn = ativo 
+                    ? "px-3 py-1 rounded bg-purple-600 text-white font-medium shadow transition text-xs" 
+                    : "px-3 py-1 rounded bg-slate-950 border border-purple-900/60 text-purple-300 hover:bg-slate-800 transition text-xs";
+                htmlFmt += `<button onclick="alternarFiltroFormato('${fmt.replace(/'/g, "\\'")}')" class="${classeBtn}">${fmt} (${qtd})</button>`;
             }
-            container.innerHTML = htmlBotoes;
+            containerFormatos.innerHTML = htmlFmt || '<span class="text-purple-400 italic">Nenhum formato encontrado.</span>';
 
-            document.querySelectorAll('.filtro-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const formatoEscolhido = e.currentTarget.getAttribute('data-format');
-                    selecionarFiltro(formatoEscolhido);
-                });
+            // 2. Gerar caixas de seleção (checkboxes) para colunas opcionais
+            const containerColunas = document.getElementById('colunasVisiveisContainer');
+            let htmlCol = '';
+            colunasOpcionaisDisponiveis.forEach(col => {
+                const checked = colunasOpcionaisAtivas.has(col) ? 'checked' : '';
+                htmlCol += `
+                    <label class="flex items-center gap-2 cursor-pointer bg-slate-900 border border-purple-900/60 px-3 py-1.5 rounded-lg hover:bg-slate-800 transition text-purple-200 shadow-sm text-xs select-none">
+                        <input type="checkbox" class="accent-purple-600 w-3.5 h-3.5 cursor-pointer" onchange="alternarColunaOpcional('${col}')" ${checked}>
+                        <span>${col}</span>
+                    </label>
+                `;
             });
+            containerColunas.innerHTML = htmlCol;
         }
 
-        function selecionarFiltro(formato) {
-            if (formatoSelecionado === formato) {
-                formatoSelecionado = '';
+        function alternarFiltroFormato(fmt) {
+            if (formatosSelecionados.has(fmt)) {
+                formatosSelecionados.delete(fmt);
             } else {
-                formatoSelecionado = formato;
+                formatosSelecionados.add(fmt);
             }
+            paginaAtual = 1;
+            gerarPaineisFiltros(colecao);
+            aplicarFiltros();
+        }
 
-            document.querySelectorAll('.filtro-btn').forEach(b => {
-                const fmtBtn = b.getAttribute('data-format');
-                if (fmtBtn === formatoSelecionado) {
-                    b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-amber-600 text-white transition-all shadow";
-                } else {
-                    b.className = "filtro-btn shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-300 hover:bg-slate-800 transition-all backdrop-blur-sm";
-                }
-            });
+        function limparFiltroFormatos() {
+            formatosSelecionados.clear();
+            paginaAtual = 1;
+            gerarPaineisFiltros(colecao);
+            aplicarFiltros();
+        }
 
-            paginaAtual = 0;
+        function alternarColunaOpcional(col) {
+            if (colunasOpcionaisAtivas.has(col)) {
+                colunasOpcionaisAtivas.delete(col);
+            } else {
+                colunasOpcionaisAtivas.add(col);
+            }
+            gerarPaineisFiltros(colecao);
+            aplicarFiltros();
+        }
+
+        function limparColunasVisiveis() {
+            colunasOpcionaisAtivas.clear();
+            gerarPaineisFiltros(colecao);
+            aplicarFiltros();
+        }
+
+        function mudarModoVisualizacao(modo) {
+            modoVisualizacao = modo;
+            const tabelaContainer = document.getElementById('containerTabelaGerencial');
+            const estanteContainer = document.getElementById('estanteContainer');
+            const btnTabela = document.getElementById('btnModoTabela');
+            const btnEstante = document.getElementById('btnModoEstante');
+
+            if (modo === 'tabela') {
+                tabelaContainer.classList.remove('hidden');
+                estanteContainer.classList.add('hidden');
+                btnTabela.className = "px-3 py-1.5 rounded text-xs font-medium transition bg-purple-700 text-white shadow";
+                btnEstante.className = "px-3 py-1.5 rounded text-xs font-medium transition text-purple-300 hover:text-white";
+            } else {
+                tabelaContainer.classList.add('hidden');
+                estanteContainer.classList.remove('hidden');
+                btnEstante.className = "px-3 py-1.5 rounded text-xs font-medium transition bg-purple-700 text-white shadow";
+                btnTabela.className = "px-3 py-1.5 rounded text-xs font-medium transition text-purple-300 hover:text-white";
+                renderizarEstanteVisual();
+            }
+        }
+
+        function mudarItensPorPagina() {
+            itensPorPagina = parseInt(document.getElementById('selectItensPorPagina').value);
+            paginaAtual = 1;
+            aplicarFiltros();
+        }
+
+        function ordenarPor(coluna) {
+            if (ordenacaoColuna === coluna) {
+                ordenacaoDirecao = ordenacaoDirecao === 'asc' ? 'desc' : 'asc';
+            } else {
+                ordenacaoColuna = coluna;
+                ordenacaoDirecao = 'asc';
+            }
             aplicarFiltros();
         }
 
         function aplicarFiltros() {
-            const termoBusca = document.getElementById('searchInput').value.toLowerCase().trim();
-            const statusExibicao = document.getElementById('status-exibicao');
+            const termoTitulo = document.getElementById('searchInput').value.toLowerCase().trim();
 
             const filtrados = colecao.filter(item => {
-                const titulo = item.titulo ? item.titulo.toString().toLowerCase() : '';
-                const formatoItem = item.formato ? item.formato.toString().trim() : 'Indefinido';
-                
-                const matchTexto = termoBusca === '' || titulo.includes(termoBusca);
-                const matchFormato = formatoSelecionado === '' || formatoSelecionado === 'todos' || formatoItem.toLowerCase() === formatoSelecionado.toLowerCase();
+                // Busca estrita por Título
+                let matchTitulo = termoTitulo === '' || (item.TITULO && item.TITULO.toString().toLowerCase().includes(termoTitulo));
+                if (!matchTitulo) return false;
 
-                return matchTexto && matchFormato;
+                // Filtro de formato
+                if (formatosSelecionados.size > 0) {
+                    let fmtItem = item.FORMATO ? item.FORMATO.toString().trim() : 'Indefinido';
+                    if (!formatosSelecionados.has(fmtItem)) {
+                        return false;
+                    }
+                }
+                return true;
             });
 
-            const totalPaginas = Math.max(1, Math.ceil(filtrados.length / itensPorPagina));
-            if (paginaAtual >= totalPaginas) paginaAtual = totalPaginas - 1;
+            // Ordenação
+            if (ordenacaoColuna) {
+                filtrados.sort((a, b) => {
+                    let valA = a[ordenacaoColuna] !== undefined && a[ordenacaoColuna] !== null ? a[ordenacaoColuna].toString().toLowerCase() : '';
+                    let valB = b[ordenacaoColuna] !== undefined && b[ordenacaoColuna] !== null ? b[ordenacaoColuna].toString().toLowerCase() : '';
 
-            const inicio = paginaAtual * itensPorPagina;
-            const fim = Math.min(inicio + itensPorPagina, filtrados.length);
-            const dadosPagina = filtrados.slice(inicio, fim);
+                    let numA = parseFloat(valA.replace('R$', '').replace(',', '.'));
+                    let numB = parseFloat(valB.replace('R$', '').replace(',', '.'));
 
-            if (filtrados.length > 0) {
-                statusExibicao.innerHTML = `Mostrando livros <strong class="text-amber-300">${inicio + 1}</strong> a <strong class="text-amber-300">${fim}</strong> de <strong class="text-amber-300">${filtrados.length}</strong> (Página ${paginaAtual + 1} de ${totalPaginas})`;
-            } else {
-                statusExibicao.innerText = `Nenhum livro encontrado com os critérios informados.`;
+                    if (!isNaN(numA) && !isNaN(numB)) {
+                        return ordenacaoDirecao === 'asc' ? numA - numB : numB - numA;
+                    }
+
+                    if (valA < valB) return ordenacaoDirecao === 'asc' ? -1 : 1;
+                    if (valA > valB) return ordenacaoDirecao === 'asc' ? 1 : -1;
+                    return 0;
+                });
             }
 
-            document.getElementById('btnAnterior').disabled = paginaAtual === 0;
-            document.getElementById('btnProximo').disabled = paginaAtual >= totalPaginas - 1;
-
-            renderizarEstantesEmPrateleiras(dadosPagina, paginaAtual);
+            if (modoVisualizacao === 'tabela') {
+                renderizarTabelaPaginada(filtrados);
+            } else {
+                renderizarEstanteVisual(filtrados);
+            }
         }
 
-        function mudarPagina(direcao) {
-            paginaAtual += direcao;
-            aplicarFiltros();
-            window.scrollTo({ top: 150, behavior: 'smooth' });
+        function renderizarTabelaPaginada(dados) {
+            const totalPaginas = Math.ceil(dados.length / itensPorPagina) || 1;
+            if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
+
+            const inicio = (paginaAtual - 1) * itensPorPagina;
+            const fim = inicio + itensPorPagina;
+            const dadosPagina = dados.slice(inicio, fim);
+
+            renderizarTabela(dadosPagina);
+            renderizarControlesPaginacao(totalPaginas);
         }
 
-        function criarElementoLivro(item, indexIndice, paginaIndex, andar) {
-            const titulo = item.titulo || 'Sem Título';
-            const volumesTexto = item.volumes ? item.volumes.toString().trim() : '';
-            
-            const qtdAdquirida = item.quantidade ? parseInt(item.quantidade) : (item.qtd ? parseInt(item.qtd) : 1);
-            const larguraBasePadrao = 26;
-            const larguraCalculada = larguraBasePadrao + Math.min((Math.max(qtdAdquirida, 1) - 1) * 4, larguraBasePadrao * 3);
-
-            const seed = ((paginaIndex + 1) * 97 + andar * 73) ^ (indexIndice * 149 + 31);
-            const altFator = Math.round(138 + ((seed % 15) * 6)); 
-            const tamanhoLetra = 11 + (seed % 3);
-            const familiaFonte = fontesDisponiveis[seed % fontesDisponiveis.length];
-
-            const temCapaValida = item.capa && item.capa.toString().startsWith('http');
-            const capaUrl = temCapaValida ? item.capa : '';
-            const corAleatoriaLombada = gerarCorAleatoria(seed);
-
-            const spine = document.createElement('div');
-            spine.className = 'book-spine';
-            spine.style.backgroundColor = corAleatoriaLombada;
-            spine.style.height = `${altFator}px`;
-            spine.style.width = `${larguraCalculada}px`;
-
-            spine.addEventListener('click', () => {
-                abrirModalDetalhesAdmin(item, capaUrl, corAleatoriaLombada);
-            });
-
-            spine.innerHTML = `
-                <div></div>
-                <div class="book-title-vertical" title="${titulo}" style="font-size: ${tamanhoLetra}px; font-family: ${familiaFonte}; max-height: ${altFator - 50}px;">${titulo}</div>
-                <div class="text-center text-amber-100 font-semibold truncate z-10" style="font-size: ${Math.max(tamanhoLetra - 1, 9)}px;" title="${volumesTexto}">${volumesTexto}</div>
-            `;
-
-            return spine;
-        }
-
-        function renderizarEstantesEmPrateleiras(dados, paginaIndex) {
-            const wrapper = document.getElementById('prateleirasWrapper');
-            wrapper.innerHTML = '';
-
-            if (dados.length === 0) {
-                wrapper.innerHTML = `
-                    <div class="shelf p-8 text-center text-slate-300 italic text-sm justify-center">
-                        Nenhum livro nesta estante.
-                    </div>
-                `;
+        function renderizarControlesPaginacao(totalPaginas) {
+            const container = document.getElementById('paginacaoControles');
+            if (totalPaginas <= 1) {
+                container.innerHTML = '';
                 return;
             }
 
-            for (let andar = 0; andar < andaresPorEstante; andar++) {
-                const inicioLote = andar * itensPorPrateleira;
-                const lote = dados.slice(inicioLote, inicioLote + itensPorPrateleira);
+            let html = `<button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''} class="px-2.5 py-1 bg-slate-950 border border-purple-900/60 rounded text-xs text-purple-300 disabled:opacity-40">&larr;</button>`;
+            
+            for (let i = 1; i <= totalPaginas; i++) {
+                if (i === 1 || i === totalPaginas || (i >= paginaAtual - 1 && i <= paginaAtual + 1)) {
+                    const ativo = i === paginaAtual;
+                    html += `<button onclick="mudarPagina(${i})" class="px-2.5 py-1 rounded text-xs font-semibold ${ativo ? 'bg-purple-700 text-white' : 'bg-slate-950 border border-purple-900/60 text-purple-300'}">${i}</button>`;
+                } else if (i === paginaAtual - 2 || i === paginaAtual + 2) {
+                    html += `<span class="px-1 text-purple-400 text-xs">...</span>`;
+                }
+            }
 
-                if (lote.length === 0 && andar > 0) continue; 
+            html += `<button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''} class="px-2.5 py-1 bg-slate-950 border border-purple-900/60 rounded text-xs text-purple-300 disabled:opacity-40">&rarr;</button>`;
+            container.innerHTML = html;
+        }
 
+        function mudarPagina(novaPagina) {
+            paginaAtual = novaPagina;
+            aplicarFiltros();
+        }
+
+        function renderizarTabela(dados) {
+            const cabecalho = document.getElementById('tabelaCabecalho');
+            const corpo = document.getElementById('tabelaCorpo');
+
+            // Montar colunas finais ativas: Base (Capa, Título, Formato) + Opcionais Ativas
+            let colunasAtivas = [...colunasBase];
+            colunasOpcionaisDisponiveis.forEach(col => {
+                if (colunasOpcionaisAtivas.has(col)) {
+                    colunasAtivas.push(col);
+                }
+            });
+
+            // Montar cabeçalho
+            let htmlCab = `<tr class="bg-slate-950 text-purple-300 border-b border-purple-900/50 uppercase tracking-wider">`;
+            colunasAtivas.forEach(chave => {
+                let seta = '';
+                if (ordenacaoColuna === chave) {
+                    seta = ordenacaoDirecao === 'asc' ? ' &uarr;' : ' &darr;';
+                }
+                htmlCab += `<th class="p-3 cursor-pointer select-none hover:text-white transition" onclick="ordenarPor('${chave}')">
+                    ${chave}${seta}
+                    <div class="resizer" onclick="event.stopPropagation()"></div>
+                </th>`;
+            });
+            htmlCab += `<th class="p-3 text-center" style="width: 140px;">AÇÕES</th></tr>`;
+            cabecalho.innerHTML = htmlCab;
+            ativarRedimensionamentoColunas();
+
+            if (dados.length === 0) {
+                corpo.innerHTML = `<tr><td colspan="${colunasAtivas.length + 1}" class="p-6 text-center text-purple-400 italic">Nenhum registro encontrado.</td></tr>`;
+                return;
+            }
+
+            let htmlCorpo = '';
+            dados.forEach(item => {
+                const itemOrig = item._original || item;
+                htmlCorpo += `<tr class="hover:bg-purple-950/20 transition">`;
+
+                colunasAtivas.forEach(chave => {
+                    if (chave === 'CAPA') {
+                        let capaUrl = item.CAPA || itemOrig['CAPA'] || itemOrig['capa'] || '';
+                        if (!capaUrl.startsWith('http')) {
+                            capaUrl = 'https://placehold.co/100x150/1e293b/cbd5e1?text=Sem+Capa';
+                        }
+                        htmlCorpo += `<td class="p-3 text-center" style="width: 70px;">
+                            <img src="${capaUrl}" class="w-8 h-12 object-cover rounded shadow border border-purple-900/40 mx-auto">
+                        </td>`;
+                    } else {
+                        let valorChave = itemOrig[chave] !== undefined ? itemOrig[chave] : (item[chave] !== undefined ? item[chave] : '');
+                        htmlCorpo += `<td class="p-3 text-purple-200" title="${valorChave}">${valorChave}</td>`;
+                    }
+                });
+
+                htmlCorpo += `
+                    <td class="p-3 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick='abrirModalEditar(${JSON.stringify(item)})' class="px-2 py-0.5 bg-purple-800 hover:bg-purple-700 text-white rounded font-medium transition text-[11px]">Editar</button>
+                            <button onclick='excluirLivro(${JSON.stringify(item.TITULO)})' class="px-2 py-0.5 bg-rose-900 hover:bg-rose-800 text-white rounded font-medium transition text-[11px]">Excluir</button>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+            corpo.innerHTML = htmlCorpo;
+        }
+
+        function ativarRedimensionamentoColunas() {
+            const tabela = document.getElementById('tabelaAcervo');
+            const colunas = tabela.querySelectorAll('th');
+            colunas.forEach(coluna => {
+                const resizer = coluna.querySelector('.resizer');
+                if (!resizer) return;
+                let x = 0;
+                let larguraW = 0;
+
+                resizer.addEventListener('mousedown', function (e) {
+                    x = e.clientX;
+                    larguraW = coluna.getBoundingClientRect().width;
+                    resizer.classList.add('resizing');
+                    document.addEventListener('mousemove', mouseMoveHandler);
+                    document.addEventListener('mouseup', mouseUpHandler);
+                });
+
+                function mouseMoveHandler(e) {
+                    const dx = e.clientX - x;
+                    coluna.style.width = `${Math.max(60, larguraW + dx)}px`;
+                }
+
+                function mouseUpHandler() {
+                    resizer.classList.remove('resizing');
+                    document.removeEventListener('mousemove', mouseMoveHandler);
+                    document.removeEventListener('mouseup', mouseUpHandler);
+                }
+            });
+        }
+
+        function renderizarEstanteVisual(dados = colecao) {
+            const wrapper = document.getElementById('prateleirasWrapper');
+            wrapper.innerHTML = '';
+            if (dados.length === 0) {
+                wrapper.innerHTML = `<div class="p-8 text-center text-purple-300 italic">Nenhum livro para exibir na estante.</div>`;
+                return;
+            }
+
+            const itensPorAndar = 25;
+            for (let i = 0; i < dados.length; i += itensPorAndar) {
+                const lote = dados.slice(i, i + itensPorAndar);
                 const shelfDiv = document.createElement('div');
-                shelfDiv.className = 'shelf card-organizando';
-                shelfDiv.style.animationDelay = `${andar * 0.1}s`;
+                shelfDiv.className = 'shelf';
 
-                const meio = Math.ceil(lote.length / 2);
-                const loteEsquerda = lote.slice(0, meio);
-                const loteDireita = lote.slice(meio);
+                lote.forEach((item) => {
+                    const spine = document.createElement('div');
+                    spine.className = 'book-spine';
+                    spine.style.height = `140px`;
+                    spine.style.width = `28px`;
+                    
+                    const corFundo = obterCorPorFormato(item.FORMATO);
+                    spine.style.backgroundColor = corFundo;
 
-                const grupoEsq = document.createElement('div');
-                grupoEsq.className = 'shelf-side-group left';
-
-                const grupoDir = document.createElement('div');
-                grupoDir.className = 'shelf-side-group right';
-
-                const qtdGapsTotal = 2 + ((paginaIndex + andar) % 2);
-                const qtdGapsEsq = Math.ceil(qtdGapsTotal / 2);
-                const qtdGapsDir = qtdGapsTotal - qtdGapsEsq;
-
-                const passoEsq = Math.max(1, Math.floor(loteEsquerda.length / (qtdGapsEsq + 1)));
-                const indicesGapsEsq = [];
-                for (let g = 1; g <= qtdGapsEsq; g++) {
-                    indicesGapsEsq.push(g * passoEsq);
-                }
-
-                loteEsquerda.forEach((item, idx) => {
-                    grupoEsq.appendChild(criarElementoLivro(item, idx, paginaIndex, andar));
-                    if (indicesGapsEsq.includes(idx + 1)) {
-                        const gap = document.createElement('div');
-                        gap.className = 'shelf-gap';
-                        gap.style.width = `${78 + (((paginaIndex * 7 + andar * 11 + idx) % 4) * 12)}px`;
-                        grupoEsq.appendChild(gap);
-                    }
+                    spine.onclick = () => abrirModalEditar(item);
+                    let tituloObra = item.TITULO || 'Sem Título';
+                    spine.innerHTML = `<div class="book-title-vertical text-[10px]" title="${tituloObra}">${tituloObra}</div>`;
+                    shelfDiv.appendChild(spine);
                 });
 
-                const passoDir = Math.max(1, Math.floor(loteDireita.length / (qtdGapsDir + 1)));
-                const indicesGapsDir = [];
-                for (let g = 1; g <= qtdGapsDir; g++) {
-                    indicesGapsDir.push(g * passoDir);
-                }
-
-                loteDireita.forEach((item, idx) => {
-                    if (indicesGapsDir.includes(idx + 1)) {
-                        const gap = document.createElement('div');
-                        gap.className = 'shelf-gap';
-                        gap.style.width = `${78 + (((paginaIndex * 5 + andar * 9 + idx) % 4) * 12)}px`;
-                        grupoDir.appendChild(gap);
-                    }
-                    grupoDir.appendChild(criarElementoLivro(item, meio + idx, paginaIndex, andar));
-                });
-
-                shelfDiv.appendChild(grupoEsq);
-                shelfDiv.appendChild(grupoDir);
                 wrapper.appendChild(shelfDiv);
             }
-        }
-
-        function abrirModalDetalhesAdmin(item, capaUrl, corBase) {
-            const modal = document.getElementById('modalDetalhes');
-            const modalBox = document.getElementById('modalBoxContainer');
-            const conteudo = document.getElementById('modalConteudo');
-
-            modalBox.style.backgroundColor = '#150c07';
-            modalBox.style.borderColor = corBase;
-
-            const temCapaReal = capaUrl && capaUrl.startsWith('http');
-            const imagemExibida = temCapaReal ? capaUrl : 'https://placehold.co/300x450/1e293b/cbd5e1?text=Biblioteca';
-
-            let paginaEsquerda = `
-                <div class="p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-black/40 relative shadow-inner" style="background-color: #201108;">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent pointer-events-none"></div>
-                    <img src="${imagemExibida}" class="w-48 h-72 sm:w-56 sm:h-80 object-cover rounded shadow-[0_15px_30px_rgba(0,0,0,0.8)] border border-black/50" alt="Capa da Obra">
-                    <span class="mt-4 text-xs tracking-widest uppercase text-amber-400 font-bold">${item.formato || 'Acervo'}</span>
-                </div>
-            `;
-
-            let paginaDireita = `
-                <div class="pagina-livro p-5 sm:p-7 flex flex-col justify-between text-slate-900 shadow-inner overflow-y-auto max-h-[85vh]">
-                    <div class="space-y-3">
-                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 border-b border-amber-900/20 pb-2">
-                            <h2 class="text-xl sm:text-2xl font-serif font-bold text-slate-900">${item.titulo || 'Sem Título'}</h2>
-                            ${item.custo !== undefined && item.custo !== null && item.custo !== '' ? `
-                                <div class="bg-emerald-950/60 border border-emerald-500 text-emerald-400 px-3 py-1 rounded-lg text-xs font-bold shadow-sm shrink-0 self-start">
-                                    R$ ${item.custo}
-                                </div>
-                            ` : ''}
-                        </div>
-
-                        <div class="space-y-2 text-xs sm:text-sm">
-            `;
-
-            for (let [chave, valor] of Object.entries(item)) {
-                if (['titulo', 'custo', 'capa'].includes(chave)) continue;
-                if (valor !== undefined && valor !== null && valor !== '') {
-                    let nomeChave = chave.replace(/_/g, ' ').toUpperCase();
-                    paginaDireita += `
-                        <div class="bg-white/90 p-2.5 rounded border border-amber-900/10 flex justify-between gap-2 shadow-sm">
-                            <span class="font-bold text-slate-600 text-[10px] uppercase">${nomeChave}:</span>
-                            <span class="text-slate-900 font-medium text-right">${valor}</span>
-                        </div>
-                    `;
-                }
-            }
-
-            paginaDireita += `
-                        </div>
-                    </div>
-
-                    <div class="mt-6 pt-4 border-t border-amber-900/20 flex gap-3 justify-end">
-                        <button onclick='abrirModalEditar(${JSON.stringify(item)})' class="px-4 py-2 bg-amber-700 hover:bg-amber-600 text-white rounded text-xs font-semibold shadow transition">Editar</button>
-                        <button onclick='excluirLivro(${JSON.stringify(item.titulo)})' class="px-4 py-2 bg-rose-700 hover:bg-rose-600 text-white rounded text-xs font-semibold shadow transition">Excluir</button>
-                    </div>
-                </div>
-            `;
-
-            conteudo.innerHTML = paginaEsquerda + paginaDireita;
-            modal.classList.remove('hidden');
-        }
-
-        function fecharModal() {
-            document.getElementById('modalDetalhes').classList.add('hidden');
         }
 
         function abrirModalAdicionar() {
@@ -727,16 +763,22 @@
         }
 
         function abrirModalEditar(item) {
-            fecharModal();
             document.getElementById('modalFormTitle').innerText = "Editar Obra";
-            document.getElementById('formIndex').value = item.titulo;
-            document.getElementById('formTitulo').value = item.titulo || '';
-            document.getElementById('formFormato').value = item.formato || '';
-            document.getElementById('formVolumes').value = item.volumes || '';
-            document.getElementById('formQuantidade').value = item.quantidade || item.qtd || 1;
-            document.getElementById('formCusto').value = item.custo || '';
-            document.getElementById('formCapa').value = item.capa || '';
-            document.getElementById('formDetalhes').value = item.observacao || item.detalhes || '';
+            let itemOrig = item._original || item;
+            document.getElementById('formIndex').value = item.TITULO || '';
+            document.getElementById('formTitulo').value = item.TITULO || '';
+            document.getElementById('formFormato').value = item.FORMATO || '';
+            document.getElementById('formVolumes').value = item['VOLUMES (TOTAIS)'] || item.VOLUMES || '';
+            document.getElementById('formEdicao').value = item.EDICAO || '';
+            document.getElementById('formAno').value = item.ANO || '';
+            document.getElementById('formCusto').value = item.CUSTO || '';
+            document.getElementById('formAdquirido').value = item.ADQUIRIDO || '';
+            document.getElementById('formFaltante').value = item.FALTANTE || '';
+            document.getElementById('formPorcentagem').value = item.PORCENTAGEM || '';
+            document.getElementById('formRaridade').value = item.RARIDADE || '';
+            document.getElementById('formEstilo').value = item['ESTILO LITERÁRIO'] || item.ESTILO || '';
+            document.getElementById('formCapa').value = item.CAPA || '';
+            document.getElementById('formObservacao').value = item.OBSERVACAO || '';
             document.getElementById('modalForm').classList.remove('hidden');
         }
 
@@ -746,115 +788,110 @@
 
         async function salvarLivro(event) {
             event.preventDefault();
-
-            const btnSalvar = document.getElementById('btnSalvarForm');
-            const textoOriginalBtn = btnSalvar.innerText;
-            btnSalvar.innerText = "Salvando obra e processando capa...";
-            btnSalvar.disabled = true;
+            const btn = document.getElementById('btnSalvarForm');
+            const txt = btn.innerText;
+            btn.innerText = "Salvando...";
+            btn.disabled = true;
 
             const tituloOriginal = document.getElementById('formIndex').value;
             const titulo = document.getElementById('formTitulo').value.trim();
             const formato = document.getElementById('formFormato').value.trim();
             const volumes = document.getElementById('formVolumes').value.trim();
-            const quantidade = document.getElementById('formQuantidade').value;
+            const edicao = document.getElementById('formEdicao').value.trim();
+            const ano = document.getElementById('formAno').value.trim();
             const custo = document.getElementById('formCusto').value.trim();
-            const capaUrlInput = document.getElementById('formCapa').value.trim();
-            const detalhes = document.getElementById('formDetalhes').value.trim();
+            const adquirido = document.getElementById('formAdquirido').value.trim();
+            const faltante = document.getElementById('formFaltante').value.trim();
+            const porcentagem = document.getElementById('formPorcentagem').value.trim();
+            const raridade = document.getElementById('formRaridade').value.trim();
+            const estilo = document.getElementById('formEstilo').value.trim();
+            const capa = document.getElementById('formCapa').value.trim();
+            const observacao = document.getElementById('formObservacao').value.trim();
             const inputArquivo = document.getElementById('formArquivoCapa');
 
             let imagemBase64 = "";
             let nomeArquivo = "";
             let tipoMime = "";
-            let capaFinal = capaUrlInput;
 
             try {
                 if (inputArquivo.files && inputArquivo.files[0]) {
                     const arquivo = inputArquivo.files[0];
                     nomeArquivo = arquivo.name;
                     tipoMime = arquivo.type;
-                    
                     imagemBase64 = await comprimirImagem(arquivo, 500, 0.85);
                     imagemBase64 = imagemBase64.split(',')[1];
                 }
 
-                const dadosPayload = {
-                    tituloOriginal: tituloOriginal,
-                    titulo: titulo,
-                    formato: formato,
-                    volumes: volumes,
-                    quantidade: quantidade,
-                    custo: custo,
-                    capa: capaFinal,
-                    observacao: detalhes,
-                    detalhes: detalhes,
-                    imagemBase64: imagemBase64,
-                    nomeArquivo: nomeArquivo,
-                    tipoMime: tipoMime
+                const payload = {
+                    tituloOriginal, 
+                    titulo, 
+                    formato, 
+                    volumes, 
+                    edicao, 
+                    ano, 
+                    custo, 
+                    adquirido, 
+                    faltante, 
+                    porcentagem, 
+                    raridade, 
+                    estiloLiterario: estilo, 
+                    capa, 
+                    observacao, 
+                    imagemBase64, 
+                    nomeArquivo, 
+                    tipoMime
                 };
 
-                const resposta = await fetch(API_URL, {
+                const res = await fetch(API_URL, {
                     method: 'POST',
                     redirect: 'follow',
-                    body: JSON.stringify(dadosPayload)
+                    body: JSON.stringify(payload)
                 });
-
-                const resultado = await resposta.json();
+                const resultado = await res.json();
 
                 if (resultado.sucesso) {
-                    alert(resultado.mensagem || "Obra salva com sucesso!");
+                    alert(resultado.mensagem || "Salvo com sucesso!");
                     fecharModalForm();
-                    fecharModal();
                     carregarDados();
                 } else {
                     alert("Erro ao salvar: " + (resultado.mensagem || resultado.erro || "Desconhecido"));
                 }
-
-            } catch (erro) {
-                console.error("Erro na requisição:", erro);
-                alert("Ocorreu um erro ao comunicar com a API.");
+            } catch (err) {
+                console.error(err);
+                alert("Erro de comunicação com a API.");
             } finally {
-                btnSalvar.innerText = textoOriginalBtn;
-                btnSalvar.disabled = false;
+                btn.innerText = txt;
+                btn.disabled = false;
             }
         }
 
         async function excluirLivro(titulo) {
             if (confirm(`Deseja realmente excluir "${titulo}" e movê-lo para a lixeira?`)) {
                 try {
-                    const resposta = await fetch(API_URL, {
+                    const res = await fetch(API_URL, {
                         method: 'POST',
                         redirect: 'follow',
-                        body: JSON.stringify({
-                            acao: "excluir",
-                            titulo: titulo
-                        })
+                        body: JSON.stringify({ acao: "excluir", titulo })
                     });
-
-                    const resultado = await resposta.json();
-
+                    const resultado = await res.json();
                     if (resultado.sucesso) {
                         alert("Item excluído com sucesso!");
-                        fecharModal();
                         carregarDados();
                     } else {
                         alert("Erro ao excluir: " + (resultado.erro || "Desconhecido"));
                     }
-                } catch (erro) {
-                    console.error("Erro na exclusão:", erro);
-                    alert("Erro ao conectar com a API para exclusão.");
+                } catch (err) {
+                    console.error(err);
+                    alert("Erro ao conectar com a API.");
                 }
             }
         }
 
-        document.getElementById('modalDetalhes').addEventListener('click', (e) => {
-            if (e.target.id === 'modalDetalhes') fecharModal();
-        });
-
         document.getElementById('searchInput').addEventListener('input', () => {
-            paginaAtual = 0;
+            paginaAtual = 1;
             aplicarFiltros();
         });
-
+        
         carregarDados();
     </script>
 </body>
