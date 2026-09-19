@@ -132,11 +132,11 @@
 </head>
 <body class="min-h-screen p-4 sm:p-6 pb-28 relative text-slate-100">
     <div class="max-w-7xl mx-auto">
-       <!-- Cabeçalho Administrativo Centralizado com Botão de Retorno -->
+        <!-- Cabeçalho Administrativo Centralizado com Botão de Retorno -->
         <header class="mb-6 text-center flex flex-col items-center border-b border-purple-900/50 pb-6 relative">
             <div class="w-full flex justify-between items-center sm:absolute sm:left-0 sm:top-0 mb-4 sm:mb-0">
                 <a href="index.html" class="bg-slate-900 hover:bg-slate-800 text-purple-200 px-4 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2 border border-purple-900/40">
-                    &larr; Voltar ao Início
+                    &larr; Voltar para Início
                 </a>
             </div>
 
@@ -158,9 +158,8 @@
 
         <!-- CONTEÚDO DA VISÃO DO ADMINISTRADOR -->
         <div id="wrapperAdmin">
-           
             <!-- Dashboard de Métricas -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                 <div class="bg-slate-900/90 border border-purple-900/40 p-4 rounded-xl shadow-lg flex items-center justify-between">
                     <div>
                         <p class="text-xs text-purple-300 uppercase tracking-wider font-semibold">Total de Obras</p>
@@ -184,7 +183,7 @@
                 </div>
             </div>
 
-             <!-- Botão Adicionar Obra (Abaixo da descrição geral e acima do painel de lote) -->
+            <!-- Botão Adicionar Obra (Abaixo das métricas e acima do painel de lote) -->
             <div class="mb-6 flex justify-start">
                 <button onclick="abrirModalAdicionar()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2">
                     + Adicionar Obra
@@ -267,7 +266,7 @@
             </div>
         </div>
 
-        <!-- CONTEÚDO DA VISÃO DO VISITANTE (Estante IDÊNTICA à Página Pública) -->
+        <!-- CONTEÚDO DA VISÃO DO VISITANTE -->
         <div id="wrapperVisitante" class="hidden space-y-6">
             <div class="text-center mb-6">
                 <h2 class="text-xl sm:text-2xl font-bold mb-1 drop-shadow-md text-amber-300">📚 Obras no Acervo</h2>
@@ -620,357 +619,99 @@
             document.getElementById('modalDetalhesVisitante').classList.add('hidden');
         }
 
-        function comprimirImagem(arquivo, tamanhoMaximoKB = 500, qualidadeInicial = 0.9) {
-            return new Promise((resolve, reject) => {
-                const leitor = new FileReader();
-                leitor.readAsDataURL(arquivo);
-                leitor.onload = (evento) => {
-                    const imagem = new Image();
-                    imagem.src = evento.target.result;
-                    imagem.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let largura = imagem.width;
-                        let altura = imagem.height;
-                        const maxDimensoes = 1200;
-                        if (largura > maxDimensoes || altura > maxDimensoes) {
-                            if (largura > altura) {
-                                altura = Math.round((altura * maxDimensoes) / largura);
-                                largura = maxDimensoes;
-                            } else {
-                                largura = Math.round((largura * maxDimensoes) / altura);
-                                altura = maxDimensoes;
-                            }
-                        }
-                        canvas.width = largura;
-                        canvas.height = altura;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(imagem, 0, 0, largura, altura);
-
-                        let qualidade = qualidadeInicial;
-                        let dadosURL = canvas.toDataURL('image/jpeg', qualidade);
-
-                        function calcularTamanhoKB(dataURL) {
-                            const base64Dados = dataURL.split(',')[1];
-                            const bytes = (base64Dados.length * (3 / 4)) - (base64Dados.indexOf('=') !== -1 ? (base64Dados.endsWith('==') ? 2 : 1) : 0);
-                            return bytes / 1024;
-                        }
-
-                        while (calcularTamanhoKB(dadosURL) > tamanhoMaximoKB && qualidade > 0.1) {
-                            qualidade -= 0.1;
-                            dadosURL = canvas.toDataURL('image/jpeg', qualidade);
-                        }
-                        resolve(dadosURL);
-                    };
-                    imagem.onerror = (e) => reject(e);
-                };
-                leitor.onerror = (e) => reject(e);
-            });
-        }
-
-        async function carregarDados() {
-            try {
-                const response = await fetch(API_URL, { method: 'GET', redirect: 'follow' });
-                if (!response.ok) throw new Error('Erro na conexão com a API');
-                let dadosBrutos = await response.json();
-                let lista = Array.isArray(dadosBrutos) ? dadosBrutos : (dadosBrutos.dados || dadosBrutos.resultado || []);
-
-                colecao = lista.map(item => {
-                    let itemNormalizado = {};
-                    for (let chave in item) {
-                        itemNormalizado[chave.trim().toUpperCase()] = item[chave];
-                    }
-                    itemNormalizado['PORCENTAGEM'] = calcularPorcentagemInteligente(itemNormalizado['ADQUIRIDO'], itemNormalizado['VOLUMES (TOTAIS)'] || itemNormalizado['VOLUMES']);
-                    itemNormalizado._original = item;
-                    return itemNormalizado;
-                }).filter(item => item.TITULO && item.TITULO.toString().trim() !== "");
-                
-                document.getElementById('loading').style.display = 'none';
-                atualizarMetricas(colecao);
-                gerarPaineisFiltros(colecao);
-                aplicarFiltros();
-            } catch (error) {
-                document.getElementById('loading').innerText = 'Erro ao carregar dados do acervo.';
-                console.error(error);
-            }
-        }
-
-        function atualizarMetricas(dados) {
-            const totalObras = dados.length;
-            let qtdFisicaTotal = 0;
-            let custoTotalAcervo = 0;
-
-            dados.forEach(item => {
-                const qtdStr = item.ADQUIRIDO || item.QUANTIDADE || '1';
-                const qtd = parseInt(qtdStr) || 1;
-                qtdFisicaTotal += qtd;
-
-                let custoStr = item.CUSTO ? item.CUSTO.toString().replace('R$', '').trim().replace(',', '.') : '0';
-                let custoNum = parseFloat(custoStr) || 0;
-                custoTotalAcervo += (custoNum * qtd);
-            });
-
-            document.getElementById('stat-total').innerText = totalObras;
-            document.getElementById('stat-qtd-fisica').innerText = qtdFisicaTotal;
-            document.getElementById('stat-custo-total').innerText = `R$ ${custoTotalAcervo.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        }
-
-        function gerarPaineisFiltros(dados) {
-            const formatosMap = {};
-            dados.forEach(item => {
-                let fmt = item.FORMATO ? item.FORMATO.toString().trim() : 'Indefinido';
-                formatosMap[fmt] = (formatosMap[fmt] || 0) + 1;
-            });
-
-            const containerFormatos = document.getElementById('formatosFiltroContainer');
-            let htmlFmt = '';
-            for (let [fmt, qtd] of Object.entries(formatosMap)) {
-                const ativo = formatosSelecionados.has(fmt);
-                const classeBtn = ativo 
-                    ? "px-3 py-1 rounded bg-purple-600 text-white font-medium shadow transition text-xs" 
-                    : "px-3 py-1 rounded bg-slate-950 border border-purple-900/60 text-purple-300 hover:bg-slate-800 transition text-xs";
-                htmlFmt += `<button onclick="alternarFiltroFormato('${fmt.replace(/'/g, "\\'")}')" class="${classeBtn}">${fmt} (${qtd})</button>`;
-            }
-            containerFormatos.innerHTML = htmlFmt || '<span class="text-purple-400 italic">Nenhum formato encontrado.</span>';
-
-            const containerColunas = document.getElementById('colunasVisiveisContainer');
-            let htmlCol = '';
-            colunasOpcionaisDisponiveis.forEach(col => {
-                const checked = colunasOpcionaisAtivas.has(col) ? 'checked' : '';
-                htmlCol += `
-                    <label class="flex items-center gap-2 cursor-pointer bg-slate-900 border border-purple-900/60 px-3 py-1.5 rounded-lg hover:bg-slate-800 transition text-purple-200 shadow-sm text-xs select-none">
-                        <input type="checkbox" class="accent-purple-600 w-3.5 h-3.5 cursor-pointer" onchange="alternarColunaOpcional('${col}')" ${checked}>
-                        <span>${col}</span>
-                    </label>
-                `;
-            });
-            containerColunas.innerHTML = htmlCol;
-        }
-
-        function alternarFiltroFormato(fmt) {
-            if (formatosSelecionados.has(fmt)) {
-                formatosSelecionados.delete(fmt);
-            } else {
-                formatosSelecionados.add(fmt);
-            }
-            paginaAtual = 1;
-            gerarPaineisFiltros(colecao);
-            aplicarFiltros();
-        }
-
-        function limparFiltroFormatos() {
-            formatosSelecionados.clear();
-            paginaAtual = 1;
-            gerarPaineisFiltros(colecao);
-            aplicarFiltros();
-        }
-
-        function alternarColunaOpcional(col) {
-            if (colunasOpcionaisAtivas.has(col)) {
-                colunasOpcionaisAtivas.delete(col);
-            } else {
-                colunasOpcionaisAtivas.add(col);
-            }
-            gerarPaineisFiltros(colecao);
-            aplicarFiltros();
-        }
-
-        function limparColunasVisiveis() {
-            colunasOpcionaisAtivas.clear();
-            gerarPaineisFiltros(colecao);
-            aplicarFiltros();
-        }
-
-        function mudarItensPorPagina() {
-            itensPorPagina = parseInt(document.getElementById('selectItensPorPagina').value);
-            paginaAtual = 1;
-            aplicarFiltros();
-        }
-
-        function ordenarPor(coluna) {
-            if (coluna === 'SELECIONAR') return;
-            if (ordenacaoColuna === coluna) {
-                ordenacaoDirecao = ordenacaoDirecao === 'asc' ? 'desc' : 'asc';
-            } else {
-                ordenacaoColuna = coluna;
-                ordenacaoDirecao = 'asc';
-            }
-            aplicarFiltros();
-        }
-
-        function aplicarFiltros() {
-            const termoTitulo = document.getElementById('searchInput').value.toLowerCase().trim();
-
-            const filtrados = colecao.filter(item => {
-                let matchTitulo = termoTitulo === '' || (item.TITULO && item.TITULO.toString().toLowerCase().includes(termoTitulo));
-                if (!matchTitulo) return false;
-
-                if (formatosSelecionados.size > 0) {
-                    let fmtItem = item.FORMATO ? item.FORMATO.toString().trim() : 'Indefinido';
-                    if (!formatosSelecionados.has(fmtItem)) {
-                        return false;
-                    }
-                }
-                return true;
-            });
-
-            if (ordenacaoColuna) {
-                filtrados.sort((a, b) => {
-                    let valA = a[ordenacaoColuna] !== undefined && a[ordenacaoColuna] !== null ? a[ordenacaoColuna].toString().toLowerCase() : '';
-                    let valB = b[ordenacaoColuna] !== undefined && b[ordenacaoColuna] !== null ? b[ordenacaoColuna].toString().toLowerCase() : '';
-
-                    let numA = parseFloat(valA.replace('R$', '').replace(',', '.'));
-                    let numB = parseFloat(valB.replace('R$', '').replace(',', '.'));
-
-                    if (!isNaN(numA) && !isNaN(numB)) {
-                        return ordenacaoDirecao === 'asc' ? numA - numB : numB - numA;
-                    }
-
-                    if (valA < valB) return ordenacaoDirecao === 'asc' ? -1 : 1;
-                    if (valA > valB) return ordenacaoDirecao === 'asc' ? 1 : -1;
-                    return 0;
-                });
-            }
-
-            renderizarTabelaPaginada(filtrados);
-        }
-
-        function renderizarTabelaPaginada(dados) {
-            const totalPaginas = Math.ceil(dados.length / itensPorPagina) || 1;
-            if (paginaAtual > totalPaginas) paginaAtual = totalPaginas;
-
-            const inicio = (paginaAtual - 1) * itensPorPagina;
-            const fim = inicio + itensPorPagina;
-            const dadosPagina = dados.slice(inicio, fim);
-
-            renderizarTabela(dadosPagina);
-            renderizarControlesPaginacao(totalPaginas);
-        }
-
-        function renderizarControlesPaginacao(totalPaginas) {
-            const container = document.getElementById('paginacaoControles');
-            if (totalPaginas <= 1) {
-                container.innerHTML = '';
-                return;
-            }
-
-            let html = `<button onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled' : ''} class="px-2.5 py-1 bg-slate-950 border border-purple-900/60 rounded text-xs text-purple-300 disabled:opacity-40">&larr;</button>`;
+        async function salvarLivro(event) {
+            event.preventDefault();
             
-            for (let i = 1; i <= totalPaginas; i++) {
-                if (i === 1 || i === totalPaginas || (i >= paginaAtual - 1 && i <= paginaAtual + 1)) {
-                    const ativo = i === paginaAtual;
-                    html += `<button onclick="mudarPagina(${i})" class="px-2.5 py-1 rounded text-xs font-semibold ${ativo ? 'bg-purple-700 text-white' : 'bg-slate-950 border border-purple-900/60 text-purple-300'}">${i}</button>`;
-                } else if (i === paginaAtual - 2 || i === paginaAtual + 2) {
-                    html += `<span class="px-1 text-purple-400 text-xs">...</span>`;
+            // --- VALIDAÇÃO DE SEGURANÇA ---
+            let senhaAdmin = prompt("🔑 Digite a senha de administrador para salvar as alterações:");
+            if (senhaAdmin === null || senhaAdmin.trim() === "") return;
+
+            const btn = document.getElementById('btnSalvarForm');
+            const txt = btn.innerText;
+            btn.innerText = "Salvando...";
+            btn.disabled = true;
+
+            const tituloOriginal = document.getElementById('formIndex').value;
+            const titulo = document.getElementById('formTitulo').value.trim();
+            const formato = document.getElementById('formFormato').value.trim();
+            const volumes = document.getElementById('formVolumes').value.trim();
+            const edicao = document.getElementById('formEdicao').value.trim();
+            const ano = document.getElementById('formAno').value.trim();
+            const custo = document.getElementById('formCusto').value.trim();
+            const adquirido = document.getElementById('formAdquirido').value.trim();
+            const faltante = document.getElementById('formFaltante').value.trim();
+            const porcentagem = calcularPorcentagemInteligente(adquirido, volumes);
+            const raridade = document.getElementById('formRaridade').value.trim();
+            const estilo = document.getElementById('formEstilo').value.trim();
+            const capa = document.getElementById('formCapa').value.trim();
+            const observacao = document.getElementById('formObservacao').value.trim();
+            const inputArquivo = document.getElementById('formArquivoCapa');
+
+            let imagemBase64 = "";
+            let nomeArquivo = "";
+            let tipoMime = "";
+
+            try {
+                if (inputArquivo.files && inputArquivo.files[0]) {
+                    const arquivo = inputArquivo.files[0];
+                    nomeArquivo = arquivo.name;
+                    tipoMime = arquivo.type;
+                    imagemBase64 = await comprimirImagem(arquivo, 500, 0.85);
+                    imagemBase64 = imagemBase64.split(',')[1];
                 }
-            }
 
-            html += `<button onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled' : ''} class="px-2.5 py-1 bg-slate-950 border border-purple-900/60 rounded text-xs text-purple-300 disabled:opacity-40">&rarr;</button>`;
-            container.innerHTML = html;
-        }
+                const payload = {
+                    senha: senhaAdmin,
+                    tituloOriginal, titulo, formato, volumes, edicao, ano, custo, adquirido, faltante, porcentagem, raridade, estiloLiterario: estilo, capa, observacao, imagemBase64, nomeArquivo, tipoMime
+                };
 
-        function mudarPagina(novaPagina) {
-            paginaAtual = novaPagina;
-            aplicarFiltros();
-        }
-
-        function renderizarTabela(dados) {
-            const cabecalho = document.getElementById('tabelaCabecalho');
-            const corpo = document.getElementById('tabelaCorpo');
-
-            let colunasAtivas = [...colunasBase];
-            colunasOpcionaisDisponiveis.forEach(col => {
-                if (colunasOpcionaisAtivas.has(col)) {
-                    colunasAtivas.push(col);
-                }
-            });
-
-            let htmlCab = `<tr class="bg-slate-950 text-purple-300 border-b border-purple-900/50 uppercase tracking-wider">`;
-            colunasAtivas.forEach(chave => {
-                if (chave === 'SELECIONAR') {
-                    htmlCab += `<th class="p-3 text-center" style="width: 45px;"><input type="checkbox" onclick="alternarTodosLote(this)" class="accent-purple-600 cursor-pointer"></th>`;
-                } else {
-                    let seta = ordenacaoColuna === chave ? (ordenacaoDirecao === 'asc' ? ' &uarr;' : ' &darr;') : '';
-                    htmlCab += `<th class="p-3 cursor-pointer select-none hover:text-white transition" onclick="ordenarPor('${chave}')">
-                        ${chave}${seta}
-                        <div class="resizer" onclick="event.stopPropagation()"></div>
-                    </th>`;
-                }
-            });
-            htmlCab += `<th class="p-3 text-center" style="width: 140px;">AÇÕES</th></tr>`;
-            cabecalho.innerHTML = htmlCab;
-            ativarRedimensionamentoColunas();
-
-            if (dados.length === 0) {
-                corpo.innerHTML = `<tr><td colspan="${colunasAtivas.length + 1}" class="p-6 text-center text-purple-400 italic">Nenhum registro encontrado.</td></tr>`;
-                return;
-            }
-
-            let htmlCorpo = '';
-            dados.forEach(item => {
-                const itemOrig = item._original || item;
-                const tituloObra = item.TITULO;
-                const isChecked = titulosSelecionadosLote.has(tituloObra) ? 'checked' : '';
-
-                htmlCorpo += `<tr class="hover:bg-purple-950/20 transition">`;
-
-                colunasAtivas.forEach(chave => {
-                    if (chave === 'SELECIONAR') {
-                        htmlCorpo += `<td class="p-3 text-center">
-                            <input type="checkbox" value="${tituloObra.replace(/"/g, '&quot;')}" onchange="alternarItemLote(this)" class="accent-purple-600 cursor-pointer item-lote" ${isChecked}>
-                        </td>`;
-                    } else if (chave === 'CAPA') {
-                        let capaUrl = item.CAPA || itemOrig['CAPA'] || itemOrig['capa'] || '';
-                        if (!capaUrl.startsWith('http')) {
-                            capaUrl = 'https://placehold.co/100x150/1e293b/cbd5e1?text=Sem+Capa';
-                        }
-                        htmlCorpo += `<td class="p-3 text-center" style="width: 70px;">
-                            <img src="${capaUrl}" class="w-8 h-12 object-cover rounded shadow border border-purple-900/40 mx-auto">
-                        </td>`;
-                    } else {
-                        let valorChave = itemOrig[chave] !== undefined ? itemOrig[chave] : (item[chave] !== undefined ? item[chave] : '');
-                        htmlCorpo += `<td class="p-3 text-purple-200" title="${valorChave}">${valorChave}</td>`;
-                    }
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    redirect: 'follow',
+                    body: JSON.stringify(payload)
                 });
+                const resultado = await res.json();
 
-                htmlCorpo += `
-                    <td class="p-3 text-center">
-                        <div class="flex items-center justify-center gap-1.5">
-                            <button onclick='abrirModalEditar(${JSON.stringify(item)})' class="px-2 py-0.5 bg-purple-800 hover:bg-purple-700 text-white rounded font-medium transition text-[11px]">Editar</button>
-                            <button onclick='excluirLivro(${JSON.stringify(tituloObra)})' class="px-2 py-0.5 bg-rose-900 hover:bg-rose-800 text-white rounded font-medium transition text-[11px]">Excluir</button>
-                        </div>
-                    </td>
-                </tr>`;
-            });
-            corpo.innerHTML = htmlCorpo;
-        }
-
-        function alternarItemLote(checkbox) {
-            const titulo = checkbox.value;
-            if (checkbox.checked) {
-                titulosSelecionadosLote.add(titulo);
-            } else {
-                titulosSelecionadosLote.delete(titulo);
-            }
-            atualizarContadorLote();
-        }
-
-        function alternarTodosLote(masterCheckbox) {
-            const checkboxes = document.querySelectorAll('.item-lote');
-            checkboxes.forEach(cb => {
-                cb.checked = masterCheckbox.checked;
-                if (masterCheckbox.checked) {
-                    titulosSelecionadosLote.add(cb.value);
+                if (resultado.sucesso) {
+                    alert(resultado.mensagem || "Salvo com sucesso!");
+                    fecharModalForm();
+                    carregarDados();
                 } else {
-                    titulosSelecionadosLote.delete(cb.value);
+                    alert("Erro ao salvar: " + (resultado.mensagem || resultado.erro || "Desconhecido"));
                 }
-            });
-            atualizarContadorLote();
+            } catch (err) {
+                console.error(err);
+                alert("Erro de comunicação com a API.");
+            } finally {
+                btn.innerText = txt;
+                btn.disabled = false;
+            }
         }
 
-        function atualizarContadorLote() {
-            const contador = document.getElementById('contadorSelecionados');
-            const qtd = titulosSelecionadosLote.size;
-            contador.innerText = qtd === 0 ? "Nenhum item selecionado" : `${qtd} item(ns) selecionado(s)`;
+        async function excluirLivro(titulo) {
+            if (confirm(`Deseja realmente excluir "${titulo}" e movê-lo para a lixeira?`)) {
+                // --- VALIDAÇÃO DE SEGURANÇA ---
+                let senhaAdmin = prompt("🔑 Digite a senha de administrador para excluir:");
+                if (senhaAdmin === null || senhaAdmin.trim() === "") return;
+
+                try {
+                    const res = await fetch(API_URL, {
+                        method: 'POST',
+                        redirect: 'follow',
+                        body: JSON.stringify({ acao: "excluir", titulo: titulo, senha: senhaAdmin })
+                    });
+                    const resultado = await res.json();
+                    if (resultado.sucesso) {
+                        alert("Item excluído com sucesso!");
+                        carregarDados();
+                    } else {
+                        alert("Erro ao excluir: " + (resultado.mensagem || resultado.erro || "Desconhecido"));
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Erro ao conectar com a API.");
+                }
+            }
         }
 
         async function executarAcaoEmLote() {
@@ -986,12 +727,17 @@
                 return;
             }
 
+            // --- VALIDAÇÃO DE SEGURANÇA ---
+            let senhaAdmin = prompt("🔑 Digite a senha de administrador para aplicar em lote:");
+            if (senhaAdmin === null || senhaAdmin.trim() === "") return;
+
             let sucessos = 0;
             for (let titulo of titulosSelecionadosLote) {
                 let obraOriginal = colecao.find(item => item.TITULO === titulo);
                 if (!obraOriginal) continue;
 
                 let payload = {
+                    senha: senhaAdmin,
                     acao: "lote",
                     tituloOriginal: titulo,
                     titulo: titulo,
@@ -1029,162 +775,6 @@
             atualizarContadorLote();
             document.getElementById('loteValor').value = '';
             carregarDados();
-        }
-
-        function ativarRedimensionamentoColunas() {
-            const tabela = document.getElementById('tabelaAcervo');
-            const colunas = tabela.querySelectorAll('th');
-            colunas.forEach(coluna => {
-                const resizer = coluna.querySelector('.resizer');
-                if (!resizer) return;
-                let x = 0;
-                let larguraW = 0;
-
-                resizer.addEventListener('mousedown', function (e) {
-                    x = e.clientX;
-                    larguraW = coluna.getBoundingClientRect().width;
-                    resizer.classList.add('resizing');
-                    document.addEventListener('mousemove', mouseMoveHandler);
-                    document.addEventListener('mouseup', mouseUpHandler);
-                });
-
-                function mouseMoveHandler(e) {
-                    const dx = e.clientX - x;
-                    coluna.style.width = `${Math.max(60, larguraW + dx)}px`;
-                }
-
-                function mouseUpHandler() {
-                    resizer.classList.remove('resizing');
-                    document.removeEventListener('mousemove', mouseMoveHandler);
-                    document.removeEventListener('mouseup', mouseUpHandler);
-                }
-            });
-        }
-
-        function abrirModalAdicionar() {
-            document.getElementById('modalFormTitle').innerText = "Adicionar Nova Obra";
-            document.getElementById('bookForm').reset();
-            document.getElementById('formIndex').value = "";
-            document.getElementById('formPorcentagem').value = "";
-            document.getElementById('modalForm').classList.remove('hidden');
-        }
-
-        function abrirModalEditar(item) {
-            document.getElementById('modalFormTitle').innerText = "Editar Obra";
-            let itemOrig = item._original || item;
-            document.getElementById('formIndex').value = item.TITULO || '';
-            document.getElementById('formTitulo').value = item.TITULO || '';
-            document.getElementById('formFormato').value = item.FORMATO || '';
-            document.getElementById('formVolumes').value = item['VOLUMES (TOTAIS)'] || item.VOLUMES || '';
-            document.getElementById('formEdicao').value = item.EDICAO || '';
-            document.getElementById('formAno').value = item.ANO || '';
-            document.getElementById('formCusto').value = item.CUSTO || '';
-            document.getElementById('formAdquirido').value = item.ADQUIRIDO || '';
-            document.getElementById('formFaltante').value = item.FALTANTE || '';
-            document.getElementById('formPorcentagem').value = item.PORCENTAGEM || '';
-            document.getElementById('formRaridade').value = item.RARIDADE || '';
-            document.getElementById('formEstilo').value = item['ESTILO LITERÁRIO'] || item.ESTILO || '';
-            document.getElementById('formCapa').value = item.CAPA || '';
-            document.getElementById('formObservacao').value = item.OBSERVACAO || '';
-            document.getElementById('modalForm').classList.remove('hidden');
-        }
-
-        function fecharModalForm() {
-            document.getElementById('modalForm').classList.add('hidden');
-        }
-
-        document.getElementById('formAdquirido').addEventListener('input', atualizarPorcentagemModal);
-        document.getElementById('formVolumes').addEventListener('input', atualizarPorcentagemModal);
-
-        function atualizarPorcentagemModal() {
-            let adq = document.getElementById('formAdquirido').value;
-            let tot = document.getElementById('formVolumes').value;
-            document.getElementById('formPorcentagem').value = calcularPorcentagemInteligente(adq, tot);
-        }
-
-        async function salvarLivro(event) {
-            event.preventDefault();
-            const btn = document.getElementById('btnSalvarForm');
-            const txt = btn.innerText;
-            btn.innerText = "Salvando...";
-            btn.disabled = true;
-
-            const tituloOriginal = document.getElementById('formIndex').value;
-            const titulo = document.getElementById('formTitulo').value.trim();
-            const formato = document.getElementById('formFormato').value.trim();
-            const volumes = document.getElementById('formVolumes').value.trim();
-            const edicao = document.getElementById('formEdicao').value.trim();
-            const ano = document.getElementById('formAno').value.trim();
-            const custo = document.getElementById('formCusto').value.trim();
-            const adquirido = document.getElementById('formAdquirido').value.trim();
-            const faltante = document.getElementById('formFaltante').value.trim();
-            const porcentagem = calcularPorcentagemInteligente(adquirido, volumes);
-            const raridade = document.getElementById('formRaridade').value.trim();
-            const estilo = document.getElementById('formEstilo').value.trim();
-            const capa = document.getElementById('formCapa').value.trim();
-            const observacao = document.getElementById('formObservacao').value.trim();
-            const inputArquivo = document.getElementById('formArquivoCapa');
-
-            let imagemBase64 = "";
-            let nomeArquivo = "";
-            let tipoMime = "";
-
-            try {
-                if (inputArquivo.files && inputArquivo.files[0]) {
-                    const arquivo = inputArquivo.files[0];
-                    nomeArquivo = arquivo.name;
-                    tipoMime = arquivo.type;
-                    imagemBase64 = await comprimirImagem(arquivo, 500, 0.85);
-                    imagemBase64 = imagemBase64.split(',')[1];
-                }
-
-                const payload = {
-                    tituloOriginal, titulo, formato, volumes, edicao, ano, custo, adquirido, faltante, porcentagem, raridade, estiloLiterario: estilo, capa, observacao, imagemBase64, nomeArquivo, tipoMime
-                };
-
-                const res = await fetch(API_URL, {
-                    method: 'POST',
-                    redirect: 'follow',
-                    body: JSON.stringify(payload)
-                });
-                const resultado = await res.json();
-
-                if (resultado.sucesso) {
-                    alert(resultado.mensagem || "Salvo com sucesso!");
-                    fecharModalForm();
-                    carregarDados();
-                } else {
-                    alert("Erro ao salvar: " + (resultado.mensagem || resultado.erro || "Desconhecido"));
-                }
-            } catch (err) {
-                console.error(err);
-                alert("Erro de comunicação com a API.");
-            } finally {
-                btn.innerText = txt;
-                btn.disabled = false;
-            }
-        }
-
-        async function excluirLivro(titulo) {
-            if (confirm(`Deseja realmente excluir "${titulo}" e movê-lo para a lixeira?`)) {
-                try {
-                    const res = await fetch(API_URL, {
-                        method: 'POST',
-                        redirect: 'follow',
-                        body: JSON.stringify({ acao: "excluir", titulo })
-                    });
-                    const resultado = await res.json();
-                    if (resultado.sucesso) {
-                        alert("Item excluído com sucesso!");
-                        carregarDados();
-                    } else {
-                        alert("Erro ao excluir: " + (resultado.erro || "Desconhecido"));
-                    }
-                } catch (err) {
-                    console.error(err);
-                    alert("Erro ao conectar com a API.");
-                }
-            }
         }
 
         document.getElementById('searchInput').addEventListener('input', () => {
