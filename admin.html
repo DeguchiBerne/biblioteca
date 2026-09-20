@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Controle e Gestão - Biblioteca</title>
+    <link rel="icon" type="image/png" href="DeguchiBerne/biblioteca/FAVCON.jpg">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -147,11 +148,14 @@
             
             <!-- Botões de Alternância de Visão no Topo -->
             <div class="flex items-center gap-3 mt-4">
-                <button id="btnVisaoAdmin" onclick="alternarVisaoPagina('admin')" class="bg-purple-700 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2">
-                    ⚙️ Painel do Administrador
-                </button>
-                <button id="btnVisaoVisitante" onclick="alternarVisaoPagina('visitante')" class="bg-slate-900 hover:bg-slate-800 text-purple-200 px-4 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2 border border-purple-900/40">
-                    👁️ Visão do Visitante
+            <button id="btnVisaoAdmin" onclick="alternarVisaoPagina('admin')" class="bg-purple-700 text-white px-4 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2">
+                <img src="COLE_O_LINK_DA_ARTE_RESTRITA_AQUI" alt="Admin" class="w-5 h-5 object-contain">
+                Painel do Administrador
+            </button>
+            <button id="btnVisaoVisitante" onclick="alternarVisaoPagina('visitante')" class="bg-slate-900 hover:bg-slate-800 text-purple-200 px-4 py-2 rounded-lg text-xs font-semibold shadow transition flex items-center gap-2 border border-purple-900/40">
+                <img src="DeguchiBerne/biblioteca/VISITANTE.jpg" alt="Visitante" class="w-5 h-5 object-contain">
+                Visão do Visitante
+            </button>
                 </button>
             </div>
         </header>
